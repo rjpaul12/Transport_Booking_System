@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Tickets</title>
+    <style>
+        :root {
+            --bg: #f4f8ff;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #1d4ed8;
+            --success: #16a34a;
+            --border: #dbe3f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 32%),
+                linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+            color: var(--text);
+            padding-bottom: 72px;
+        }
+
+        .app-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(29, 78, 216, 0.96);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(29, 78, 216, 0.16);
+        }
+
+        .back-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .ticket-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+            border: 1px solid rgba(219, 227, 240, 0.9);
+        }
+
+        .route-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .route-subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .status {
+            float: right;
+            color: white;
+            background: var(--success);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .details-item {
+            padding: 12px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .details-item strong {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 56px;
+            background: var(--surface);
+            padding: 28px 20px;
+            border-radius: 18px;
+            border: 1px dashed var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-bar">
+        <a href="/dashboard" class="back-btn">&#8592;</a>
+        <span style="font-weight: 800; font-size: 18px;">My Tickets</span>
+    </div>
+
+    <div class="container">
+        {% if tickets %}
+            {% for ticket in tickets %}
+            <div class="ticket-card">
+                <div class="route-title">
+                    {{ ticket['Origin'] }} to {{ ticket['Destination'] }}
+                    <span class="status">{{ ticket['Status'] }}</span>
+                </div>
+
+                <div class="route-subtitle">
+                    {{ ticket['Type'] }} {{ ticket['Plate_Number'] }} | Booking #{{ ticket['Booking_ID'] }}
+                </div>
+
+                <div class="details-grid">
+                    <div class="details-item">
+                        <strong>Depart</strong>
+                        {{ ticket['Departure_Time'] }}
+                    </div>
+                    <div class="details-item">
+                        <strong>Arrive</strong>
+                        {{ ticket['Arrival_Time'] }}
+                    </div>
+                    <div class="details-item">
+                        <strong>Paid</strong>
+                        &#8369;{{ ticket['Total_Price'] }}
+                    </div>
+                    <div class="details-item">
+                        <strong>Booked On</strong>
+                        {{ ticket['Booking_Date'] }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div style="font-size: 50px; margin-bottom: 10px;">&#127915;</div>
+                <h3>No tickets yet</h3>
+                <p>Your booked trips will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "GoRoute Booking System",
+  "short_name": "GoRoute",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#f0f2f5",
+  "theme_color": "#007bff",
+  "icons": []
+}

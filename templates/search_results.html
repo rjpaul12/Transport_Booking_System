@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Search Results</title>
+    <style>
+        :root {
+            --bg: #f4f8ff;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #1d4ed8;
+            --success: #16a34a;
+            --border: #dbe3f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 32%),
+                linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+            color: var(--text);
+            padding-bottom: 20px;
+        }
+
+        .app-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(29, 78, 216, 0.96);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(29, 78, 216, 0.16);
+        }
+
+        .back-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .heading {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .heading strong {
+            font-size: 18px;
+        }
+
+        .heading span {
+            font-size: 13px;
+            opacity: 0.92;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .map-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+            border: 1px solid rgba(219, 227, 240, 0.9);
+        }
+
+        .map-card h3 {
+            margin: 0 0 8px 0;
+        }
+
+        .map-card p {
+            margin: 0 0 12px 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .map-frame {
+            width: 100%;
+            height: 280px;
+            border: 0;
+            border-radius: 14px;
+        }
+
+        .map-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 13px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .ticket-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+            border: 1px solid rgba(219, 227, 240, 0.9);
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .vehicle-type {
+            font-weight: 800;
+            color: var(--text);
+            font-size: 18px;
+            line-height: 1.3;
+        }
+
+        .vehicle-type small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .price {
+            color: var(--success);
+            font-weight: 800;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .meta-item {
+            padding: 12px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .meta-item strong {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .book-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 56px;
+            background: var(--surface);
+            padding: 28px 20px;
+            border-radius: 18px;
+            border: 1px dashed var(--border);
+        }
+
+        .no-results h3 {
+            margin-top: 0;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-bar">
+        <a href="/dashboard" class="back-btn">&#8592;</a>
+        <div class="heading">
+            <strong>{{ origin }} to {{ destination }}</strong>
+            <span>
+                {% if trip_date %}Travel date: {{ trip_date }}{% else %}All travel dates{% endif %}
+                {% if transport_mode and transport_mode != 'All' %} | {{ transport_mode }}{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="summary">
+            <span class="pill">&#128205; Cebu-only routes</span>
+            <span class="pill">&#128652; Bus, taxi, and motorcycle options</span>
+        </div>
+
+        {% if transport_mode in ['Taxi', 'Motorcycle'] %}
+        <section class="map-card">
+            <h3>Route Map</h3>
+            <p>Open the Google Maps route preview for your taxi or motorcycle trip.</p>
+            <iframe
+                class="map-frame"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="{{ map_url }}">
+            </iframe>
+            <a class="map-link" href="{{ map_url }}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+        </section>
+        {% endif %}
+
+        {% if trips %}
+            {% for trip in trips %}
+            <div class="ticket-card">
+                <div class="ticket-header">
+                    <div class="vehicle-type">
+                        {{ trip['Type'] }}
+                        <small>{{ trip['Plate_Number'] }}</small>
+                    </div>
+                    <div class="price">&#8369;{{ trip['Base_Fare'] }}</div>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <strong>Departure</strong>
+                        {{ trip['Departure_Time'] }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Arrival</strong>
+                        {{ trip['Arrival_Time'] }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Route</strong>
+                        {{ trip['Origin'] }} to {{ trip['Destination'] }}
+                    </div>
+                </div>
+
+                <a href="/book/{{ trip['Schedule_ID'] }}" class="book-btn">Book this trip</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <h3>No trips found</h3>
+                <p>Try a different date, transport type, or route pair.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

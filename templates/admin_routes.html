@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Route Manager</title>
+    <style>
+        :root {
+            --bg: #fff5f5;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --danger: #dc3545;
+            --primary: #1d4ed8;
+            --border: #f1d5d8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(220, 53, 69, 0.12), transparent 32%),
+                linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text);
+        }
+
+        .app-bar {
+            background: rgba(220, 53, 69, 0.96);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 18px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin-top: 0;
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #ecfdf3;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #d8dfe9;
+            font-size: 16px;
+            background: #fff;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--primary);
+            border: 1px solid rgba(29, 78, 216, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
+            color: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 10px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 20px 0 6px;
+        }
+
+        .edit-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .delete-form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-bar">
+        <a href="/admin_dashboard" class="back-btn">&#8592;</a>
+        <div style="font-weight: 800; font-size: 18px;">Route Manager</div>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <div class="container">
+        <section class="panel">
+            <h2>{{ 'Edit Route' if edit_route else 'Add Route' }}</h2>
+            <p style="color: #6b7280; margin-top: -4px;">Manage Cebu routes, fares, and distances directly from the app.</p>
+
+            {% if message %}
+            <div class="message">{{ message }}</div>
+            {% endif %}
+
+            <form method="post" action="/admin/routes">
+                <input type="hidden" name="route_id" value="{{ edit_route['Route_ID'] if edit_route else '' }}">
+                <div class="form-grid">
+                    <div>
+                        <label for="origin">Origin</label>
+                        <input type="text" id="origin" name="origin" value="{{ edit_route['Origin'] if edit_route else 'Cebu City' }}" required>
+                    </div>
+                    <div>
+                        <label for="destination">Destination</label>
+                        <input type="text" id="destination" name="destination" value="{{ edit_route['Destination'] if edit_route else '' }}" required>
+                    </div>
+                    <div>
+                        <label for="distance">Distance (km)</label>
+                        <input type="number" step="0.1" min="0" id="distance" name="distance" value="{{ edit_route['Distance'] if edit_route else '' }}" required>
+                    </div>
+                    <div>
+                        <label for="base_fare">Base Fare (PHP)</label>
+                        <input type="number" step="0.01" min="0" id="base_fare" name="base_fare" value="{{ edit_route['Base_Fare'] if edit_route else '' }}" required>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" name="action" value="save" class="btn btn-primary">{{ 'Update Route' if edit_route else 'Save Route' }}</button>
+                    {% if edit_route %}
+                    <a href="/admin/routes" class="btn btn-secondary">Cancel</a>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>Existing Routes</h3>
+            {% if routes %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Distance</th>
+                        <th>Fare</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for route in routes %}
+                    <tr>
+                        <td>{{ route['Origin'] }}</td>
+                        <td>{{ route['Destination'] }}</td>
+                        <td>{{ route['Distance'] }} km</td>
+                        <td>&#8369;{{ route['Base_Fare'] }}</td>
+                        <td>
+                            <a class="edit-link" href="/admin/routes?edit_id={{ route['Route_ID'] }}">Edit</a>
+                            <form class="delete-form" method="post" action="/admin/routes" onsubmit="return confirm('Delete this route?');">
+                                <input type="hidden" name="route_id" value="{{ route['Route_ID'] }}">
+                                <button type="submit" name="action" value="delete" class="btn btn-danger" style="padding: 8px 12px; margin-left: 8px;">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty">No routes found yet.</div>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>

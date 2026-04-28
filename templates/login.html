@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <title>GoRoute Login</title>
+    
+    <style>
+        /* 1. GLOBAL RESET */
+        body {
+            font-family: 'Roboto', -apple-system, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #b7e1ff !important;
+            overflow: hidden;
+        }
+
+        /* 2. SPLASH SCREEN (Material White) */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            background-color: #b7e1ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1.2s ease, visibility 1.2s;
+        }
+
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .fade-out { opacity: 0; visibility: hidden; }
+
+        /* 3. LOGIN CARD */
+        .login-card {
+            background-color: #ffffff !important;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-sizing: border-box;
+            opacity: 0; /* Hidden for fade-in */
+            transform: translateY(20px);
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+
+        .login-card.visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        .app-logo {
+    width: 80px; 
+    height: 80px;
+    border-radius: 50%;
+    /* This makes the image fill the circle without stretching */
+    object-fit: cover; 
+    /* This creates a clean white border around the image itself */
+    border: 2px solid #ffffff; 
+    /* This adds the shadow to the circle to make it 'pop' */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    background-color: #fff; /* Ensures no transparency behind the logo */
+}
+
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    /* Extra spacing to ensure it doesn't touch the "Sign in" text */
+}
+
+        /* 5. MATERIAL UI ELEMENTS */
+        h2 { font-size: 28px; color: #333; margin: 0 0 8px 0; font-weight: 400; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 25px; text-align: left; }
+        
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 12px 0; border: none;
+            border-bottom: 2px solid #dcdcdc;
+            background: transparent; font-size: 16px;
+        }
+
+        input:focus { outline: none; border-bottom-color: #1a73e8; }
+
+        .extra-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 13px; color: #555; margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            width: 100%; padding: 14px; background-color: #1a73e8;
+            color: white; border: none; border-radius: 4px;
+            font-size: 14px; font-weight: bold; text-transform: uppercase;
+            cursor: pointer; box-shadow: 0 2px 5px rgba(26,115,232,0.3);
+        }
+
+        .divider { display: flex; align-items: center; color: #aaa; font-size: 12px; margin: 25px 0; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #eee; margin: 0 10px; }
+
+        .btn-social {
+            width: 100%; padding: 12px; background: white; border: 1px solid #dadce0;
+            border-radius: 4px; margin-bottom: 10px; display: flex; align-items: center;
+            justify-content: center; font-size: 14px; color: #3c4043; cursor: pointer;
+        }
+        .btn-social img { width: 18px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="GoRoute Logo" style="width: 100px; border-radius: 50%;">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="app-logo">
+        </div>
+        
+        <h2>Sign in</h2>
+        <p class="subtitle">to continue to your GoRoute account</p>
+        
+        <form action="/" method="post">
+            <div class="input-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            
+            <div class="extra-row">
+                <label><input type="checkbox" style="width: auto; margin-right: 5px;"> Keep me signed in</label>
+                <a href="#" style="color: #1a73e8; font-weight: bold; text-decoration: none; text-transform: uppercase;">Forgot Password?</a>
+            </div>
+            
+            <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <button type="button" class="btn-social" onclick="window.location.href='/login/google'">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+    Continue with Google
+</button>
+        <button type="button" class="btn-social">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook">
+            Continue with Facebook
+        </button>
+
+        <p style="font-size: 14px; color: #555; margin-top: 25px;">
+            Don't have an account? <a href="/signup" style="color: #1a73e8; font-weight: bold; text-decoration: none;">Create account</a>
+        </p>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const splash = document.getElementById('splash-screen');
+        const loginCard = document.querySelector('.login-card');
+
+        // Check the "referrer" (the page the user just came from)
+        const cameFromSignup = document.referrer.includes('signup');
+
+        if (cameFromSignup) {
+            // If they came from signup, skip the loading for speed
+            splash.style.display = 'none';
+            loginCard.classList.add('visible');
+        } else {
+            // If they refreshed or opened the app fresh, show the loading
+            setTimeout(() => {
+                splash.classList.add('fade-out');
+                loginCard.classList.add('visible');
+            }, 500);
+        }
+    });
+</script>
+</body>
+</html>
