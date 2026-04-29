@@ -5,8 +5,28 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Redirect if already logged in
+// ── Authentication Routing ──
 sb.auth.getSession().then(({ data }) => {
-  if (data.session) window.location.href = 'index.html';
+  const currentPage = window.location.pathname;
+  
+  // If user IS logged in, but they are looking at the login page
+  if (data.session && currentPage.includes('auth.html')) {
+    window.location.href = 'index.html';
+  } 
+  // If user is NOT logged in, but trying to view the main app
+  else if (!data.session && !currentPage.includes('auth.html')) {
+    window.location.href = 'auth.html';
+  }
+});
+
+// Listen for live login/logout events (like clicking Google/Facebook)
+sb.auth.onAuthStateChange((event, session) => {
+  const currentPage = window.location.pathname;
+  if (event === 'SIGNED_IN' && currentPage.includes('auth.html')) {
+    window.location.href = 'index.html';
+  } else if (event === 'SIGNED_OUT' && !currentPage.includes('auth.html')) {
+    window.location.href = 'auth.html';
+  }
 });
 
 // ── Tab switch ──
@@ -127,4 +147,214 @@ async function handleGoogle() {
 }
 async function handleFacebook() {
   await sb.auth.signInWithOAuth({ provider: 'facebook', options: { redirectTo: window.location.origin + '/index.html' } });
+}
+
+// ── Bus Search & Database Query ──
+async function searchBuses() {
+  const btn = document.querySelector('.search-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'Searching...';
+  btn.disabled = true;
+
+  try {
+    // 1. Fetch schedules from Supabase, joining the buses and locations tables
+    const { data: schedules, error } = await sb
+      .from('schedules')
+      .select(`
+        id,
+        departure_time,
+        arrival_time,
+        price,
+        buses ( operator_name, bus_type, total_seats ),
+        origin:origin_id ( name ),
+        destination:destination_id ( name )
+      `);
+
+    if (error) throw error;
+
+    // 2. Hide search screen, show results screen
+    document.getElementById('searchScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'block';
+
+    // 3. Render the results
+    const container = document.getElementById('busResultsList');
+    container.innerHTML = ''; 
+
+    if (schedules.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">No buses found.</div>';
+      return;
+    }
+
+    schedules.forEach(schedule => {
+      // Format timestamps into readable times (e.g., 6:00 PM)
+      const depDate = new Date(schedule.departure_time);
+      const arrDate = new Date(schedule.arrival_time);
+      const depTime = depDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      const arrTime = arrDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+      // Calculate travel duration
+      const diffMs = arrDate - depDate;
+      const diffHrs = Math.floor(diffMs / 3600000);
+      const diffMins = Math.round(((diffMs % 3600000) / 60000));
+      const durationStr = `${diffHrs}h ${diffMins}m`;
+
+      // Build the HTML card
+      const card = `
+        <div class="bus-card" style="cursor:pointer;" onclick="openSeatSelection('${schedule.id}', ${schedule.price}, '${schedule.origin.name}', '${schedule.destination.name}', '${durationStr}')">
+          <div class="bus-name">${schedule.buses.operator_name}</div>
+          <div class="bus-type">${schedule.buses.bus_type} · ${durationStr}</div>
+          <div class="bus-row">
+            <div class="time-block"><div class="time">${depTime}</div><div class="place">${schedule.origin.name}</div></div>
+            <div class="duration">─── ${durationStr} ───</div>
+            <div class="time-block" style="text-align:right"><div class="time">${arrTime}</div><div class="place">${schedule.destination.name}</div></div>
+          </div>
+          <div class="bus-row" style="margin-top:6px">
+            <div class="seats-left">${schedule.buses.total_seats} seats total</div>
+            <div class="price">₱ ${schedule.price}</div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += card;
+    });
+
+  } catch (err) {
+    alert("Error fetching buses: " + err.message);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+// ── Seat Selection Logic ──
+let currentScheduleId = null;
+let currentTicketPrice = 0;
+let selectedSeats = [];
+
+async function openSeatSelection(scheduleId, price, origin, dest, duration) {
+  currentScheduleId = scheduleId;
+  currentTicketPrice = price;
+  selectedSeats = [];
+
+  // 1. Update UI headers
+  document.getElementById('seatOrigin').innerText = origin;
+  document.getElementById('seatDest').innerText = dest;
+  document.getElementById('seatPriceBadge').innerText = `₱ ${price} · ${duration}`;
+  updateSeatFooter();
+
+  // 2. Fetch already booked seats from Supabase
+  const { data: bookings, error } = await sb
+    .from('bookings')
+    .select('seat_number')
+    .eq('schedule_id', scheduleId);
+
+  // Create an array of strings like ['1A', '3C']
+  const bookedSeatNumbers = bookings ? bookings.map(b => b.seat_number) : [];
+
+  // 3. Generate Grid (20 seats in a 2+2 layout)
+  const grid = document.getElementById('seatGrid');
+  grid.innerHTML = '';
+  
+  const rows = 5;
+  const cols = ['A', 'B', 'C', 'D']; // A&B left, C&D right
+
+  for (let r = 1; r <= rows; r++) {
+    cols.forEach(c => {
+      const seatNum = `${r}${c}`;
+      const isBooked = bookedSeatNumbers.includes(seatNum);
+
+      if (isBooked) {
+        grid.innerHTML += `<div class="seat booked">${seatNum}</div>`;
+      } else {
+        grid.innerHTML += `<div class="seat avail" id="seat-${seatNum}" onclick="toggleSeat('${seatNum}')">${seatNum}</div>`;
+      }
+      
+      // Add aisle space after column B
+      if (c === 'B') grid.innerHTML += `<div class="aisle"></div>`;
+    });
+  }
+
+  // 4. Switch screens
+  document.getElementById('resultsScreen').style.display = 'none';
+  document.getElementById('seatScreen').style.display = 'block';
+}
+
+function toggleSeat(seatNum) {
+  const seatEl = document.getElementById(`seat-${seatNum}`);
+
+  if (selectedSeats.includes(seatNum)) {
+    // Deselect
+    selectedSeats = selectedSeats.filter(s => s !== seatNum);
+    seatEl.classList.remove('selected', 'avail'); // clean up classes
+    seatEl.classList.add('avail');
+  } else {
+    // Select (Max 4 tickets at a time)
+    if (selectedSeats.length >= 4) {
+      alert("You can only book up to 4 seats at once.");
+      return;
+    }
+    selectedSeats.push(seatNum);
+    seatEl.classList.remove('avail', 'selected');
+    seatEl.classList.add('selected');
+  }
+  updateSeatFooter();
+}
+
+function updateSeatFooter() {
+  document.getElementById('selectedSeatsText').innerText = selectedSeats.length > 0 ? `Seats ${selectedSeats.join(', ')}` : 'None';
+  document.getElementById('selectedCountText').innerText = ` · ${selectedSeats.length} seats`;
+  document.getElementById('totalPriceText').innerText = `₱ ${selectedSeats.length * currentTicketPrice}`;
+}
+
+async function proceedToBooking() {
+  if (selectedSeats.length === 0) {
+    alert("Please select at least one seat to continue.");
+    return;
+  }
+
+  // Change button text so the user knows it's loading
+  const btn = document.querySelector('.proceed-btn');
+  const originalText = btn.innerText;
+  btn.innerText = "Booking...";
+  btn.disabled = true;
+
+  try {
+    // 1. Get the currently logged-in user's ID
+    const { data: { session }, error: sessionError } = await sb.auth.getSession();
+    
+    if (sessionError || !session) {
+      alert("Session expired. Please log in again.");
+      window.location.href = 'auth.html';
+      return;
+    }
+    
+    const userId = session.user.id;
+
+    // 2. Prepare the data to be inserted
+    // This creates an array of rows, one for each seat you selected
+    const bookingsToInsert = selectedSeats.map(seatNum => ({
+      schedule_id: currentScheduleId,
+      user_id: userId,
+      seat_number: seatNum,
+      status: 'Confirmed'
+    }));
+
+    // 3. Send it to Supabase!
+    const { error } = await sb.from('bookings').insert(bookingsToInsert);
+
+    if (error) throw error;
+
+    // 4. Success! 
+    alert(`Success! You have officially booked seats: ${selectedSeats.join(', ')}`);
+    
+    // Send the user back to the home screen to book another trip
+    document.getElementById('seatScreen').style.display = 'none';
+    document.getElementById('searchScreen').style.display = 'block';
+    
+  } catch (err) {
+    alert("Error booking seats: " + err.message);
+  } finally {
+    // Reset the button
+    btn.innerText = originalText;
+    btn.disabled = false;
+  }
 }

@@ -1,16 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoRoute | Book · Travel · Explore</title>
-    
-    <link rel="stylesheet" href="assets/css/style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GoRoute | Search Flights & Buses</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
-    <script src="assets/js/app.js"></script>
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      Go<span>Route</span>
+      <small>Book · Travel · Explore</small>
+    </div>
+    <div class="tabs">
+      <button class="tab active" style="color: var(--accent); background: #FFF0F0;" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="screens" style="grid-template-columns: 1fr; max-width: 400px; margin: 0 auto;">
+    
+    <div id="searchScreen">
+      <div class="screen-label">Search</div>
+      <div class="screen hero-screen">
+        <svg class="bus-illustration" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="12" width="72" height="28" rx="6" fill="#3B9EE8"/>
+          <rect x="6" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+          <rect x="24" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+          <rect x="42" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+          <rect x="58" y="16" width="12" height="12" rx="2" fill="#EBF6FE"/>
+          <rect x="2" y="33" width="72" height="7" rx="3" fill="#1A6FB0"/>
+          <circle cx="16" cy="42" r="5" fill="#1A2940"/>
+          <circle cx="16" cy="42" r="2.5" fill="#6DBAF1"/>
+          <circle cx="58" cy="42" r="5" fill="#1A2940"/>
+          <circle cx="58" cy="42" r="2.5" fill="#6DBAF1"/>
+          <rect x="60" y="20" width="4" height="8" rx="1" fill="#FFA552"/>
+          <rect x="0" y="22" width="4" height="4" rx="1" fill="#FF6B6B"/>
+        </svg>
+        <h2>Where do you want to go?</h2>
+        <p>Fast, reliable bus booking across the country</p>
+        <div class="search-card">
+          <div class="input-row">
+            <div class="dot"></div>
+            <div class="fake-input">Cebu</div> 
+          </div>
+          <div class="input-row">
+            <div class="dot orange"></div>
+            <div class="fake-input">Manila</div>
+            <div class="swap-btn">⇅</div>
+          </div>
+          <div class="date-row">
+            <div class="date-pill active-pill">Today</div>
+            <div class="date-pill">Tomorrow</div>
+            <div class="date-pill">Other</div>
+          </div>
+          <button class="search-btn" onclick="searchBuses()">Find Buses</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsScreen" style="display: none;">
+      <div class="screen-label">Search results</div>
+      <div class="screen results-screen">
+        <div class="route-header">
+          <div class="route-title">
+            <span>Cebu</span>
+            <div class="arrow-right"></div>
+            <span>Manila</span>
+          </div>
+          <div class="date-badge">Today</div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-chip active">All</div>
+          <div class="filter-chip">AC</div>
+          <div class="filter-chip">Sleeper</div>
+        </div>
+        
+        <div id="busResultsList"></div>
+        
+        <button onclick="document.getElementById('resultsScreen').style.display='none'; document.getElementById('searchScreen').style.display='block';" style="width:100%; padding:10px; background:var(--blue-light); color:var(--blue-dark); border:none; border-radius:10px; margin-top:10px; cursor:pointer; font-weight:bold; font-family:'Nunito', sans-serif;">← Back to Search</button>
+      </div>
+    </div>
+
+    <div id="seatScreen" style="display: none;">
+      <div class="screen-label">Seat selection</div>
+      <div class="screen seat-screen">
+        <div class="route-header">
+          <div class="route-title">
+            <span id="seatOrigin">Cebu</span>
+            <div class="arrow-right"></div>
+            <span id="seatDest">Manila</span>
+          </div>
+          <div class="date-badge" id="seatPriceBadge">₱ 0 · 9h</div>
+        </div>
+        
+        <div class="seat-legend">
+          <div class="legend-item"><div class="legend-dot ld-booked"></div>Booked</div>
+          <div class="legend-item"><div class="legend-dot ld-avail"></div>Available</div>
+          <div class="legend-item"><div class="legend-dot ld-selected"></div>Yours</div>
+        </div>
+        <div style="text-align:center;font-size:10px;color:var(--text3);margin-bottom:6px;">Lower Deck</div>
+
+        <div class="seat-grid" id="seatGrid"></div>
+
+        <div class="seat-footer">
+          <div class="sf-info"><strong id="selectedSeatsText">None</strong><span id="selectedCountText">0 seats</span></div>
+          <div>
+            <div style="font-size:10px;color:var(--text2);text-align:right;margin-bottom:3px;">Total</div>
+            <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:4px;" id="totalPriceText">₱ 0</div>
+            <button class="proceed-btn" onclick="proceedToBooking()">Proceed</button>
+          </div>
+        </div>
+        <button onclick="document.getElementById('seatScreen').style.display='none'; document.getElementById('resultsScreen').style.display='block';" style="width:100%; padding:10px; background:var(--blue-light); color:var(--blue-dark); border:none; border-radius:10px; margin-top:10px; cursor:pointer; font-weight:bold; font-family:'Nunito', sans-serif;">← Back to Results</button>
+      </div>
+    </div>
+
+  </div> <div class="mobile-bottom-bar">
+    <div class="bottom-nav" style="border-top:none; padding-top: 12px;">
+      <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 2l7 7" stroke="#3B9EE8" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="9" width="10" height="8" rx="1" fill="#3B9EE8" fill-opacity=".2" stroke="#3B9EE8" stroke-width="1.2"/></svg>Home</div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="#8ba5be" stroke-width="1.2"/><path d="M6 3V1M12 3V1M2 7h14" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Tickets</div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#8ba5be" stroke-width="1.2"/><path d="M9 5v4l3 2" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Wallet</div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#8ba5be" stroke-width="1.2"/><path d="M3 16c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Account</div>
+    </div>
+  </div>
+
+</div> <script src="assets/js/app.js"></script>
+
+<script>
+  async function handleLogout() {
+    await sb.auth.signOut();
+  }
+</script>
+
 </body>
 </html>

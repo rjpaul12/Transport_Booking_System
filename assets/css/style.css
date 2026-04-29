@@ -388,3 +388,119 @@ html, body {
   .hero-panel { display: none; }
   .form-panel { padding: 32px 24px; }
 }
+
+/* ── Main App Layout & Dashboard ── */
+.app { max-width: 980px; margin: 0 auto; padding: 12px; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 18px; }
+.logo { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 22px; color: var(--blue-dark); }
+.logo span { color: var(--blue); }
+.logo small { font-size: 11px; font-weight: 500; color: var(--text3); display: block; letter-spacing: 1px; }
+.tabs { display: flex; gap: 4px; background: var(--blue-light); border-radius: 12px; padding: 4px; }
+.tab { padding: 7px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--text2); transition: all .2s; }
+.tab.active { background: var(--white); color: var(--blue-dark); box-shadow: 0 1px 6px rgba(59,158,232,.18); }
+.screens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.screen { background: #fff; border-radius: 20px; border: 1.5px solid var(--border); overflow: hidden; box-shadow: 0 4px 24px rgba(59,158,232,.12); }
+.screen-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--text3); text-align: center; padding: 6px 0 2px; text-transform: uppercase; }
+
+/* Hero screen */
+.hero-screen { background: linear-gradient(150deg, #EBF6FE 0%, #D6ECFA 100%); padding: 24px 18px 20px; text-align: center; }
+.bus-illustration { width: 80px; height: 50px; margin: 0 auto 12px; display: block; }
+.hero-screen h2 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: var(--blue-dark); margin-bottom: 4px; }
+.hero-screen p { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+.search-card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 10px rgba(59,158,232,.12); }
+.input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+.dot.orange { background: var(--amber); }
+.fake-input { flex: 1; background: var(--blue-pale); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--text2); border: 1px solid var(--border); text-align: left;}
+.swap-btn { width: 22px; height: 22px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.date-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.date-pill { flex: 1; padding: 6px; background: var(--blue-pale); border-radius: 8px; font-size: 11px; color: var(--text2); text-align: center; border: 1px solid var(--border); }
+.date-pill.active-pill { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue-dark); font-weight: 700; }
+.search-btn { width: 100%; padding: 10px; background: var(--blue); color: #fff; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* Bottom nav */
+.bottom-nav { display: flex; justify-content: space-around; padding: 10px 0 2px; border-top: 1px solid var(--border); }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 9px; color: var(--text3); cursor: pointer; }
+.nav-item.active { color: var(--blue); }
+.nav-icon { width: 18px; height: 18px; }
+
+/* ── Results Screen & Bus Cards ── */
+.results-screen { padding: 14px; }
+.route-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.route-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--blue-dark); }
+.arrow-right { width: 18px; height: 8px; position: relative; display: flex; align-items: center; }
+.arrow-right::before { content: ''; position: absolute; left: 0; right: 6px; height: 2px; background: var(--blue); }
+.arrow-right::after { content: ''; position: absolute; right: 0; border: 4px solid transparent; border-left-color: var(--blue); }
+.date-badge { font-size: 10px; color: var(--text3); font-weight: 500; }
+.bus-card { background: var(--blue-pale); border-radius: 12px; padding: 10px; margin-bottom: 8px; border: 1px solid var(--border); }
+.bus-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.bus-type { font-size: 10px; color: var(--text3); margin-bottom: 6px; }
+.bus-row { display: flex; align-items: center; justify-content: space-between; }
+.time-block { text-align: left; }
+.time-block .time { font-size: 13px; font-weight: 800; color: var(--blue-dark); }
+.time-block .place { font-size: 9px; color: var(--text3); }
+.duration { font-size: 10px; color: var(--text2); text-align: center; }
+.price { font-size: 14px; font-weight: 800; color: var(--accent); }
+.seats-left { font-size: 9px; color: var(--text3); text-align: right; }
+.filter-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.filter-chip { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; background: var(--blue-pale); border: 1px solid var(--border); color: var(--text2); cursor: pointer; }
+.filter-chip.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue-dark); }
+
+/* ── Mobile Responsiveness (Fits Any Phone) ── */
+/* ── Base style for the bottom bar ── */
+.mobile-bottom-bar {
+  max-width: 400px; 
+  margin: 14px auto 0;
+  background: var(--card);
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  padding: 0 10px 6px; 
+  box-shadow: var(--shadow);
+}
+
+/* ── Mobile Responsiveness (Fits Any Phone) ── */
+@media screen and (max-width: 480px) {
+  /* Let the app fill the whole screen and leave space at bottom */
+  .app { 
+    padding: 10px; 
+    width: 100%; 
+    padding-bottom: 90px; 
+  }
+  
+  /* Override any hardcoded 400px limits for smaller phones */
+  div[style*="max-width: 400px"] { max-width: 100% !important; margin: 0 !important; }
+  
+  /* Make the bus cards fluid */
+  .bus-card { padding: 12px 10px; }
+  .duration { font-size: 9px; letter-spacing: -0.5px; }
+  
+  /* Make the seat grid stretch perfectly */
+  .seat-grid { max-width: 100%; gap: 8px; justify-content: center; }
+  .seat { width: 35px; height: 35px; font-size: 11px; }
+  .aisle { width: 15px; } /* Creates a flexible aisle */
+  
+  /* Make the bottom navigation sticky on phones */
+  .mobile-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100% !important;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    padding-bottom: 20px;
+    z-index: 1000;
+  }
+
+  .bottom-nav { padding-bottom: 12px; }
+}
+
+/* Extra tweak for super narrow phones (like older iPhones) */
+@media screen and (max-width: 350px) {
+  .seat { width: 30px; height: 30px; }
+  .route-title { font-size: 11px; }
+  .price { font-size: 12px; }
+}
