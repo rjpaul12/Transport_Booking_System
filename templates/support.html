@@ -109,6 +109,7 @@
             margin-bottom: 6px;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
     <div class="app-bar">
@@ -151,6 +152,25 @@
             Support email: <a href="mailto:support@transport-booking-system.local">support@transport-booking-system.local</a><br>
             Simple rule: if it is within Metro Cebu, motorcycle service is usually available. Outside Metro Cebu, availability is not guaranteed.
         </section>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/dashboard" class="nav-item">
+            <span class="nav-icon">&#127968;</span>
+            Home
+        </a>
+        <a href="/dashboard" class="nav-item">
+            <span class="nav-icon">&#128269;</span>
+            Search
+        </a>
+        <a href="/my_tickets" class="nav-item">
+            <span class="nav-icon">&#127915;</span>
+            Tickets
+        </a>
+        <a href="/support" class="nav-item active">
+            <span class="nav-icon">&#10067;</span>
+            Help
+        </a>
     </div>
 </body>
 </html>

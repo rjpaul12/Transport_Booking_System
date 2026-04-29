@@ -25,7 +25,7 @@
                 linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 20px 20px 100px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -102,6 +102,7 @@
             border: 1px solid rgba(29, 78, 216, 0.2);
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
     <div class="success-card">
@@ -127,6 +128,25 @@
             <a href="/my_tickets" class="btn">View My Tickets</a>
             <a href="/dashboard" class="btn secondary">Back to Home</a>
         </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/dashboard" class="nav-item">
+            <span class="nav-icon">&#127968;</span>
+            Home
+        </a>
+        <a href="/dashboard" class="nav-item">
+            <span class="nav-icon">&#128269;</span>
+            Search
+        </a>
+        <a href="/my_tickets" class="nav-item active">
+            <span class="nav-icon">&#127915;</span>
+            Tickets
+        </a>
+        <a href="/support" class="nav-item">
+            <span class="nav-icon">&#10067;</span>
+            Help
+        </a>
     </div>
 </body>
 </html>

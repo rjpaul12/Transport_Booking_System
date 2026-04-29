@@ -6,89 +6,134 @@
     <title>Join GoRoute</title>
     
     <style>
-        body {
-            font-family: 'Roboto', -apple-system, sans-serif;
-            margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
-            background-color: #b7e1ff !important;
-            overflow: hidden;
-        }
-        
-        .login-card {
-            background-color: #ffffff !important;
-            padding: 40px; border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            width: 90%; max-width: 400px; text-align: center; box-sizing: border-box;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#3B9EE8;--blue-light:#EBF5FD;--blue-mid:#6DBAF1;--blue-dark:#1A6FB0;
+  --blue-pale:#F0F9FF;--accent:#FF6B6B;--accent-warm:#FFA552;
+  --text:#1a2940;--text2:#4a6080;--text3:#8ba5be;--white:#fff;--bg:#F4F9FD;
+  --border:#D6ECFA;--shadow:0 2px 12px rgba(59,158,232,.1);
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
 
-        .login-card.visible { opacity: 1 !important; transform: translateY(0) !important; }
+.screen{background:var(--white);border-radius:22px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow);max-width:400px;margin:20px auto;}
 
-        .logo-container { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
-        .app-logo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-
-        h2 { font-size: 28px; color: #333; margin: 0 0 8px 0; font-weight: 400; }
-        .subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
-
-        .input-group { margin-bottom: 25px; text-align: left; }
-        input {
-            width: 100%; padding: 12px 0; border: none;
-            border-bottom: 2px solid #dcdcdc; background: transparent; font-size: 16px;
-        }
-        input:focus { outline: none; border-bottom-color: #1a73e8; }
-
-        /* Green button for "Creating" a new account */
-        .btn-primary {
-            width: 100%; padding: 14px; background-color: #28a745;
-            color: white; border: none; border-radius: 4px;
-            font-size: 14px; font-weight: bold; text-transform: uppercase;
-            cursor: pointer; box-shadow: 0 2px 5px rgba(40,167,69,0.3);
-            margin-top: 10px;
-        }
-
-        .footer-link { font-size: 14px; color: #555; margin-top: 25px; }
-        .footer-link a { color: #1a73e8; font-weight: bold; text-decoration: none; }
+.auth-topbar{background:var(--blue);padding:20px 18px 28px;position:relative;}
+.auth-topbar::after{content:'';position:absolute;bottom:-16px;left:0;right:0;height:32px;background:var(--white);border-radius:50% 50% 0 0 / 100% 100% 0 0;}
+.logo-badge{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:#fff;}
+.logo-text span{color:rgba(255,255,255,.7);}
+.auth-heading{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+.auth-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px;}
+.auth-body{padding:28px 18px 18px;}
+.field-group{margin-bottom:12px;}
+.field-label{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);}
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    background:var(--blue-pale);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:10px 10px 10px 34px;
+    font-size:12px;
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    box-sizing:border-box;
+}
+input:focus { outline: none; border-color: var(--blue-mid); }
+.field-action{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--blue);font-weight:700;cursor:pointer;}
+.name-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.terms-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;}
+.checkbox{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--blue-mid);background:var(--blue-light);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
+.terms-text{font-size:10px;color:var(--text2);line-height:1.5;}
+.terms-text a{color:var(--blue-dark);font-weight:700;}
+.auth-btn{display:block;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;}
+.switch-auth{text-align:center;font-size:11px;color:var(--text2);}
+.switch-auth a{color:var(--blue-dark);font-weight:700;text-decoration:none;}
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="GoRoute Logo" class="app-logo">
+    <div class="screen phone-screen">
+        <div class="auth-topbar">
+            <div class="logo-badge">
+                <div class="logo-icon">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="1" y="5" width="16" height="10" rx="3" fill="white" fill-opacity=".9"/>
+                        <circle cx="5" cy="16" r="2" fill="white" fill-opacity=".7"/>
+                        <circle cx="13" cy="16" r="2" fill="white" fill-opacity=".7"/>
+                        <rect x="3" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
+                        <rect x="9" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
+                    </svg>
+                </div>
+                <div class="logo-text">Go<span>Route</span></div>
+            </div>
+            <div class="auth-heading">Create account</div>
+            <div class="auth-sub">Join thousands of happy travellers</div>
         </div>
-        
-        <h2>Create Account</h2>
-        <p class="subtitle">Join the GoRoute community</p>
-        
-        <form action="/signup" method="post">
-            <div class="input-group">
-                <input type="text" name="name" placeholder="Full Name" required>
-            </div>
-            <div class="input-group">
-                <input type="email" name="email" placeholder="Email" required>
-            </div>
-            <div class="input-group">
-                <input type="password" name="password" placeholder="Password" required>
-            </div>
-            
-            <button type="submit" class="btn-primary">Sign Up</button>
-        </form>
-
-        <p class="footer-link">
-            Already have an account? <a href="/">Sign In</a>
-        </p>
+        <div class="auth-body">
+            <form action="/signup" method="post">
+                <div class="name-row">
+                    <div class="field-group" style="margin-bottom:0">
+                        <div class="field-label">First name</div>
+                        <div class="field-wrap">
+                            <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="5" r="3" stroke="#8ba5be" stroke-width="1.2"/>
+                                <path d="M1 13c0-3.5 2.5-6 6-6s6 2.5 6 6" stroke="#8ba5be" stroke-width="1.2"/>
+                            </svg>
+                            <input type="text" name="first_name" placeholder="Juan" required>
+                        </div>
+                    </div>
+                    <div class="field-group" style="margin-bottom:0">
+                        <div class="field-label">Last name</div>
+                        <div class="field-wrap">
+                            <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="5" r="3" stroke="#8ba5be" stroke-width="1.2"/>
+                                <path d="M1 13c0-3.5 2.5-6 6-6s6 2.5 6 6" stroke="#8ba5be" stroke-width="1.2"/>
+                            </svg>
+                            <input type="text" name="last_name" placeholder="dela Cruz" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">Email address</div>
+                    <div class="field-wrap">
+                        <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <rect x="1" y="3" width="12" height="9" rx="2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <path d="M1 5l6 4 6-4" stroke="#8ba5be" stroke-width="1.2"/>
+                        </svg>
+                        <input type="email" name="email" placeholder="your@email.com" required>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">Password</div>
+                    <div class="field-wrap">
+                        <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <rect x="3" y="6" width="8" height="7" rx="2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <path d="M5 6V4a2 2 0 014 0v2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <circle cx="7" cy="9.5" r="1" fill="#8ba5be"/>
+                        </svg>
+                        <input type="password" name="password" placeholder="Create password" required>
+                        <div class="field-action">Show</div>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="checkbox">
+                        <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3l3 3 4-5" stroke="#3B9EE8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="terms-text">I agree to GoRoute's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></div>
+                </div>
+                <button type="submit" class="auth-btn">Sign Up</button>
+            </form>
+            <div class="switch-auth">Already have an account? <a href="/">Sign In</a></div>
+        </div>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mark splash as shown here too, just in case they land on Sign Up first
-        sessionStorage.setItem('splashShown', 'true');
-        
-        // Show the signup card immediately
-        const signupCard = document.querySelector('.login-card');
-        signupCard.classList.add('visible');
-    });
-</script>
+    // Optional: Add JavaScript for interactions
+    </script>
 </body>
 </html>

@@ -7,191 +7,131 @@
     <title>GoRoute Login</title>
     
     <style>
-        /* 1. GLOBAL RESET */
-        body {
-            font-family: 'Roboto', -apple-system, sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #b7e1ff !important;
-            overflow: hidden;
-        }
-
-        /* 2. SPLASH SCREEN (Material White) */
-        #splash-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100vh;
-            background-color: #b7e1ff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 1.2s ease, visibility 1.2s;
-        }
-
-        .spinner {
-            width: 30px; height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #1a73e8;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-top: 20px;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .fade-out { opacity: 0; visibility: hidden; }
-
-        /* 3. LOGIN CARD */
-        .login-card {
-            background-color: #ffffff !important;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-sizing: border-box;
-            opacity: 0; /* Hidden for fade-in */
-            transform: translateY(20px);
-            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
-        }
-
-        .login-card.visible {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-
-        .app-logo {
-    width: 80px; 
-    height: 80px;
-    border-radius: 50%;
-    /* This makes the image fill the circle without stretching */
-    object-fit: cover; 
-    /* This creates a clean white border around the image itself */
-    border: 2px solid #ffffff; 
-    /* This adds the shadow to the circle to make it 'pop' */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-    background-color: #fff; /* Ensures no transparency behind the logo */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#3B9EE8;--blue-light:#EBF5FD;--blue-mid:#6DBAF1;--blue-dark:#1A6FB0;
+  --blue-pale:#F0F9FF;--accent:#FF6B6B;--accent-warm:#FFA552;
+  --text:#1a2940;--text2:#4a6080;--text3:#8ba5be;--white:#fff;--bg:#F4F9FD;
+  --border:#D6ECFA;--shadow:0 2px 12px rgba(59,158,232,.1);
 }
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
 
-.logo-container {
+.screen{background:var(--white);border-radius:22px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow);max-width:400px;margin:20px auto;}
+
+.auth-topbar{background:var(--blue);padding:20px 18px 28px;position:relative;}
+.auth-topbar::after{content:'';position:absolute;bottom:-16px;left:0;right:0;height:32px;background:var(--white);border-radius:50% 50% 0 0 / 100% 100% 0 0;}
+.logo-badge{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:#fff;}
+.logo-text span{color:rgba(255,255,255,.7);}
+.auth-heading{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+.auth-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px;}
+.auth-body{padding:28px 18px 18px;}
+.field-group{margin-bottom:12px;}
+.field-label{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);}
+input[type="email"], input[type="password"] {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 25px;
-    /* Extra spacing to ensure it doesn't touch the "Sign in" text */
+    background:var(--blue-pale);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:10px 10px 10px 34px;
+    font-size:12px;
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    box-sizing:border-box;
 }
-
-        /* 5. MATERIAL UI ELEMENTS */
-        h2 { font-size: 28px; color: #333; margin: 0 0 8px 0; font-weight: 400; }
-        .subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
-
-        .input-group { margin-bottom: 25px; text-align: left; }
-        
-        input[type="email"], input[type="password"] {
-            width: 100%; padding: 12px 0; border: none;
-            border-bottom: 2px solid #dcdcdc;
-            background: transparent; font-size: 16px;
-        }
-
-        input:focus { outline: none; border-bottom-color: #1a73e8; }
-
-        .extra-row {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px; color: #555; margin-bottom: 25px;
-        }
-
-        .btn-primary {
-            width: 100%; padding: 14px; background-color: #1a73e8;
-            color: white; border: none; border-radius: 4px;
-            font-size: 14px; font-weight: bold; text-transform: uppercase;
-            cursor: pointer; box-shadow: 0 2px 5px rgba(26,115,232,0.3);
-        }
-
-        .divider { display: flex; align-items: center; color: #aaa; font-size: 12px; margin: 25px 0; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #eee; margin: 0 10px; }
-
-        .btn-social {
-            width: 100%; padding: 12px; background: white; border: 1px solid #dadce0;
-            border-radius: 4px; margin-bottom: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 14px; color: #3c4043; cursor: pointer;
-        }
-        .btn-social img { width: 18px; margin-right: 10px; }
+input:focus { outline: none; border-color: var(--blue-mid); }
+.field-action{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--blue);font-weight:700;cursor:pointer;}
+.forgot{text-align:right;font-size:11px;color:var(--blue-dark);font-weight:700;margin-bottom:14px;cursor:pointer;}
+.auth-btn{display:block;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;}
+.divider-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.divider-line{flex:1;height:1px;background:var(--border);}
+.divider-text{font-size:11px;color:var(--text3);}
+.social-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1.5px solid var(--border);border-radius:10px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;background:var(--white);}
+.switch-auth{text-align:center;font-size:11px;color:var(--text2);}
+.switch-auth a{color:var(--blue-dark);font-weight:700;text-decoration:none;}
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
 
-    <div id="splash-screen">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="GoRoute Logo" style="width: 100px; border-radius: 50%;">
-        <div class="spinner"></div>
-    </div>
-
-    <div class="login-card">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="app-logo">
+    <div class="screen login-screen">
+        <div class="auth-topbar">
+            <div class="logo-badge">
+                <div class="logo-icon">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="1" y="5" width="16" height="10" rx="3" fill="white" fill-opacity=".9"/>
+                        <circle cx="5" cy="16" r="2" fill="white" fill-opacity=".7"/>
+                        <circle cx="13" cy="16" r="2" fill="white" fill-opacity=".7"/>
+                        <rect x="3" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
+                        <rect x="9" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
+                    </svg>
+                </div>
+                <div class="logo-text">Go<span>Route</span></div>
+            </div>
+            <div class="auth-heading">Welcome back!</div>
+            <div class="auth-sub">Sign in to your account to continue</div>
         </div>
-        
-        <h2>Sign in</h2>
-        <p class="subtitle">to continue to your GoRoute account</p>
-        
-        <form action="/" method="post">
-            <div class="input-group">
-                <input type="email" name="email" placeholder="Email" required>
+        <div class="auth-body">
+            <form action="/" method="post">
+                <div class="field-group">
+                    <div class="field-label">Email address</div>
+                    <div class="field-wrap">
+                        <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <rect x="1" y="3" width="12" height="9" rx="2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <path d="M1 5l6 4 6-4" stroke="#8ba5be" stroke-width="1.2"/>
+                        </svg>
+                        <input type="email" name="email" placeholder="juan@email.com" required>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">Password</div>
+                    <div class="field-wrap">
+                        <svg class="field-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <rect x="3" y="6" width="8" height="7" rx="2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <path d="M5 6V4a2 2 0 014 0v2" stroke="#8ba5be" stroke-width="1.2"/>
+                            <circle cx="7" cy="9.5" r="1" fill="#8ba5be"/>
+                        </svg>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                        <div class="field-action">Show</div>
+                    </div>
+                </div>
+                <div class="forgot"><a href="#" style="color: inherit; text-decoration: none;">Forgot password?</a></div>
+                <button type="submit" class="auth-btn">Sign In</button>
+            </form>
+            <div class="divider-row">
+                <div class="divider-line"></div>
+                <div class="divider-text">or continue with</div>
+                <div class="divider-line"></div>
             </div>
-            
-            <div class="input-group">
-                <input type="password" name="password" placeholder="Password" required>
+            <div class="social-row">
+                <button type="button" class="social-btn" onclick="window.location.href='/login/google'">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M13 7.07c0-.47-.04-.93-.12-1.37H7v2.6h3.37a2.89 2.89 0 01-1.25 1.9v1.58h2.02C12.34 10.65 13 9 13 7.07z" fill="#4285F4"/>
+                        <path d="M7 13c1.69 0 3.1-.56 4.14-1.52l-2.02-1.57c-.56.38-1.28.6-2.12.6-1.63 0-3.01-1.1-3.51-2.58H1.4v1.62A6 6 0 007 13z" fill="#34A853"/>
+                        <path d="M3.49 7.93A3.6 3.6 0 013.3 7c0-.32.06-.64.19-.93V4.45H1.4A6 6 0 001.4 7c0 .97.23 1.88.4 2.55l2.09-1.62z" fill="#FBBC05"/>
+                        <path d="M7 3.49c.92 0 1.74.32 2.39.94l1.79-1.79A6 6 0 001.4 4.45l2.09 1.62C3.99 4.6 5.37 3.49 7 3.49z" fill="#EA4335"/>
+                    </svg>
+                    Google
+                </button>
+                <button type="button" class="social-btn">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <rect width="14" height="14" rx="3" fill="#1877F2"/>
+                        <path d="M9.5 7H8V11H6V7H5V5h1V4a2 2 0 012-2h1.5v2H8.5a.5.5 0 00-.5.5V5h2l-.5 2z" fill="white"/>
+                    </svg>
+                    Facebook
+                </button>
             </div>
-            
-            <div class="extra-row">
-                <label><input type="checkbox" style="width: auto; margin-right: 5px;"> Keep me signed in</label>
-                <a href="#" style="color: #1a73e8; font-weight: bold; text-decoration: none; text-transform: uppercase;">Forgot Password?</a>
-            </div>
-            
-            <button type="submit" class="btn-primary">Sign In</button>
-        </form>
-
-        <div class="divider">or</div>
-
-        <button type="button" class="btn-social" onclick="window.location.href='/login/google'">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-    Continue with Google
-</button>
-        <button type="button" class="btn-social">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook">
-            Continue with Facebook
-        </button>
-
-        <p style="font-size: 14px; color: #555; margin-top: 25px;">
-            Don't have an account? <a href="/signup" style="color: #1a73e8; font-weight: bold; text-decoration: none;">Create account</a>
-        </p>
+            <div class="switch-auth">No account yet? <a href="/signup">Create one</a></div>
+        </div>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const splash = document.getElementById('splash-screen');
-        const loginCard = document.querySelector('.login-card');
-
-        // Check the "referrer" (the page the user just came from)
-        const cameFromSignup = document.referrer.includes('signup');
-
-        if (cameFromSignup) {
-            // If they came from signup, skip the loading for speed
-            splash.style.display = 'none';
-            loginCard.classList.add('visible');
-        } else {
-            // If they refreshed or opened the app fresh, show the loading
-            setTimeout(() => {
-                splash.classList.add('fade-out');
-                loginCard.classList.add('visible');
-            }, 500);
-        }
-    });
-</script>
+    // Optional: Add any JavaScript for interactions, like showing/hiding password
+    </script>
 </body>
 </html>

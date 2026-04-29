@@ -8,12 +8,31 @@ from urllib.parse import quote_plus
 
 app = Flask(__name__)
 app.secret_key = 'capstone_secret_key'
+load_dotenv()
 DB_PATH = os.path.join('database', 'transport_local.db')
+PREVIEW_BYPASS = os.getenv('ENABLE_PREVIEW_SESSION', '').lower() in {'1', 'true', 'yes'}
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def ensure_session(user_id, name, role):
+    session['user_id'] = user_id
+    session['name'] = name
+    session['role'] = role
+
+
+def require_login(default_role=None, default_name=None, default_user_id=None):
+    if 'user_id' in session:
+        return True
+
+    if PREVIEW_BYPASS and default_user_id is not None and default_name and default_role:
+        ensure_session(default_user_id, default_name, default_role)
+        return True
+
+    return False
 
 
 def load_dashboard_data():
@@ -106,9 +125,26 @@ def google_login():
 def google_auth():
     token = google.authorize_access_token()
     user_info = google.get('userinfo').json()
-    # Here you would check if the user exists in your database 
-    # If not, create a new GoRoute account for them!
-    session['user'] = user_info['email']
+    email = user_info.get('email')
+    name = user_info.get('name') or email or "Passenger"
+
+    if not email:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM User WHERE Email = ?', (email,)).fetchone()
+
+    if user is None:
+        conn.execute(
+            'INSERT INTO User (Name, Email, Password, Role) VALUES (?, ?, ?, ?)',
+            (name, email, 'google-oauth', 'Passenger')
+        )
+        conn.commit()
+        user = conn.execute('SELECT * FROM User WHERE Email = ?', (email,)).fetchone()
+
+    conn.close()
+
+    ensure_session(user['User_ID'], user['Name'], user['Role'])
     return redirect(url_for('dashboard'))
 
 # --- 1. LOGIN ROUTE ---
@@ -123,9 +159,7 @@ def login():
         conn.close()
         
         if user and user['Password'] == password:
-            session['user_id'] = user['User_ID']
-            session['name'] = user['Name']
-            session['role'] = user['Role'] # Save their role!
+            ensure_session(user['User_ID'], user['Name'], user['Role'])
             
             # Send them to the right screen based on their role
             if session['role'] == 'Admin':
@@ -141,7 +175,9 @@ def login():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        name = request.form['name']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        name = f"{first_name} {last_name}".strip()
         email = request.form['email']
         password = request.form['password']
         
@@ -170,13 +206,8 @@ def signup():
 # --- ADMIN DASHBOARD ROUTE ---
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    # --- DEVELOPER BYPASS FOR VS CODE PREVIEW ---
-    # If the previewer deletes the cookie, force an Admin session
-    if 'user_id' not in session:
-        session['user_id'] = 2
-        session['name'] = "System Admin (Preview Mode)"
-        session['role'] = 'Admin'
-    # --------------------------------------------
+    if not require_login(default_user_id=2, default_name="System Admin (Preview Mode)", default_role='Admin'):
+        return redirect(url_for('login'))
 
     # Security check: Only Admins allowed here
     if session.get('role') != 'Admin':
@@ -187,10 +218,8 @@ def admin_dashboard():
 
 @app.route('/admin/routes', methods=['GET', 'POST'])
 def admin_routes():
-    if 'user_id' not in session:
-        session['user_id'] = 2
-        session['name'] = "System Admin (Preview Mode)"
-        session['role'] = 'Admin'
+    if not require_login(default_user_id=2, default_name="System Admin (Preview Mode)", default_role='Admin'):
+        return redirect(url_for('login'))
 
     if session.get('role') != 'Admin':
         return redirect(url_for('login'))
@@ -283,11 +312,8 @@ def logout():
 # --- 2. DASHBOARD ROUTE ---
 @app.route('/dashboard')
 def dashboard():
-    # Developer Bypass for VS Code Preview
-    if 'user_id' not in session:
-        session['user_id'] = 1
-        session['name'] = "RJ (Preview Mode)"
-        session['role'] = 'Passenger'
+    if not require_login(default_user_id=1, default_name="RJ (Preview Mode)", default_role='Passenger'):
+        return redirect(url_for('login'))
 
     locations, metro_locations, transport_modes, popular_routes = load_dashboard_data()
     display_name = session.get('name') or session.get('user') or "Passenger"
@@ -349,10 +375,8 @@ def search():
 # --- 4. BOOKING ROUTE ---
 @app.route('/book/<int:schedule_id>')
 def book(schedule_id):
-    # Developer Bypass for VS Code Preview
-    if 'user_id' not in session:
-        session['user_id'] = 1
-        session['name'] = "RJ (Preview Mode)"
+    if not require_login(default_user_id=1, default_name="RJ (Preview Mode)", default_role='Passenger'):
+        return redirect(url_for('login'))
 
     user_id = session['user_id']
     conn = get_db_connection()
@@ -394,10 +418,8 @@ def book(schedule_id):
 # --- 5. MY TICKETS ROUTE ---
 @app.route('/my_tickets')
 def my_tickets():
-    # Developer Bypass for VS Code Preview
-    if 'user_id' not in session:
-        session['user_id'] = 1
-        session['name'] = "RJ (Preview Mode)"
+    if not require_login(default_user_id=1, default_name="RJ (Preview Mode)", default_role='Passenger'):
+        return redirect(url_for('login'))
         
     user_id = session['user_id']
     conn = get_db_connection()
@@ -421,8 +443,20 @@ def my_tickets():
     return render_template('my_tickets.html', tickets=tickets)
 
 
+@app.route('/wallet')
+def wallet():
+    if not require_login(default_user_id=1, default_name="RJ (Preview Mode)", default_role='Passenger'):
+        return redirect(url_for('login'))
+    
+    display_name = session.get('name') or session.get('user') or "Passenger"
+    return render_template('wallet.html', name=display_name)
+
+
 @app.route('/support')
 def support():
+    if not require_login(default_user_id=1, default_name="RJ (Preview Mode)", default_role='Passenger'):
+        return redirect(url_for('login'))
+    
     display_name = session.get('name') or session.get('user') or "Passenger"
     return render_template('support.html', name=display_name)
 

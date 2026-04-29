@@ -10,6 +10,7 @@ USERS = [
 
 VEHICLES = [
     ('BUS-101', 'Bus', 45),
+    ('BUS-202', 'Bus', 45),
     ('TAXI-102', 'Taxi', 4),
     ('MOTOR-103', 'Motorcycle', 2),
     ('BUS-104', 'Bus', 45),

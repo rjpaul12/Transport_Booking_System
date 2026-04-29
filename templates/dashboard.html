@@ -3,51 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard</title>
+    <title>GoRoute - Book Your Trip</title>
+    
     <style>
-        :root {
-            --bg: #eef4ff;
-            --surface: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --primary: #1d4ed8;
-            --accent: #16a34a;
-            --border: #dbe3f0;
-        }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#3B9EE8;--blue-light:#EBF5FD;--blue-mid:#6DBAF1;--blue-dark:#1A6FB0;
+  --blue-pale:#F0F9FF;--blue-btn:#2E8FD4;--accent:#FF6B6B;--accent-warm:#FFA552;
+  --text:#1a2940;--text2:#4a6080;--text3:#8ba5be;--white:#fff;--bg:#F4F9FD;
+  --card:#fff;--border:#D6ECFA;--shadow:0 2px 12px rgba(59,158,232,.1);
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
+.app{max-width:980px;margin:0 auto;padding:12px;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 18px;}
+.logo{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--blue-dark);}
+.logo span{color:var(--blue);}
+.logo small{font-size:11px;font-weight:500;color:var(--text3);display:block;letter-spacing:1px;}
+.tabs{display:flex;gap:4px;background:var(--blue-light);border-radius:12px;padding:4px;}
+.tab{padding:7px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .2s;}
+.tab.active{background:var(--white);color:var(--blue-dark);box-shadow:0 1px 6px rgba(59,158,232,.18);}
+.screens{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.screen{background:var(--card);border-radius:20px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.screen-label{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-align:center;padding:6px 0 2px;text-transform:uppercase;}
 
-        * { box-sizing: border-box; }
+/* Hero screen */
+.hero-screen{background:linear-gradient(150deg,#EBF6FE 0%,#D6ECFA 100%);padding:24px 18px 20px;text-align:center;}
+.bus-illustration{width:80px;height:50px;margin:0 auto 12px;display:block;}
+.hero-screen h2{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;}
+.hero-screen p{font-size:12px;color:var(--text2);margin-bottom:16px;}
+.search-card{background:var(--white);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(59,158,232,.12);}
+.input-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.dot.orange{background:var(--accent-warm);}
+.fake-input{flex:1;background:var(--blue-pale);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text2);border:1px solid var(--border);}
+.swap-btn{width:22px;height:22px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.date-row{display:flex;gap:6px;margin-bottom:12px;}
+.date-pill{flex:1;padding:6px;background:var(--blue-pale);border-radius:8px;font-size:11px;color:var(--text2);text-align:center;border:1px solid var(--border);}
+.date-pill.active-pill{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue-dark);font-weight:700;}
+.search-btn{width:100%;padding:10px;background:var(--blue);color:var(--white);border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            background:
-                radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 35%),
-                linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
-            color: var(--text);
-            padding-bottom: 88px;
-        }
+/* Bottom nav */
+.bottom-nav{display:flex;justify-content:space-around;padding:10px 0 2px;border-top:1px solid var(--border);}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;color:var(--text3);cursor:pointer;}
+.nav-item.active{color:var(--blue);}
+.nav-icon{width:18px;height:18px;}
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
 
-        .app-bar {
-            background: rgba(29, 78, 216, 0.96);
-            color: #fff;
-            padding: 16px 18px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 8px 24px rgba(29, 78, 216, 0.18);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    <div class="app">
+        <div class="header">
+            <div class="logo">
+                Go<span>Route</span>
+                <small>Book · Travel · Explore</small>
+            </div>
+            <div class="tabs">
+                <button class="tab active">Bus</button>
+                <button class="tab">Train</button>
+                <button class="tab">Ferry</button>
+            </div>
+        </div>
 
-        .brand {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
+        <div class="screens">
+            <!-- Screen 1: Welcome / Search -->
+            <div>
+                <div class="screen-label">Search</div>
+                <div class="screen hero-screen">
+                    <svg class="bus-illustration" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="12" width="72" height="28" rx="6" fill="#3B9EE8"/>
+                        <rect x="6" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+                        <rect x="24" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+                        <rect x="42" y="16" width="14" height="12" rx="2" fill="#EBF6FE"/>
+                        <rect x="58" y="16" width="12" height="12" rx="2" fill="#EBF6FE"/>
+                        <rect x="2" y="33" width="72" height="7" rx="3" fill="#1A6FB0"/>
+                        <circle cx="16" cy="42" r="5" fill="#1A2940"/>
+                        <circle cx="16" cy="42" r="2.5" fill="#6DBAF1"/>
+                        <circle cx="58" cy="42" r="5" fill="#1A2940"/>
+                        <circle cx="58" cy="42" r="2.5" fill="#6DBAF1"/>
+                        <rect x="60" y="20" width="4" height="8" rx="1" fill="#FFA552"/>
+                        <rect x="0" y="22" width="4" height="4" rx="1" fill="#FF6B6B"/>
+                    </svg>
+                    <h2>Where do you want to go?</h2>
+                    <p>Fast, reliable bus booking across the country</p>
+                    <div class="search-card">
+                        {% if locations %}
+                        <form action="/search" method="get">
+                            <div class="input-row">
+                                <div class="dot"></div>
+                                <select name="origin" class="fake-input" required>
+                                    <option value="">Boarding from...</option>
+                                    {% for location in locations %}
+                                    <option value="{{ location }}">{{ location }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="input-row">
+                                <div class="dot orange"></div>
+                                <select name="destination" class="fake-input" required>
+                                    <option value="">Where are you going?</option>
+                                    {% for location in locations %}
+                                    <option value="{{ location }}">{{ location }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="swap-btn">⇅</div>
+                            </div>
+                            <div class="date-row">
+                                <div class="date-pill active-pill">Today</div>
+                                <div class="date-pill">Tomorrow</div>
+                                <div class="date-pill">Other</div>
+                            </div>
+                            <select name="transport_mode" style="display:none;">
+                                <option value="Bus" selected>Bus</option>
+                            </select>
+                            <input type="date" name="trip_date" value="{{ default_date }}" style="display:none;">
+                            <button type="submit" class="search-btn">Find Buses</button>
+                        </form>
+                        {% else %}
+                        <div style="color:var(--text3);font-size:12px;padding:20px;">
+                            No routes available yet. Please contact support.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        .logout-link {
+        <!-- Bottom nav row for all screens shown -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:2px;">
+            <div style="background:var(--card);border-radius:0 0 20px 20px;border:1.5px solid var(--border);border-top:none;padding:0 10px 6px;">
+                <div class="bottom-nav">
+                    <a href="/dashboard" class="nav-item active">
+                        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 2l7 7" stroke="#3B9EE8" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="9" width="10" height="8" rx="1" fill="#3B9EE8" fill-opacity=".2" stroke="#3B9EE8" stroke-width="1.2"/></svg>Home</a>
+                    <a href="/dashboard" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="#8ba5be" stroke-width="1.2"/><path d="M6 3V1M12 3V1M2 7h14" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Tickets</a>
+                    <a href="/wallet" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#8ba5be" stroke-width="1.2"/><path d="M9 5v4l3 2" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Wallet</a>
+                    <a href="/logout" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#8ba5be" stroke-width="1.2"/><path d="M3 16c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle date selection
+        document.querySelectorAll('.date-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active-pill'));
+                this.classList.add('active-pill');
+                
+                const today = new Date();
+                let selectedDate;
+                
+                if (this.textContent === 'Today') {
+                    selectedDate = today;
+                } else if (this.textContent === 'Tomorrow') {
+                    selectedDate = new Date(today);
+                    selectedDate.setDate(today.getDate() + 1);
+                } else {
+                    // For "Other", we'll keep the current date input
+                    return;
+                }
+                
+                const dateInput = document.querySelector('input[name="trip_date"]');
+                dateInput.value = selectedDate.toISOString().split('T')[0];
+            });
+        });
+    </script>
+</body>
+</html>
             color: #fff;
             text-decoration: none;
             font-size: 14px;
@@ -245,6 +371,7 @@
             margin-bottom: 4px;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
     <div class="app-bar">
@@ -342,9 +469,13 @@
             <span class="nav-icon">&#127968;</span>
             Home
         </a>
+        <a href="/dashboard" class="nav-item">
+            <span class="nav-icon">&#128269;</span>
+            Search
+        </a>
         <a href="/my_tickets" class="nav-item">
             <span class="nav-icon">&#127915;</span>
-            My Tickets
+            Tickets
         </a>
         <a href="/support" class="nav-item">
             <span class="nav-icon">&#10067;</span>

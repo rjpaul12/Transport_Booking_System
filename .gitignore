@@ -1,0 +1,14 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite journals
+*.db-journal
+
+# Environment files
+*.env
+.env.*
+
+# VS Code settings
+.vscode/
