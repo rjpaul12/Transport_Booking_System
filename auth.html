@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoRoute | Sign In</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="hero-panel">
+    <div class="hero-logo">
+      <div class="hero-logo-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="8" width="26" height="16" rx="5" fill="white" fill-opacity=".9"/>
+          <circle cx="7" cy="26" r="3" fill="white" fill-opacity=".7"/>
+          <circle cx="21" cy="26" r="3" fill="white" fill-opacity=".7"/>
+          <rect x="4" y="11" width="6" height="6" rx="2" fill="#3B9EE8"/>
+          <rect x="12" y="11" width="6" height="6" rx="2" fill="#3B9EE8"/>
+          <rect x="20" y="11" width="5" height="6" rx="2" fill="#3B9EE8"/>
+          <circle cx="14" cy="4" r="3" fill="white"/>
+          <circle cx="14" cy="3" r="1.5" fill="#3B9EE8"/>
+          <polygon points="12,6 16,6 14,10" fill="white"/>
+        </svg>
+      </div>
+      <div class="hero-logo-text">Go<span>Route</span></div>
+    </div>
+
+    <div class="hero-bus-wrap">
+      <svg viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="130" width="280" height="30" rx="8" fill="rgba(255,255,255,.08)"/>
+        <rect x="20" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="60" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="100" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="140" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="180" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="220" y="142" width="30" height="4" rx="2" fill="rgba(255,255,255,.2)"/>
+        <rect x="20" y="50" width="200" height="88" rx="14" fill="rgba(255,255,255,.22)"/>
+        <rect x="20" y="50" width="200" height="88" rx="14" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+        <rect x="24" y="36" width="192" height="26" rx="10" fill="rgba(255,255,255,.15)"/>
+        <rect x="30" y="60" width="32" height="24" rx="5" fill="rgba(255,255,255,.6)"/>
+        <rect x="70" y="60" width="32" height="24" rx="5" fill="rgba(255,255,255,.6)"/>
+        <rect x="110" y="60" width="32" height="24" rx="5" fill="rgba(255,255,255,.6)"/>
+        <rect x="150" y="60" width="32" height="24" rx="5" fill="rgba(255,255,255,.6)"/>
+        <rect x="176" y="90" width="36" height="38" rx="5" fill="rgba(255,255,255,.12)"/>
+        <rect x="177" y="106" width="34" height="2" rx="1" fill="rgba(255,255,255,.4)"/>
+        <rect x="20" y="128" width="200" height="10" rx="5" fill="rgba(0,0,0,.15)"/>
+        <circle cx="60" cy="138" r="16" fill="rgba(0,0,0,.4)"/>
+        <circle cx="60" cy="138" r="8" fill="rgba(255,255,255,.3)"/>
+        <circle cx="180" cy="138" r="16" fill="rgba(0,0,0,.4)"/>
+        <circle cx="180" cy="138" r="8" fill="rgba(255,255,255,.3)"/>
+        <rect x="218" y="76" width="8" height="12" rx="3" fill="#FFA552"/>
+        <rect x="14" y="76" width="8" height="12" rx="3" fill="#FF6B6B"/>
+        <circle cx="120" cy="22" r="13" fill="rgba(255,255,255,.9)"/>
+        <circle cx="120" cy="20" r="7" fill="#3B9EE8"/>
+        <polygon points="114,25 126,25 120,36" fill="rgba(255,255,255,.9)"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-headline">Travel anywhere,<br>anytime with ease</h1>
+    <p class="hero-sub">Book bus tickets across the country in seconds. Safe, reliable, and affordable travel at your fingertips.</p>
+
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Routes</div></div>
+      <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Happy Riders</div></div>
+      <div class="stat"><div class="stat-num">100+</div><div class="stat-label">Bus Partners</div></div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-card">
+      <div class="form-title">Welcome to GoRoute</div>
+      <div class="form-subtitle">Sign in to your account or create a new one to start booking.</div>
+
+      <div class="tab-switch">
+        <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="signupTab" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <div class="alert" id="alertBox"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="1" y="3" width="14" height="11" rx="2"/><path d="M1 6l7 5 7-5"/>
+            </svg>
+            <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="3" y="7" width="10" height="8" rx="2"/><path d="M5 7V5a3 3 0 016 0v2"/>
+              <circle cx="8" cy="11" r="1.2" fill="currentColor"/>
+            </svg>
+            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="toggle-pw" onclick="togglePw('loginPassword', this)">Show</button>
+          </div>
+        </div>
+        <div class="forgot-row"><a href="#" onclick="showForgot()">Forgot password?</a></div>
+        <button type="submit" class="submit-btn" id="loginBtn">Sign In</button>
+      </form>
+
+      <form id="signupForm" style="display:none" onsubmit="handleSignup(event)">
+        <div class="name-row">
+          <div class="field">
+            <label>First name</label>
+            <div class="input-wrap">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+                <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+              </svg>
+              <input type="text" id="firstName" placeholder="Juan" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <div class="input-wrap">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+                <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+              </svg>
+              <input type="text" id="lastName" placeholder="dela Cruz" required>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="1" y="3" width="14" height="11" rx="2"/><path d="M1 6l7 5 7-5"/>
+            </svg>
+            <input type="email" id="signupEmail" placeholder="your@email.com" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Mobile number</label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="4" y="1" width="8" height="14" rx="2"/>
+              <circle cx="8" cy="12" r="1" fill="currentColor"/>
+            </svg>
+            <input type="tel" id="signupPhone" placeholder="+63 912 345 6789" autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="3" y="7" width="10" height="8" rx="2"/><path d="M5 7V5a3 3 0 016 0v2"/>
+              <circle cx="8" cy="11" r="1.2" fill="currentColor"/>
+            </svg>
+            <input type="password" id="signupPassword" placeholder="Create a strong password" autocomplete="new-password" required minlength="8">
+            <button type="button" class="toggle-pw" onclick="togglePw('signupPassword', this)">Show</button>
+          </div>
+        </div>
+        <div class="terms-row">
+          <input type="checkbox" id="agreeTerms" required>
+          <label for="agreeTerms">I agree to GoRoute's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+        <button type="submit" class="submit-btn" id="signupBtn">Create Account</button>
+      </form>
+
+      <div class="otp-panel" id="otpPanel">
+        <div class="otp-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#3B9EE8" stroke-width="1.6">
+            <rect x="7" y="3" width="14" height="22" rx="3"/>
+            <circle cx="14" cy="21" r="1.5" fill="#3B9EE8"/>
+            <rect x="10" y="8" width="8" height="2" rx="1"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;">Verify your email</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;">We've sent a 6-digit code to<br><strong id="otpEmail" style="color:var(--blue-dark);"></strong></p>
+        <div class="otp-boxes">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,0)">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,1)">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,2)">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,3)">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,4)">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" oninput="otpInput(this,5)">
+        </div>
+        <div class="resend-row">Didn't get it? <a onclick="resendOtp()">Resend code</a></div>
+        <button class="submit-btn" onclick="verifyOtp()">Verify & Continue</button>
+        <div class="switch-link"><a onclick="switchTab('signup')" style="cursor:pointer;">← Back to sign up</a></div>
+      </div>
+
+      <div id="socialSection">
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-text">or continue with</div>
+          <div class="divider-line"></div>
+        </div>
+        <div class="social-row">
+          <button class="social-btn" onclick="handleGoogle()">
+            <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Google
+          </button>
+          <button class="social-btn" onclick="handleFacebook()">
+            <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="18" height="18" rx="4" fill="#1877F2"/>
+              <path d="M12.5 9H10V13.5H7.5V9H6V6.5h1.5V5a2.5 2.5 0 012.5-2.5H12V5h-1.5a.5.5 0 00-.5.5V6.5H12.5L12 9z" fill="white"/>
+            </svg>
+            Facebook
+          </button>
+        </div>
+        <div class="switch-link" id="switchText">
+          Don't have an account? <a href="#" onclick="switchTab('signup');return false;">Create one</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
