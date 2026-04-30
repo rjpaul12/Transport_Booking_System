@@ -458,6 +458,25 @@ html, body {
   box-shadow: var(--shadow);
 }
 
+/* ── Seat Screen ── */
+.seat-screen { padding: 14px; }
+.seat-legend { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; }
+.legend-item { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.ld-booked { background: #e0e0e0; }
+.ld-avail { background: var(--blue-light); border: 1px solid var(--blue); }
+.ld-selected { background: var(--blue); }
+.seat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 0 auto 12px; max-width: 160px; }
+.seat { width: 28px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; transition: all 0.2s; }
+.seat.booked { background: #ebebeb; color: #bbb; cursor: not-allowed; }
+.seat.avail { background: var(--blue-light); border: 1px solid var(--blue-mid); color: var(--blue-dark); cursor: pointer; }
+.seat.selected { background: var(--blue); color: #fff; transform: scale(1.1); }
+.aisle { height: 24px; }
+.seat-footer { background: var(--blue-pale); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
+.sf-info { font-size: 10px; color: var(--text2); }
+.sf-info strong { color: var(--text); display: block; font-size: 13px; }
+.proceed-btn { background: var(--blue); color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; }
+
 /* ── Mobile Responsiveness (Fits Any Phone) ── */
 @media screen and (max-width: 480px) {
   /* Let the app fill the whole screen and leave space at bottom */
@@ -474,10 +493,56 @@ html, body {
   .bus-card { padding: 12px 10px; }
   .duration { font-size: 9px; letter-spacing: -0.5px; }
   
-  /* Make the seat grid stretch perfectly */
-  .seat-grid { max-width: 100%; gap: 8px; justify-content: center; }
-  .seat { width: 35px; height: 35px; font-size: 11px; }
-  .aisle { width: 15px; } /* Creates a flexible aisle */
+ /* ── The Clean 2+2 Seat Grid (Like Mockup) ── */
+.seat-grid {
+  display: grid;
+  /* 5 columns exactly: Seat, Seat, Aisle, Seat, Seat */
+  grid-template-columns: 32px 32px 24px 32px 32px;
+  gap: 10px 8px;
+  margin: 0 auto 20px;
+  justify-content: center;
+}
+
+.seat {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+/* 1. Booked: Solid light grey */
+.seat.booked {
+  background: #EAEAEA;
+  color: #BDBDBD;
+  cursor: not-allowed;
+  border: 1px solid transparent;
+}
+
+/* 2. Available: White with blue outline */
+.seat.avail {
+  background: var(--white);
+  border: 1px solid var(--blue-mid);
+  color: var(--blue-dark);
+  cursor: pointer;
+}
+
+/* 3. Yours (Selected): Solid Blue */
+.seat.selected {
+  background: var(--blue);
+  color: var(--white);
+  border: 1px solid var(--blue);
+}
+
+/* The empty walking space in the middle */
+.aisle {
+  width: 100%;
+  height: 100%;
+}
   
   /* Make the bottom navigation sticky on phones */
   .mobile-bottom-bar {

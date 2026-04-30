@@ -311,14 +311,16 @@ async function proceedToBooking() {
     return;
   }
 
+  const totalPrice = selectedSeats.length * currentTicketPrice;
+
   // Change button text so the user knows it's loading
   const btn = document.querySelector('.proceed-btn');
   const originalText = btn.innerText;
-  btn.innerText = "Booking...";
+  btn.innerText = "Processing Payment...";
   btn.disabled = true;
 
   try {
-    // 1. Get the currently logged-in user's ID
+    // 1. Get the currently logged-in user
     const { data: { session }, error: sessionError } = await sb.auth.getSession();
     
     if (sessionError || !session) {
@@ -329,8 +331,41 @@ async function proceedToBooking() {
     
     const userId = session.user.id;
 
-    // 2. Prepare the data to be inserted
-    // This creates an array of rows, one for each seat you selected
+    // 2. Check Wallet Balance
+    let { data: wallet, error: walletError } = await sb
+      .from('wallets')
+      .select('balance')
+      .eq('user_id', userId)
+      .single();
+
+    // If the wallet doesn't exist yet, create it on the fly with ₱5,000!
+    if (!wallet) {
+      const { data: newWallet, error: createError } = await sb
+        .from('wallets')
+        .insert([{ user_id: userId, balance: 5000 }])
+        .select()
+        .single();
+        
+      if (createError) throw createError;
+      wallet = newWallet; // Use the newly created wallet for the rest of the transaction
+    }
+
+    // 3. Reject if they don't have enough money
+    if (wallet.balance < totalPrice) {
+      alert(`Insufficient funds! Your balance is ₱${wallet.balance.toLocaleString()}, but this trip costs ₱${totalPrice.toLocaleString()}.`);
+      return;
+    }
+
+    // 4. Deduct the money from the wallet!
+    const newBalance = wallet.balance - totalPrice;
+    const { error: updateError } = await sb
+      .from('wallets')
+      .update({ balance: newBalance })
+      .eq('user_id', userId);
+
+    if (updateError) throw updateError;
+
+    // 5. Insert the booked seats into the database
     const bookingsToInsert = selectedSeats.map(seatNum => ({
       schedule_id: currentScheduleId,
       user_id: userId,
@@ -338,15 +373,13 @@ async function proceedToBooking() {
       status: 'Confirmed'
     }));
 
-    // 3. Send it to Supabase!
-    const { error } = await sb.from('bookings').insert(bookingsToInsert);
+    const { error: bookingError } = await sb.from('bookings').insert(bookingsToInsert);
+    if (bookingError) throw bookingError;
 
-    if (error) throw error;
-
-    // 4. Success! 
-    alert(`Success! You have officially booked seats: ${selectedSeats.join(', ')}`);
+    // 6. Success! 
+    alert(`Success! You booked seats: ${selectedSeats.join(', ')}.\n\n₱${totalPrice.toLocaleString()} has been deducted from your wallet!`);
     
-    // Send the user back to the home screen to book another trip
+    // Send the user back to the home screen
     document.getElementById('seatScreen').style.display = 'none';
     document.getElementById('searchScreen').style.display = 'block';
     
@@ -357,4 +390,110 @@ async function proceedToBooking() {
     btn.innerText = originalText;
     btn.disabled = false;
   }
+}
+// ── Navigation & Tickets Logic ──
+
+function switchTab(tab) {
+  // Hide all screens
+  document.getElementById('searchScreen').style.display = 'none';
+  if(document.getElementById('resultsScreen')) document.getElementById('resultsScreen').style.display = 'none';
+  if(document.getElementById('seatScreen')) document.getElementById('seatScreen').style.display = 'none';
+  if(document.getElementById('ticketsScreen')) document.getElementById('ticketsScreen').style.display = 'none';
+  if(document.getElementById('walletScreen')) document.getElementById('walletScreen').style.display = 'none';
+
+  // Reset nav icons
+  document.getElementById('nav-home').classList.remove('active');
+  document.getElementById('nav-tickets').classList.remove('active');
+  document.getElementById('nav-wallet').classList.remove('active');
+
+  // Show selected tab
+  if (tab === 'home') {
+    document.getElementById('searchScreen').style.display = 'block';
+    document.getElementById('nav-home').classList.add('active');
+  } else if (tab === 'tickets') {
+    document.getElementById('ticketsScreen').style.display = 'block';
+    document.getElementById('nav-tickets').classList.add('active');
+    loadMyTickets();
+  } else if (tab === 'wallet') {
+    document.getElementById('walletScreen').style.display = 'block';
+    document.getElementById('nav-wallet').classList.add('active');
+    loadWallet(); // Fetch balance!
+  }
+}
+
+async function loadMyTickets() {
+  const listEl = document.getElementById('myTicketsList');
+  listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">Loading tickets...</div>';
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+
+    // Fetch the user's bookings from Supabase
+    const { data: bookings, error } = await sb
+      .from('bookings')
+      .select(`
+        id,
+        seat_number,
+        status,
+        created_at
+      `)
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!bookings || bookings.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">No tickets found. Time to book a trip!</div>';
+      return;
+    }
+
+    // Draw the ticket cards
+    listEl.innerHTML = bookings.map(b => `
+      <div class="ticket-card">
+        <div class="ticket-no">Ticket ID: ${b.id.substring(0,8).toUpperCase()}</div>
+        <div class="ticket-route">
+          <span class="city">Booked Seat</span>
+          <div class="arrow-right" style="transform:scale(.7)"></div>
+          <span class="city">${b.seat_number}</span>
+        </div>
+        <div class="ticket-meta">
+          <div>
+            <div style="font-weight:700;font-size:11px;">Status: ${b.status}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="ticket-status">Confirmed</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:3px;">
+              ${new Date(b.created_at).toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--accent);">Error loading tickets. Check console.</div>';
+  }
+}
+
+async function loadWallet() {
+  const balanceText = document.getElementById('liveWalletBalance');
+  balanceText.innerText = "Loading...";
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const userId = session.user.id;
+
+  // Check if wallet exists
+  let { data: wallet, error } = await sb.from('wallets').select('*').eq('user_id', userId).single();
+
+  // If new user, create a wallet with ₱5,000
+  if (!wallet) {
+    const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 5000 }]).select().single();
+    wallet = newWallet;
+  }
+
+  balanceText.innerText = `₱ ${wallet.balance.toLocaleString()}`;
 }

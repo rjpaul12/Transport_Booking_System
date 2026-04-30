@@ -27,6 +27,8 @@
 
   <div class="screens" style="grid-template-columns: 1fr; max-width: 400px; margin: 0 auto;">
     
+
+    <!-- 1. Search Screen -->
     <div id="searchScreen">
       <div class="screen-label">Search</div>
       <div class="screen hero-screen">
@@ -66,6 +68,8 @@
       </div>
     </div>
 
+
+    <!-- 2. Results Screen -->
     <div id="resultsScreen" style="display: none;">
       <div class="screen-label">Search results</div>
       <div class="screen results-screen">
@@ -89,6 +93,8 @@
       </div>
     </div>
 
+
+    <!-- 3. Seat Screen -->
     <div id="seatScreen" style="display: none;">
       <div class="screen-label">Seat selection</div>
       <div class="screen seat-screen">
@@ -122,16 +128,66 @@
       </div>
     </div>
 
-  </div> <div class="mobile-bottom-bar">
+    <!-- 4. My Tickets Screen -->
+    <div id="ticketsScreen" style="display: none;">
+      <div class="screen-label">My tickets</div>
+      <div class="screen results-screen">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:800;color:var(--blue-dark);">My Tickets</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div>
+        </div>
+        
+        <!-- JavaScript will inject the live Supabase tickets here -->
+        <div id="myTicketsList">
+          <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">Loading tickets...</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 5. Wallet Screen -->
+    <div id="walletScreen" style="display: none;">
+      <div class="screen-label">Wallet</div>
+      <div class="screen wallet-screen">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:800;color:var(--blue-dark);">My Wallet</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div>
+        </div>
+        <div class="wallet-hero">
+          <div class="wallet-label">Available Balance</div>
+          <div class="wallet-balance" id="liveWalletBalance">₱ 0</div>
+          <button class="add-money-btn">+ Add Money</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ─── Functional Bottom Navigation ─── -->
+  <div class="mobile-bottom-bar">
     <div class="bottom-nav" style="border-top:none; padding-top: 12px;">
-      <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 2l7 7" stroke="#3B9EE8" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="9" width="10" height="8" rx="1" fill="#3B9EE8" fill-opacity=".2" stroke="#3B9EE8" stroke-width="1.2"/></svg>Home</div>
-      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="#8ba5be" stroke-width="1.2"/><path d="M6 3V1M12 3V1M2 7h14" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Tickets</div>
-      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#8ba5be" stroke-width="1.2"/><path d="M9 5v4l3 2" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Wallet</div>
-      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#8ba5be" stroke-width="1.2"/><path d="M3 16c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#8ba5be" stroke-width="1.2" stroke-linecap="round"/></svg>Account</div>
+      <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
+        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 2l7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="9" width="10" height="8" rx="1" fill="currentColor" fill-opacity=".2" stroke="currentColor" stroke-width="1.2"/></svg>
+        Home
+      </div>
+      <div class="nav-item" id="nav-tickets" onclick="switchTab('tickets')">
+        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M6 3V1M12 3V1M2 7h14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Tickets
+      </div>
+      <div class="nav-item" id="nav-wallet">
+        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2"/><path d="M9 5v4l3 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Wallet
+      </div>
+      <div class="nav-item" id="nav-account">
+        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M3 16c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Account
+      </div>
     </div>
   </div>
 
-</div> <script src="assets/js/app.js"></script>
+</div>
+
+<script src="assets/js/app.js"></script>
 
 <script>
   async function handleLogout() {
