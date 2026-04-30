@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoRoute | Admin Dashboard</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: var(--blue-dark); color: white;">
+  
+  <div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <h1 style="font-family: 'Poppins', sans-serif;">GoRoute Admin</h1>
+      <button onclick="adminLogout()" style="padding: 8px 16px; background: #FF6B6B; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Sign Out</button>
+    </div>
+
+    <div style="background: white; border-radius: 16px; padding: 20px; color: var(--text);">
+      <h2 style="font-size: 18px; margin-bottom: 16px;">All Platform Bookings</h2>
+      
+      <!-- This is where all the user tickets will load -->
+      <div id="adminBookingsList">Loading data from Supabase...</div>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Special Admin Script to fetch ALL bookings
+    async function loadAdminData() {
+      const { data: bookings, error } = await sb
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('adminBookingsList').innerText = "Error: " + error.message;
+        return;
+      }
+
+      const container = document.getElementById('adminBookingsList');
+      if (bookings.length === 0) {
+        container.innerHTML = "<p>No bookings have been made yet.</p>";
+        return;
+      }
+
+      // Draw a simple table for the Admin
+      let html = `<table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 14px;">
+                    <tr style="border-bottom: 2px solid #eee;">
+                      <th style="padding: 10px;">Ticket ID</th>
+                      <th>Seat</th>
+                      <th>Passenger</th>
+                      <th>Status</th>
+                    </tr>`;
+      
+      bookings.forEach(b => {
+        html += `<tr style="border-bottom: 1px solid #eee;">
+                   <td style="padding: 10px; color: var(--text3);">${b.id.substring(0,8)}</td>
+                   <td style="font-weight: bold; color: var(--blue);">${b.seat_number}</td>
+                   <td>${b.passenger_name || 'N/A'}</td>
+                   <td><span style="background: var(--blue-light); padding: 2px 8px; border-radius: 12px; font-size: 11px;">${b.status}</span></td>
+                 </tr>`;
+      });
+      html += `</table>`;
+      container.innerHTML = html;
+    }
+
+    async function adminLogout() {
+      await sb.auth.signOut();
+      window.location.href = 'auth.html';
+    }
+
+    // Run the load function immediately when the admin page opens
+    loadAdminData();
+  </script>
+</body>
+</html>
