@@ -15,9 +15,58 @@ let currentBusName     = '';
 let currentOrigin      = '';
 let currentDest        = '';
 let selectedSeats      = [];
+let currentAuthSession = null;
+
+function getProfileInitials(session) {
+  const meta = session?.user?.user_metadata || {};
+  const fullName = (meta.full_name || meta.name || meta.display_name || '').trim();
+  const email = (session?.user?.email || '').trim();
+  const source = fullName || email;
+
+  if (!source) return 'U';
+
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  return parts[0]?.[0]?.toUpperCase() || 'U';
+}
+
+function renderHeaderProfile() {
+  const chip = document.getElementById('headerProfileBtn');
+  const avatar = document.getElementById('headerProfileAvatar');
+  if (!chip || !avatar) return;
+
+  const session = currentAuthSession;
+  const meta = session?.user?.user_metadata || {};
+  const fullName = (meta.full_name || meta.name || meta.display_name || '').trim();
+  const email = (session?.user?.email || '').trim();
+  const avatarUrl = meta.avatar_url || meta.picture || meta.avatar || '';
+  const label = fullName || email || 'Profile';
+
+  chip.title = label;
+  chip.setAttribute('aria-label', `${label} profile`);
+
+  if (avatarUrl) {
+    avatar.classList.add('has-photo');
+    avatar.style.backgroundImage = `url("${avatarUrl}")`;
+    avatar.textContent = '';
+  } else {
+    avatar.classList.remove('has-photo');
+    avatar.style.backgroundImage = '';
+    avatar.textContent = getProfileInitials(session);
+  }
+}
+
+function setCurrentAuthSession(session) {
+  currentAuthSession = session || null;
+  renderHeaderProfile();
+}
 
 // ── Auth Routing ───────────────────────────────────────
 sb.auth.getSession().then(({ data }) => {
+  setCurrentAuthSession(data.session);
   const currentPage = window.location.pathname;
   if (data.session && currentPage.includes('auth.html')) {
     window.location.href = 'index.html';
@@ -27,6 +76,7 @@ sb.auth.getSession().then(({ data }) => {
 });
 
 sb.auth.onAuthStateChange((event, session) => {
+  setCurrentAuthSession(session);
   const currentPage = window.location.pathname;
   if (event === 'SIGNED_IN' && currentPage.includes('auth.html')) {
     window.location.href = 'index.html';
@@ -34,6 +84,8 @@ sb.auth.onAuthStateChange((event, session) => {
     window.location.href = 'auth.html';
   }
 });
+
+document.addEventListener('DOMContentLoaded', renderHeaderProfile);
 
 // ════════════════════════════════════════════════════════
 //   SHARED TAB SWITCHER
@@ -135,7 +187,6 @@ async function handleLogin(e) {
   const btn = document.getElementById('loginBtn');
   btn.innerHTML = '<span class="spinner"></span>Signing in…';
   btn.disabled = true;
-
   const email    = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
 
@@ -242,17 +293,400 @@ async function handleLogout() {
   window.location.href = 'auth.html';
 }
 
+// ── Date Button Logic ──
+let finalBookingDate = new Date().toISOString().split('T')[0];
+let selectedDate = 'today'; // Default to today
+
+function triggerCalendar() {
+  const calendar = document.getElementById('hiddenCalendar');
+  const otherBtn = document.getElementById('otherBtn');
+  if (!calendar || !otherBtn) return;
+
+  calendar.min = new Date().toISOString().split('T')[0];
+  selectDate(otherBtn, 'other');
+
+  if (typeof calendar.showPicker === 'function') {
+    calendar.showPicker();
+  } else {
+    calendar.click();
+  }
+}
+
+function selectDate(btn, val) {
+  document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (val === 'today' || val === 'tomorrow') {
+    const d = new Date();
+    if (val === 'tomorrow') d.setDate(d.getDate() + 1);
+    finalBookingDate = d.toISOString().split('T')[0];
+    const otherBtn = document.getElementById('otherBtn');
+    if (otherBtn) otherBtn.innerText = 'Other';
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    finalBookingDate = val;
+  }
+
+  selectedDate = val;
+  console.log("Booking for:", finalBookingDate);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const calendar = document.getElementById('hiddenCalendar');
+  const otherBtn = document.getElementById('otherBtn');
+  if (!calendar || !otherBtn) return;
+
+  calendar.addEventListener('change', function(e) {
+    const selected = e.target.value;
+    if (!selected) return;
+
+    finalBookingDate = selected;
+    const dateObj = new Date(selected);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    otherBtn.innerText = formattedDate;
+    selectDate(otherBtn, selected);
+  });
+});
+
+// ── Simple Swap Logic ──
+function swapLocations() {
+  const origin = document.getElementById('searchOrigin');
+  const dest = document.getElementById('searchDestination');
+
+  const temp = origin.value;
+  origin.value = dest.value;
+  dest.value = temp;
+}
+
+// ── Philippine Cities Data ──
+const phCities = [
+  "Alaminos", "Angeles City", "Antipolo", "Bacoor", "Bacolod", "Bago", "Baguio", "Bais", "Balanga", "Batac", 
+  "Batangas City", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran",
+   "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calamba", "Calapan", "Calasiao", "Calbayog", "Caloocan", 
+   "Candon", "Canlaon", "Carcar", "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan",
+    "Danao", "Dapitan", "Dasmariñas", "Davao City", "Digos", "Dipolog", "Dumaguete", "El Salvador", "Escalante", 
+    "Gapan", "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan", 
+    "Iloilo City", "Imus", "Iriga", "Isabela City", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", 
+    "Lamitan", "Laoag", "Lapu-Lapu", "Las Piñas", "Legazpi", "Ligao", "Lipa", "Lucena", "Maasin", "Mabalacat", 
+    "Mandaluyong", "Mandaue", "Manila", "Marawi", "Marikina", "Masbate City", "Mati", "Meycauayan", "Muñoz", 
+    "Muntinlupa", "Naga", "Navotas", "Olongapo", "Ormoc", "Oroquieta", "Ozamiz", "Pagadian", "Palayan", "Panabo", 
+    "Pansol", "Parañaque", "Pasay", "Pasig", "Passi", "Puerto Princesa", "Quezon City", "Roxas City", "Sagay", 
+    "Samal", "San Carlos (Negros)", "San Carlos (Pangasinan)", "San Fernando (La Union)", "San Fernando (Pampanga)", 
+    "San Jose", "San Jose del Monte", "San Juan", "San Pablo", "San Pedro", "Santa Rosa", "Santiago", "Silay", 
+    "Sorsogon City", "Surigao City", "Tabaco", "Tabuk", "Tacloban", "Tacurong", "Tagaytay", "Tagbilaran", "Taguig",
+     "Tagum", "Talisay (Cebu)", "Talisay (Negros)", "Tanauan", "Tandag", "Tangub", "Tanjay", "Tarlac City", 
+     "Tayabas", "Toledo", "Trece Martires", "Tuguegarao", "Urdaneta", "Valencia", "Valenzuela", "Victorias", 
+     "Vigan", "Zamboanga City"
+];
+
+// ── Function to Populate Dropdowns ──
+function initCityDropdowns() {
+  const originSelect = document.getElementById('searchOrigin');
+  const destSelect = document.getElementById('searchDestination');
+  if (!originSelect || !destSelect) return;
+
+  const sortedCities = [...phCities].sort();
+
+  sortedCities.forEach(city => {
+    const optOrigin = document.createElement('option');
+    optOrigin.value = city;
+    optOrigin.textContent = city;
+    originSelect.appendChild(optOrigin);
+
+    const optDest = document.createElement('option');
+    optDest.value = city;
+    optDest.textContent = city;
+    destSelect.appendChild(optDest);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initCityDropdowns);
+
+// ── Multi-City Logic ──
+let routeCount = 1;
+
+function addRoute() {
+  routeCount++;
+  const container = document.getElementById('routesContainer');
+  
+  // We grab the destination of the PREVIOUS route to auto-fill the origin of the NEW route
+  // (e.g., if Route 1 goes to Manila, Route 2 should automatically start in Manila!)
+  const allDestInputs = document.querySelectorAll('.dest-input');
+  const lastDestination = allDestInputs[allDestInputs.length - 1].value;
+
+  const newRouteHTML = `
+    <div class="route-segment" id="route-${routeCount}">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 13px; font-weight: 700; color: #94A3B8;">Route ${routeCount}</span>
+        <button type="button" class="remove-route-btn" onclick="removeRoute('route-${routeCount}')">✕ Remove</button>
+      </div>
+      
+      <div style="position: relative; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+        <select class="finput origin-input" required>
+          <option value="Cebu" ${lastDestination === 'Cebu' ? 'selected' : ''}>Cebu</option>
+          <option value="Manila" ${lastDestination === 'Manila' ? 'selected' : ''}>Manila</option>
+          <option value="Davao" ${lastDestination === 'Davao' ? 'selected' : ''}>Davao</option>
+          <option value="Iloilo" ${lastDestination === 'Iloilo' ? 'selected' : ''}>Iloilo</option>
+          <option value="Baguio" ${lastDestination === 'Baguio' ? 'selected' : ''}>Baguio</option>
+        </select>
+        
+        <button type="button" class="swap-btn" onclick="swapDynamicLocations(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 10v12"></path><path d="M11 18l-4 4-4-4"></path><path d="M17 14V2"></path><path d="M21 6l-4-4-4 4"></path>
+          </svg>
+        </button>
+
+        <select class="finput dest-input" required>
+          <option value="" disabled selected>Going to...</option>
+          <option value="Cebu">Cebu</option>
+          <option value="Manila">Manila</option>
+          <option value="Davao">Davao</option>
+          <option value="Iloilo">Iloilo</option>
+          <option value="Baguio">Baguio</option>
+        </select>
+      </div>
+      
+      <!-- Simple Date Input for additional routes -->
+      <input type="date" class="finput" style="width: 100%; color: #64748B;">
+    </div>
+  `;
+  
+  // Inject the new route into the HTML
+  container.insertAdjacentHTML('beforeend', newRouteHTML);
+}
+
+function removeRoute(routeId) {
+  const routeToRemove = document.getElementById(routeId);
+  if (routeToRemove) {
+    routeToRemove.remove();
+    routeCount--; // Optional: recalculate route numbers if you want to get fancy!
+  }
+}
+
+// ── Smart Location Swap (Works on any route row!) ──
+function swapDynamicLocations(btnElement) {
+  // Find the exact inputs next to the specific button you clicked
+  const container = btnElement.parentElement;
+  const originInput = container.querySelector('.origin-input');
+  const destInput = container.querySelector('.dest-input');
+  
+  // Swap their values
+  const temp = originInput.value;
+  originInput.value = destInput.value;
+  destInput.value = temp;
+}
+
 // ════════════════════════════════════════════════════════
 //   BUS SEARCH
 // ════════════════════════════════════════════════════════
-async function searchBuses() {
-  const btn = document.querySelector('.search-btn');
+async function resolveLocationId(locationName) {
+  if (!locationName) return null;
+
+  const { data, error } = await sb
+    .from('locations')
+    .select('id')
+    .eq('name', locationName)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data?.id ?? null;
+}
+
+async function findBuses() {
+    // 1. Grab inputs
+    const originName = document.getElementById('searchOrigin').value;
+    const destName = document.getElementById('searchDestination').value;
+    
+    // Assumes you have a variable 'finalBookingDate' from your calendar/date pills
+    // If you don't, it defaults to today.
+    let searchDate = new Date(window.finalBookingDate || new Date());
+
+    // 2. The Timezone Fix: Create a window from 00:00:00 to 23:59:59
+    const startOfDay = new Date(searchDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(searchDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    console.log(`Searching from ${originName} to ${destName} on ${startOfDay.toDateString()}`);
+
+    // 3. Query Supabase
+    const { data, error } = await sb
+        .from('schedules')
+        .select(`
+            id, price, departure_time, arrival_time,
+            buses ( operator_name, bus_type ),
+            origin:locations!origin_id ( name ),
+            destination:locations!destination_id ( name )
+        `)
+        .eq('origin.name', originName)
+        .eq('destination.name', destName)
+        .gte('departure_time', startOfDay.toISOString())
+        .lte('departure_time', endOfDay.toISOString())
+        .order('departure_time', { ascending: true }); // Sort by earliest departure
+
+    // 4. Handle Results
+    if (error) {
+        console.error("Supabase Error:", error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        console.log("0 Results found.");
+        // Code to show your "No buses found" empty state here
+    } else {
+        console.log("Success! Found Buses:", data);
+        // Code to render your bus ticket cards here
+    }
+}
+
+async function searchBuses(originName, destName, selectedDate) {
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(selectedDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const originId = await resolveLocationId(originName);
+  const destId = await resolveLocationId(destName);
+
+  if (!originId || !destId) {
+    showNoResults();
+    return;
+  }
+
+  const { data, error } = await sb
+    .from('schedules')
+    .select(`
+      *,
+      buses (*),
+      origin:origin_id(name),
+      destination:destination_id(name)
+    `)
+    .eq('origin_id', originId)
+    .eq('destination_id', destId)
+    .gte('departure_time', startOfDay.toISOString())
+    .lte('departure_time', endOfDay.toISOString());
+
+  console.log("Database returned:", data);
+
+  if (error) {
+    console.error("Database Error:", error);
+    alert("Error: " + error.message);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    showNoResults();
+  } else {
+    renderTickets(data);
+  }
+}
+
+function showNoResults() {
+  const resultsContainer = document.getElementById('resultsContainer');
+  if (resultsContainer) {
+    resultsContainer.innerHTML = `
+      <div style="text-align:center;padding:30px 20px;">
+        <div style="font-size:28px;margin-bottom:10px;">🔍</div>
+        <div style="font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;">No buses found</div>
+        <div style="font-size:12px;color:var(--text3);">Try a different route or date.</div>
+      </div>`;
+  }
+
+  document.getElementById('searchScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+}
+
+function renderTickets(data) {
+  const resultsContainer = document.getElementById('resultsContainer');
+  if (!resultsContainer) return;
+
+  document.getElementById('searchScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+
+  const routeTitle = document.querySelector('#resultsScreen .route-title');
+  if (routeTitle && data[0]) {
+    const routeSpans = routeTitle.querySelectorAll('span');
+    if (routeSpans[0]) routeSpans[0].textContent = data[0].origin?.name || '';
+    if (routeSpans[1]) routeSpans[1].textContent = data[0].destination?.name || '';
+  }
+
+  const dateBadge = document.querySelector('#resultsScreen .date-badge');
+  if (dateBadge) {
+    if (selectedDate === 'today') {
+      dateBadge.textContent = 'Today';
+    } else if (selectedDate === 'tomorrow') {
+      dateBadge.textContent = 'Tomorrow';
+    } else {
+      dateBadge.textContent = new Date(finalBookingDate).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  }
+
+  resultsContainer.innerHTML = '';
+
+  data.forEach((schedule, i) => {
+    const depDate = new Date(schedule.departure_time);
+    const arrDate = new Date(schedule.arrival_time);
+    const depTime = depDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const arrTime = arrDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const diffMs = arrDate - depDate;
+    const diffHrs = Math.floor(diffMs / 3600000);
+    const diffMins = Math.round((diffMs % 3600000) / 60000);
+    const duration = diffMins > 0 ? `${diffHrs}h ${diffMins}m` : `${diffHrs}h`;
+    const isFeatured = i === 0 ? 'featured' : '';
+
+    resultsContainer.innerHTML += `
+      <div class="bus-card ${isFeatured}" onclick="openSeatSelection(
+        '${schedule.id}',
+        ${schedule.price},
+        '${(schedule.origin?.name || 'Origin').replace(/'/g,"\\'")}',
+        '${(schedule.destination?.name || 'Destination').replace(/'/g,"\\'")}',
+        '${duration}',
+        '${(schedule.buses?.operator_name || 'Bus').replace(/'/g,"\\'")}',
+        '${(schedule.buses?.bus_type || '').replace(/'/g,"\\'")}',
+        ${schedule.buses?.total_seats || 20}
+      )">
+        <div class="bus-name">${schedule.buses?.operator_name || '—'}</div>
+        <div class="bus-type">${schedule.buses?.bus_type || '—'} · ${duration}</div>
+        <div class="bus-row">
+          <div class="time-block">
+            <div class="time">${depTime}</div>
+            <div class="place">${schedule.origin?.name || '—'}</div>
+          </div>
+          <div class="duration">—— ${duration} ——</div>
+          <div class="time-block" style="text-align:right">
+            <div class="time">${arrTime}</div>
+            <div class="place">${schedule.destination?.name || '—'}</div>
+          </div>
+        </div>
+        <div class="bus-row" style="margin-top:6px">
+          <div class="seats-left">${schedule.buses?.total_seats || '?'} seats available</div>
+          <div class="price">₱ ${Number(schedule.price).toLocaleString()}</div>
+        </div>
+      </div>`;
+  });
+}
+
+async function searchBusesLegacy() {
+  const btn = document.querySelector('.find-buses-btn') || document.querySelector('.primary-btn') || document.querySelector('.search-btn');
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="spinner"></span>Searching…';
   btn.disabled = true;
+  const origin = document.getElementById('searchOrigin')?.value || '';
+  const destination = document.getElementById('searchDestination')?.value || '';
+
+  if (!origin || !destination) {
+    alert('Please choose both an origin and a destination.');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    return;
+  }
 
   try {
-    // Fetch schedules joined with buses + location names
     const { data: schedules, error } = await sb
       .from('schedules')
       .select(`
@@ -263,17 +697,62 @@ async function searchBuses() {
         buses ( operator_name, bus_type, total_seats ),
         origin:origin_id ( name ),
         destination:destination_id ( name )
-      `);
+      `)
+      .eq('origin.name', origin)
+      .eq('destination.name', destination);
 
-    if (error) throw error;
+    let filteredSchedules = schedules || [];
+
+    if (error) {
+      console.warn('Direct route filter failed, falling back to local filtering.', error);
+      const fallback = await sb
+        .from('schedules')
+        .select(`
+          id,
+          departure_time,
+          arrival_time,
+          price,
+          buses ( operator_name, bus_type, total_seats ),
+          origin:origin_id ( name ),
+          destination:destination_id ( name )
+        `);
+      if (fallback.error) throw fallback.error;
+      filteredSchedules = (fallback.data || []).filter(schedule => {
+        const scheduleOrigin = schedule.origin?.name || '';
+        const scheduleDestination = schedule.destination?.name || '';
+        return scheduleOrigin === origin && scheduleDestination === destination;
+      });
+    }
 
     document.getElementById('searchScreen').style.display  = 'none';
     document.getElementById('resultsScreen').style.display = 'block';
 
-    const container = document.getElementById('busResultsList');
+    const resultsRouteTitle = document.querySelector('#resultsScreen .route-title');
+    if (resultsRouteTitle) {
+      const routeSpans = resultsRouteTitle.querySelectorAll('span');
+      if (routeSpans[0]) routeSpans[0].textContent = origin;
+      if (routeSpans[1]) routeSpans[1].textContent = destination;
+    }
+
+    const dateBadge = document.querySelector('#resultsScreen .date-badge');
+    if (dateBadge) {
+      if (selectedDate === 'today') {
+        dateBadge.textContent = 'Today';
+      } else if (selectedDate === 'tomorrow') {
+        dateBadge.textContent = 'Tomorrow';
+      } else {
+        dateBadge.textContent = new Date(finalBookingDate).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+    }
+
+    const container = document.getElementById('resultsContainer');
     container.innerHTML = '';
 
-    if (!schedules || schedules.length === 0) {
+    if (!filteredSchedules.length) {
       container.innerHTML = `
         <div style="text-align:center;padding:30px 20px;">
           <div style="font-size:28px;margin-bottom:10px;">🔍</div>
@@ -283,7 +762,7 @@ async function searchBuses() {
       return;
     }
 
-    schedules.forEach((schedule, i) => {
+    filteredSchedules.forEach((schedule, i) => {
       const depDate   = new Date(schedule.departure_time);
       const arrDate   = new Date(schedule.arrival_time);
       const depTime   = depDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -563,28 +1042,25 @@ async function confirmAndPay() {
 // ════════════════════════════════════════════════════════
 async function loadMyTickets() {
   const listEl = document.getElementById('myTicketsList');
-  if (!listEl) return;
-  listEl.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--text3);">Loading tickets…</div>';
+  listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">Loading tickets...</div>';
 
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
 
-    // Fetch bookings and join with schedule → bus + location names
+    // Fetch the user's bookings
     const { data: bookings, error } = await sb
       .from('bookings')
       .select(`
         id,
         seat_number,
-        passenger_name,
-        passenger_age,
         status,
-        price,
         created_at,
         schedules (
+          id,
           departure_time,
           arrival_time,
-          buses ( operator_name, bus_type ),
+          buses ( operator_name ),
           origin:origin_id ( name ),
           destination:destination_id ( name )
         )
@@ -595,136 +1071,183 @@ async function loadMyTickets() {
     if (error) throw error;
 
     if (!bookings || bookings.length === 0) {
-      listEl.innerHTML = `
-        <div style="text-align:center;padding:30px 20px;">
-          <div style="font-size:32px;margin-bottom:10px;">🎫</div>
-          <div style="font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:6px;">No tickets yet</div>
-          <div style="font-size:12px;color:var(--text3);">Book your first trip to see your tickets here!</div>
-        </div>`;
+      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">No tickets found. Time to book a trip!</div>';
       return;
     }
 
-    const statusStyle = {
-      confirmed: { bg: 'var(--blue-light)',  color: 'var(--blue-dark)' },
-      Confirmed: { bg: 'var(--blue-light)',  color: 'var(--blue-dark)' },
-      pending:   { bg: '#FFF4E5',            color: '#E67E00'          },
-      cancelled: { bg: '#F5F5F5',            color: '#999'             },
-      Cancelled: { bg: '#F5F5F5',            color: '#999'             },
-    };
+    // ── SMART GROUPING: Combine multiple seats for the same trip into ONE card! ──
+    const groupedTrips = {};
+    bookings.forEach(b => {
+      const scheduleId = b.schedules.id;
+      if (!groupedTrips[scheduleId]) {
+        groupedTrips[scheduleId] = {
+          scheduleId: scheduleId,
+          status: b.status,
+          created_at: b.created_at,
+          schedules: b.schedules,
+          seats: [] // Create an empty array for the seats
+        };
+      }
+      groupedTrips[scheduleId].seats.push(b.seat_number); // Add the seat to the group
+    });
 
-    listEl.innerHTML = bookings.map(b => {
-      const s       = b.schedules;
-      const origin  = s?.origin?.name || '—';
-      const dest    = s?.destination?.name || '—';
-      const busName = s?.buses?.operator_name || '—';
-      const busType = s?.buses?.bus_type || '';
-      const depTime = s?.departure_time
-        ? new Date(s.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '—';
-      const date    = new Date(b.created_at).toLocaleDateString('en-PH', { day: 'numeric', month: 'short', year: 'numeric' });
-      const sc      = statusStyle[b.status] || statusStyle.confirmed;
+    // Convert the grouped object back into an array to draw the HTML
+    const tripsArray = Object.values(groupedTrips);
+
+    // Draw the new grouped ticket cards
+    listEl.innerHTML = tripsArray.map(trip => {
+      const origin = trip.schedules?.origin?.name || "Unknown";
+      const dest = trip.schedules?.destination?.name || "Unknown";
+      const operator = trip.schedules?.buses?.operator_name || "GoRoute";
+      
+      const depTime = trip.schedules?.departure_time ? new Date(trip.schedules.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+      const arrTime = trip.schedules?.arrival_time ? new Date(trip.schedules.arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+      const displayDate = new Date(trip.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      let badgeClass = 'status-confirmed';
+      if (trip.status.toLowerCase() === 'upcoming') badgeClass = 'status-upcoming';
+      if (trip.status.toLowerCase() === 'completed') badgeClass = 'status-completed';
+
+      // Join the seats together (e.g., "1A, 1B, 2C")
+      const seatString = trip.seats.join(', ');
+      const seatCountText = trip.seats.length === 1 ? '1 Seat' : `${trip.seats.length} Seats`;
 
       return `
-        <div class="ticket-card">
-          <div class="ticket-no">Ticket #${b.id.substring(0, 8).toUpperCase()}</div>
-          <div class="ticket-route">
-            <span class="city">${origin}</span>
-            <span style="margin:0 5px;color:var(--blue);font-weight:700;">→</span>
-            <span class="city">${dest}</span>
-          </div>
-          <div class="ticket-meta">
-            <div>
-              <div style="font-weight:700;font-size:11px;">${depTime} · Seat ${b.seat_number}</div>
-              <div style="font-size:10px;color:var(--text3);">${busName}${busType ? ' · ' + busType : ''}</div>
-              <div style="font-size:10px;color:var(--text2);margin-top:2px;">👤 ${b.passenger_name}${b.passenger_age ? ', ' + b.passenger_age + ' yrs' : ''}</div>
-            </div>
-            <div style="text-align:right">
-              <span class="ticket-status" style="background:${sc.bg};color:${sc.color};">${b.status}</span>
-              <div style="font-size:10px;color:var(--text3);margin-top:4px;">${date}</div>
-              <div style="font-size:12px;font-weight:800;color:var(--accent);margin-top:2px;">₱ ${Number(b.price || 0).toLocaleString()}</div>
-            </div>
-          </div>
+      <div class="ticket-card" style="cursor: pointer;" onclick="openQR('${trip.scheduleId}', '${origin} → ${dest}', '${displayDate} · ${depTime}', '${seatString}')">
+        
+        <div class="ticket-left">
+          <div class="ticket-no">PHB/Ticket No: ${trip.scheduleId.substring(0,8).toUpperCase()}</div>
+          <div class="ticket-route">${origin} <span class="arrow">→</span> ${dest}</div>
+          <div class="ticket-time">${depTime} <span class="arrow">→</span> ${arrTime}</div>
+          <div class="ticket-meta-info">${operator} · ${seatCountText}</div>
         </div>
-      `;
-    }).join('');
+        
+        <div class="ticket-right">
+          <div class="status-badge ${badgeClass}">${trip.status}</div>
+          <div class="ticket-date">${displayDate}</div>
+        </div>
+        
+      </div>
+      `}).join('');
 
   } catch (err) {
-    console.error(err);
-    listEl.innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--accent);">Error loading tickets: ${err.message}</div>`;
+    listEl.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--accent);">Error: ${err.message}</div>`;
   }
+}
+
+// ── QR Code Logic ──
+let qrcodeObj = null; // Store the QR code so we can clear it later
+
+function openQR(scheduleId, route, dateTime, seats) {
+  // 1. Fill in the popup text
+  document.getElementById('qrRoute').innerText = route;
+  document.getElementById('qrDate').innerText = dateTime;
+  document.getElementById('qrSeats').innerText = `Seats: ${seats}`;
+
+  // 2. Clear out any old QR code image
+  const qrContainer = document.getElementById('qrcode-container');
+  qrContainer.innerHTML = ''; 
+
+  // 3. Create the data payload for the scanner (Schedule ID and Seats)
+  const qrDataPayload = JSON.stringify({ 
+    app: "GoRoute",
+    schedule: scheduleId,
+    seats: seats 
+  });
+
+  // 4. Generate the new QR Code
+  qrcodeObj = new QRCode(qrContainer, {
+    text: qrDataPayload,
+    width: 160,
+    height: 160,
+    colorDark : "#1A6FB0", // Draw it in GoRoute Blue!
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+
+  // 5. Show the popup
+  document.getElementById('qrModal').style.display = 'flex';
+}
+
+function closeQR() {
+  document.getElementById('qrModal').style.display = 'none';
 }
 
 // ════════════════════════════════════════════════════════
 //   WALLET
 // ════════════════════════════════════════════════════════
 async function loadWallet() {
-  const balanceEl = document.getElementById('liveWalletBalance');
-  if (!balanceEl) return;
-  balanceEl.innerText = 'Loading…';
+  const screen = document.getElementById('walletScreen');
+  
+  // Show loading state while fetching the real balance
+  screen.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text3);">Loading wallet securely...</div>';
 
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    const userId = session.user.id;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
 
-    let { data: wallet } = await sb
-      .from('wallets')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+  const userId = session.user.id;
 
-    // Auto-create wallet with ₱5,000 starter if new user
-    if (!wallet) {
-      const { data: newWallet } = await sb
-        .from('wallets')
-        .insert([{ user_id: userId, balance: 5000 }])
-        .select()
-        .single();
-      wallet = newWallet;
-    }
+  // Fetch the actual real balance from Supabase!
+  let { data: wallet } = await sb.from('wallets').select('*').eq('user_id', userId).single();
 
-    balanceEl.innerText = `₱ ${Number(wallet.balance).toLocaleString()}`;
-
-    // ── Passbook: last 10 bookings as transactions ──
-    const { data: txns } = await sb
-      .from('bookings')
-      .select('id, seat_number, price, status, created_at, schedules(origin:origin_id(name), destination:destination_id(name))')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    const passbook = document.querySelector('.passbook');
-    if (passbook && txns && txns.length > 0) {
-      const rows = txns.map(t => {
-        const origin = t.schedules?.origin?.name || 'Booking';
-        const dest   = t.schedules?.destination?.name || '';
-        const date   = new Date(t.created_at).toLocaleDateString('en-PH', { day: 'numeric', month: 'short', year: 'numeric' });
-        const time   = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `
-          <div class="txn-row">
-            <div>
-              <div class="txn-desc">Ticket — ${origin}${dest ? ' → ' + dest : ''}</div>
-              <div class="txn-date">${date} · ${time}</div>
-            </div>
-            <div class="txn-amt debit">− ₱ ${Number(t.price || 0).toLocaleString()}</div>
-          </div>`;
-      }).join('');
-
-      passbook.innerHTML = `
-        <div class="passbook-title">Passbook</div>
-        ${rows}
-      `;
-    } else if (passbook) {
-      passbook.innerHTML = `
-        <div class="passbook-title">Passbook</div>
-        <div style="text-align:center;padding:20px;font-size:12px;color:var(--text3);">No transactions yet.</div>
-      `;
-    }
-
-  } catch (err) {
-    console.error(err);
-    if (balanceEl) balanceEl.innerText = 'Error';
+  // If new user, create a wallet with ₱5,000
+  if (!wallet) {
+    const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 5000 }]).select().single();
+    wallet = newWallet;
   }
+
+  // Inject the beautiful new UI
+  screen.innerHTML = `
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h2 style="color: var(--blue-dark); font-size: 18px;">My Wallet</h2>
+      <div style="width: 32px; height: 32px; background: #EBF5FD; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--blue-dark);">👤</div>
+    </div>
+
+    <!-- Blue Balance Card -->
+    <div class="wallet-card">
+      <div class="wallet-title">Wallet Balance</div>
+      <div class="wallet-amount">₱ ${wallet.balance.toLocaleString()}</div>
+      <button class="add-money-btn" onclick="alert('Payment gateway integration coming soon!')">+ Add Money</button>
+    </div>
+
+    <!-- Passbook List (Placeholder Data) -->
+    <div class="passbook-container">
+      <div class="passbook-header">Passbook</div>
+      
+      <div class="transaction-row">
+        <div>
+          <div class="tx-title">Added money to wallet</div>
+          <div class="tx-date">18 Jan 2025 · 08:40 AM</div>
+        </div>
+        <div class="tx-amt tx-plus">+ ₱ 600</div>
+      </div>
+
+      <div class="transaction-row">
+        <div>
+          <div class="tx-title">Bus ticket — Cebu to Manila</div>
+          <div class="tx-date">12 Jan 2025 · 02:15 PM</div>
+        </div>
+        <div class="tx-amt tx-minus">- ₱ 600</div>
+      </div>
+
+      <div class="transaction-row">
+        <div>
+          <div class="tx-title">Cashback earned</div>
+          <div class="tx-date">03 Jan 2025 · 11:06 AM</div>
+        </div>
+        <div class="tx-amt tx-plus">+ ₱ 400</div>
+      </div>
+      
+      <div class="transaction-row">
+        <div>
+          <div class="tx-title">Added money to wallet</div>
+          <div class="tx-date">01 Jan 2025 · 09:00 AM</div>
+        </div>
+        <div class="tx-amt tx-plus">+ ₱ 100</div>
+      </div>
+    </div>
+  `;
 }
 
 // ════════════════════════════════════════════════════════

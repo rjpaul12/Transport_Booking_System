@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -20,9 +21,9 @@
       Go<span>Route</span>
       <small>Book · Travel · Explore</small>
     </div>
-    <div class="tabs">
-      <button class="tab active" style="color: var(--accent); background: #FFF0F0;" onclick="handleLogout()">Sign Out</button>
-    </div>
+    <button type="button" class="profile-chip" id="headerProfileBtn" onclick="switchTab('account')" aria-label="Open profile" title="Profile">
+      <span class="profile-chip-avatar" id="headerProfileAvatar">U</span>
+    </button>
   </div>
 
   <div class="screens" style="grid-template-columns: 1fr; max-width: 400px; margin: 0 auto;">
@@ -48,22 +49,40 @@
         </svg>
         <h2>Where do you want to go?</h2>
         <p>Fast, reliable bus booking across the country</p>
-        <div class="search-card">
+        <div class="search-container">
+          <!-- Origin Input Row -->
           <div class="input-row">
-            <div class="dot"></div>
-            <div class="fake-input">Cebu</div> 
+            <span class="dot dot-blue"></span>
+            <label for="searchOrigin" class="sr-only">Boarding from</label>
+            <select id="searchOrigin" class="finput">
+              <option value="" disabled selected>Boarding from...</option>
+            </select>
           </div>
-          <div class="input-row">
-            <div class="dot orange"></div>
-            <div class="fake-input">Manila</div>
-            <div class="swap-btn">⇅</div>
+
+          <!-- Row 2: Destination + Swap Button beside it -->
+          <div class="input-row-flex">
+            <span class="dot dot-orange"></span>
+            <label for="searchDestination" class="sr-only">Going to</label>
+            <select id="searchDestination" class="finput">
+              <option value="" disabled selected>Where are you going?</option>
+            </select>
+
+            <!-- The Swap Button now sits in its own space to the right -->
+            <button type="button" class="swap-btn-side" onclick="swapLocations()">
+              &#8645;
+            </button>
           </div>
-          <div class="date-row">
-            <div class="date-pill active-pill">Today</div>
-            <div class="date-pill">Tomorrow</div>
-            <div class="date-pill">Other</div>
+
+          <!-- Date Pills -->
+          <div class="date-pills-container">
+            <button type="button" class="date-pill active" onclick="selectDate(this, 'today')">Today</button>
+            <button type="button" class="date-pill" onclick="selectDate(this, 'tomorrow')">Tomorrow</button>
+            <button type="button" id="otherBtn" class="date-pill" onclick="triggerCalendar()">Other</button>
+            <input type="date" id="hiddenCalendar" style="opacity:0; position:absolute; width:0; height:0; pointer-events:none;">
           </div>
-          <button class="search-btn" onclick="searchBuses()">Find Buses</button>
+
+          <!-- Find Buses Button -->
+          <button type="button" class="find-buses-btn" onclick="findBuses()">Find Buses</button>
         </div>
       </div>
     </div>
@@ -87,7 +106,7 @@
           <div class="filter-chip">Sleeper</div>
         </div>
         
-        <div id="busResultsList"></div>
+        <div id="resultsContainer"></div>
         
         <button onclick="document.getElementById('resultsScreen').style.display='none'; document.getElementById('searchScreen').style.display='block';" style="width:100%; padding:10px; background:var(--blue-light); color:var(--blue-dark); border:none; border-radius:10px; margin-top:10px; cursor:pointer; font-weight:bold; font-family:'Nunito', sans-serif;">← Back to Search</button>
       </div>
@@ -240,6 +259,21 @@
     </div>
   </div>
 
+</div>
+
+<!-- QR Code Modal Overlay -->
+<div id="qrModal" class="modal-overlay" style="display: none;">
+  <div class="qr-card">
+    <button class="close-btn" onclick="closeQR()">✕</button>
+    <div style="font-size: 11px; color: var(--text3); text-transform: uppercase; margin-bottom: 4px;">Boarding Pass</div>
+    <h3 id="qrRoute" style="color: var(--blue-dark); margin-bottom: 4px;">Cebu → Manila</h3>
+    <p id="qrDate" style="font-size: 13px; color: var(--text3); margin-bottom: 16px;">Jan 12, 2025 · 6:00 PM</p>
+    
+    <div id="qrcode-container"></div>
+    
+    <p id="qrSeats" class="qr-seats">Seats: 1A, 1B</p>
+    <p class="qr-instruction">Show this QR code to the bus operator when boarding.</p>
+  </div>
 </div>
 
 <script src="assets/js/app.js"></script>
