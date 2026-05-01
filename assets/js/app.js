@@ -1,14 +1,15 @@
-/* ═══════════════════════════════════════════════════════
+﻿/* ════════════════════════════════════════════════════════
    GoRoute | app.js
    All auth + app logic powered by Supabase
-   ═══════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════ */
 
-// ── Supabase Init ──────────────────────────────────────
+// ── Supabase Init ───────────────────────────────────────
 const SUPABASE_URL     = 'https://djyegteotxpiqsycpwuj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeWVndGVvdHhwaXFzeWNwd3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjE0NTMsImV4cCI6MjA5MzAzNzQ1M30.OFRtRheiZBlZ-3twI2o9vjakeETjacrZVJQhEygwZHc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let lastSearchResults = []; // This stores the full list of buses found
 
-// ── Seat State ─────────────────────────────────────────
+// ── Seat State ──────────────────────────────────────────
 let currentScheduleId  = null;
 let currentTicketPrice = 0;
 let currentBusName     = '';
@@ -64,12 +65,12 @@ function setCurrentAuthSession(session) {
   renderHeaderProfile();
 }
 
-// ── Auth Routing ───────────────────────────────────────
+
 sb.auth.getSession().then(({ data }) => {
   setCurrentAuthSession(data.session);
   const currentPage = window.location.pathname;
   if (data.session && currentPage.includes('auth.html')) {
-    window.location.href = 'index.html';
+    window.location.replace('index.html');
   } else if (!data.session && !currentPage.includes('auth.html')) {
     window.location.href = 'auth.html';
   }
@@ -79,7 +80,7 @@ sb.auth.onAuthStateChange((event, session) => {
   setCurrentAuthSession(session);
   const currentPage = window.location.pathname;
   if (event === 'SIGNED_IN' && currentPage.includes('auth.html')) {
-    window.location.href = 'index.html';
+    window.location.replace('index.html');
   } else if (event === 'SIGNED_OUT' && !currentPage.includes('auth.html')) {
     window.location.href = 'auth.html';
   }
@@ -87,12 +88,11 @@ sb.auth.onAuthStateChange((event, session) => {
 
 document.addEventListener('DOMContentLoaded', renderHeaderProfile);
 
-// ════════════════════════════════════════════════════════
-//   SHARED TAB SWITCHER
-// ════════════════════════════════════════════════════════
 function switchTab(tab) {
+  // Always make sure the nav bar is visible when switching tabs
+  const bottomBar = document.querySelector('.mobile-bottom-bar');
+  if (bottomBar) bottomBar.style.display = '';
 
-  // ── Auth page: login ↔ signup ──────────────────────
   if (tab === 'login' || tab === 'signup') {
     hideAlert();
     const isLogin = tab === 'login';
@@ -115,10 +115,9 @@ function switchTab(tab) {
     return;
   }
 
-  // ── Main app: hide all screens, then show target ───
   const allScreens = [
-    'searchScreen', 'resultsScreen', 'seatScreen',
-    'ticketsScreen', 'walletScreen', 'accountScreen', 'bookingFormScreen'
+  'searchScreen', 'resultsScreen', 'seatScreen',
+  'ticketsScreen', 'walletScreen', 'accountScreen', 'bookingFormScreen', 'successScreen' 
   ];
   allScreens.forEach(id => {
     const el = document.getElementById(id);
@@ -156,17 +155,13 @@ function switchTab(tab) {
   }
 }
 
-// ════════════════════════════════════════════════════════
-//   AUTH PAGE FUNCTIONS
-// ════════════════════════════════════════════════════════
-
-// ── Alert helpers ──
 function showAlert(msg, type = 'error') {
   const el = document.getElementById('alertBox');
   if (!el) return;
   el.textContent = msg;
   el.className = `alert ${type} show`;
 }
+
 function hideAlert() {
   const el = document.getElementById('alertBox');
   if (el) el.className = 'alert';
@@ -185,7 +180,7 @@ async function handleLogin(e) {
   e.preventDefault();
   hideAlert();
   const btn = document.getElementById('loginBtn');
-  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+  btn.innerHTML = '<span class="spinner"></span>Signing in...';
   btn.disabled = true;
   const email    = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -197,22 +192,20 @@ async function handleLogin(e) {
     btn.innerHTML = 'Sign In';
     btn.disabled = false;
   } else {
-    btn.innerHTML = '✓ Redirecting…';
-    // Admin door — change this to your admin email
+    btn.innerHTML = '✓ Redirecting...';
     if (email.toLowerCase() === 'admin@goroute.com') {
       window.location.href = 'admin.html';
     } else {
-      window.location.href = 'index.html';
+      window.location.replace('index.html');
     }
   }
 }
 
-// ── Sign up ──
 async function handleSignup(e) {
   e.preventDefault();
   hideAlert();
   const btn = document.getElementById('signupBtn');
-  btn.innerHTML = '<span class="spinner"></span>Creating account…';
+  btn.innerHTML = '<span class="spinner"></span>Creating account...';
   btn.disabled = true;
 
   const first = document.getElementById('firstName').value.trim();
@@ -239,7 +232,6 @@ async function handleSignup(e) {
   }
 }
 
-// ── OTP auto-advance ──
 function otpInput(el, idx) {
   const boxes = document.querySelectorAll('.otp-box');
   if (el.value && idx < boxes.length - 1) boxes[idx + 1].focus();
@@ -253,7 +245,7 @@ async function verifyOtp() {
   if (code.length < 6) { showAlert('Enter the full 6-digit code.'); return; }
   const { error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
   if (error) showAlert(error.message);
-  else window.location.href = 'index.html';
+  else window.location.replace('index.html');
 }
 
 async function resendOtp() {
@@ -262,7 +254,6 @@ async function resendOtp() {
   showAlert('Code resent! Check your email.', 'success');
 }
 
-// ── Forgot password ──
 async function showForgot() {
   const email = document.getElementById('loginEmail').value.trim();
   if (!email) { showAlert('Enter your email address above first.'); return; }
@@ -273,13 +264,13 @@ async function showForgot() {
   else showAlert('Password reset link sent! Check your inbox.', 'success');
 }
 
-// ── Social auth ──
 async function handleGoogle() {
   await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin + '/index.html' }
   });
 }
+
 async function handleFacebook() {
   await sb.auth.signInWithOAuth({
     provider: 'facebook',
@@ -287,15 +278,13 @@ async function handleFacebook() {
   });
 }
 
-// ── Logout ──
 async function handleLogout() {
   await sb.auth.signOut();
   window.location.href = 'auth.html';
 }
 
-// ── Date Button Logic ──
 let finalBookingDate = new Date().toISOString().split('T')[0];
-let selectedDate = 'today'; // Default to today
+let selectedDate = 'today'; 
 
 function triggerCalendar() {
   const calendar = document.getElementById('hiddenCalendar');
@@ -347,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ── Simple Swap Logic ──
 function swapLocations() {
   const origin = document.getElementById('searchOrigin');
   const dest = document.getElementById('searchDestination');
@@ -357,7 +345,6 @@ function swapLocations() {
   dest.value = temp;
 }
 
-// ── Philippine Cities Data ──
 const phCities = [
   "Alaminos", "Angeles City", "Antipolo", "Bacoor", "Bacolod", "Bago", "Baguio", "Bais", "Balanga", "Batac", 
   "Batangas City", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran",
@@ -378,7 +365,6 @@ const phCities = [
      "Vigan", "Zamboanga City"
 ];
 
-// ── Function to Populate Dropdowns ──
 function initCityDropdowns() {
   const originSelect = document.getElementById('searchOrigin');
   const destSelect = document.getElementById('searchDestination');
@@ -401,15 +387,12 @@ function initCityDropdowns() {
 
 document.addEventListener('DOMContentLoaded', initCityDropdowns);
 
-// ── Multi-City Logic ──
 let routeCount = 1;
 
 function addRoute() {
   routeCount++;
   const container = document.getElementById('routesContainer');
   
-  // We grab the destination of the PREVIOUS route to auto-fill the origin of the NEW route
-  // (e.g., if Route 1 goes to Manila, Route 2 should automatically start in Manila!)
   const allDestInputs = document.querySelectorAll('.dest-input');
   const lastDestination = allDestInputs[allDestInputs.length - 1].value;
 
@@ -445,12 +428,10 @@ function addRoute() {
         </select>
       </div>
       
-      <!-- Simple Date Input for additional routes -->
       <input type="date" class="finput" style="width: 100%; color: #64748B;">
     </div>
   `;
   
-  // Inject the new route into the HTML
   container.insertAdjacentHTML('beforeend', newRouteHTML);
 }
 
@@ -458,18 +439,15 @@ function removeRoute(routeId) {
   const routeToRemove = document.getElementById(routeId);
   if (routeToRemove) {
     routeToRemove.remove();
-    routeCount--; // Optional: recalculate route numbers if you want to get fancy!
+    routeCount--; 
   }
 }
 
-// ── Smart Location Swap (Works on any route row!) ──
 function swapDynamicLocations(btnElement) {
-  // Find the exact inputs next to the specific button you clicked
   const container = btnElement.parentElement;
   const originInput = container.querySelector('.origin-input');
   const destInput = container.querySelector('.dest-input');
   
-  // Swap their values
   const temp = originInput.value;
   originInput.value = destInput.value;
   destInput.value = temp;
@@ -492,50 +470,60 @@ async function resolveLocationId(locationName) {
 }
 
 async function findBuses() {
-    // 1. Grab inputs
+    console.log("--- STARTING BUS SEARCH ---");
     const originName = document.getElementById('searchOrigin').value;
     const destName = document.getElementById('searchDestination').value;
-    
-    // Assumes you have a variable 'finalBookingDate' from your calendar/date pills
-    // If you don't, it defaults to today.
-    let searchDate = new Date(window.finalBookingDate || new Date());
 
-    // 2. The Timezone Fix: Create a window from 00:00:00 to 23:59:59
+    let rawDateString = window.finalBookingDate || new Date().toISOString().split('T')[0];
+    let searchDate = new Date(rawDateString + "T00:00:00");
     const startOfDay = new Date(searchDate);
     startOfDay.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(searchDate);
     endOfDay.setHours(23, 59, 59, 999);
 
-    console.log(`Searching from ${originName} to ${destName} on ${startOfDay.toDateString()}`);
+    const originId = await resolveLocationId(originName);
+    const destId = await resolveLocationId(destName);
 
-    // 3. Query Supabase
+    if (!originId || !destId) {
+        showNoResults();
+        return;
+    }
+
     const { data, error } = await sb
         .from('schedules')
         .select(`
             id, price, departure_time, arrival_time,
-            buses ( operator_name, bus_type ),
+            buses ( operator_name, bus_type, total_seats ),
             origin:locations!origin_id ( name ),
             destination:locations!destination_id ( name )
         `)
-        .eq('origin.name', originName)
-        .eq('destination.name', destName)
-        .gte('departure_time', startOfDay.toISOString())
-        .lte('departure_time', endOfDay.toISOString())
-        .order('departure_time', { ascending: true }); // Sort by earliest departure
+        .eq('origin_id', originId)
+        .eq('destination_id', destId)
+        .gte('departure_time', startOfDay.toISOString()) 
+        .lte('departure_time', endOfDay.toISOString())   
+        .order('departure_time', { ascending: true });
 
-    // 4. Handle Results
     if (error) {
         console.error("Supabase Error:", error);
         return;
     }
 
     if (!data || data.length === 0) {
-        console.log("0 Results found.");
-        // Code to show your "No buses found" empty state here
+        showNoResults();
     } else {
-        console.log("Success! Found Buses:", data);
-        // Code to render your bus ticket cards here
+        const uniqueData = [];
+        const seenTrips = new Set();
+        data.forEach(bus => {
+            const fingerprint = bus.buses.operator_name + "_" + bus.departure_time;
+            if (!seenTrips.has(fingerprint)) {
+                seenTrips.add(fingerprint);
+                uniqueData.push(bus);
+            }
+        });
+
+        lastSearchResults = uniqueData; 
+        renderTickets(uniqueData); 
     }
 }
 
@@ -674,7 +662,7 @@ function renderTickets(data) {
 async function searchBusesLegacy() {
   const btn = document.querySelector('.find-buses-btn') || document.querySelector('.primary-btn') || document.querySelector('.search-btn');
   const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner"></span>Searching…';
+  btn.innerHTML = '<span class="spinner"></span>Searching...';
   btn.disabled = true;
   const origin = document.getElementById('searchOrigin')?.value || '';
   const destination = document.getElementById('searchDestination')?.value || '';
@@ -791,7 +779,7 @@ async function searchBusesLegacy() {
               <div class="time">${depTime}</div>
               <div class="place">${schedule.origin?.name || '—'}</div>
             </div>
-            <div class="duration">── ${duration} ──</div>
+            <div class="duration">—— ${duration} ——</div>
             <div class="time-block" style="text-align:right">
               <div class="time">${arrTime}</div>
               <div class="place">${schedule.destination?.name || '—'}</div>
@@ -827,7 +815,7 @@ async function openSeatSelection(scheduleId, price, origin, dest, duration, busN
 
   document.getElementById('seatOrigin').innerText    = origin;
   document.getElementById('seatDest').innerText      = dest;
-  document.getElementById('seatPriceBadge').innerText = `₱ ${Number(price).toLocaleString()} · ${duration}`;
+  document.getElementById('seatPriceBadge').innerText = `₱${Number(price).toLocaleString('en-US', {minimumFractionDigits: 2})} · ${duration}`;
   updateSeatFooter();
 
   // Fetch already-booked seats for this schedule
@@ -839,7 +827,7 @@ async function openSeatSelection(scheduleId, price, origin, dest, duration, busN
 
   const bookedSeatNumbers = bookings ? bookings.map(b => b.seat_number) : [];
 
-  // Generate seat grid (5 rows × 2+2 layout = 20 seats)
+  // Generate seat grid (5 rows x 2+2 layout = 20 seats)
   const grid = document.getElementById('seatGrid');
   grid.innerHTML = '';
   const rows = 5;
@@ -888,7 +876,7 @@ function updateSeatFooter() {
   if (document.getElementById('selectedCountText'))
     document.getElementById('selectedCountText').innerText = ` · ${count} seat${count !== 1 ? 's' : ''}`;
   if (document.getElementById('totalPriceText'))
-    document.getElementById('totalPriceText').innerText = `₱ ${total.toLocaleString()}`;
+  document.getElementById('totalPriceText').innerText = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 }
 
 // ════════════════════════════════════════════════════════
@@ -906,10 +894,9 @@ function showBookingForm() {
 
   document.getElementById('formRoute').innerText      = `${origin} → ${dest}`;
   document.getElementById('formBusInfo').innerText    = `${currentBusName} · Seats: ${selectedSeats.join(', ')}`;
-  document.getElementById('formTotalPrice').innerText = `₱ ${total.toLocaleString()}`;
+  document.getElementById('formTotalPrice').innerText = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
   document.getElementById('formSeatCount').innerText  = `${selectedSeats.length} seat${selectedSeats.length !== 1 ? 's' : ''}`;
 
-  // Dynamically build one passenger form per seat
   const container = document.getElementById('passengerFieldsContainer');
   container.innerHTML = '';
   selectedSeats.forEach((seat, index) => {
@@ -936,7 +923,6 @@ function showBookingForm() {
     `;
   });
 
-  // Pre-fill email from session
   sb.auth.getSession().then(({ data }) => {
     if (data.session?.user) {
       document.getElementById('contactEmail').value = data.session.user.email;
@@ -960,7 +946,7 @@ async function confirmAndPay() {
 
   const btn = document.querySelector('.book-btn');
   const originalText = btn.innerText;
-  btn.innerHTML = '<span class="spinner"></span>Processing Payment…';
+  btn.innerHTML = '<span class="spinner"></span>Processing Payment...';
   btn.disabled  = true;
 
   try {
@@ -968,7 +954,6 @@ async function confirmAndPay() {
     if (sessionError || !session) throw new Error('Session expired. Please log in again.');
     const userId = session.user.id;
 
-    // ── Wallet check & deduct ──────────────────────────
     let { data: wallet } = await sb
       .from('wallets')
       .select('balance')
@@ -976,26 +961,19 @@ async function confirmAndPay() {
       .single();
 
     if (!wallet) {
-      // Create wallet with ₱5,000 starting balance for new users
-      const { data: newWallet } = await sb
-        .from('wallets')
-        .insert([{ user_id: userId, balance: 5000 }])
-        .select()
-        .single();
+      const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
       wallet = newWallet;
     }
 
     if (wallet.balance < totalPrice) {
-      throw new Error(`Insufficient wallet balance. You have ₱${wallet.balance.toLocaleString()} but need ₱${totalPrice.toLocaleString()}.`);
+      throw new Error(`Insufficient wallet balance. You have ₱${wallet.balance.toLocaleString('en-US', {minimumFractionDigits: 2})} but need ₱${totalPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}.`);
     }
 
-    // Deduct from wallet
     await sb
       .from('wallets')
       .update({ balance: wallet.balance - totalPrice })
       .eq('user_id', userId);
 
-    // ── Build booking records ──────────────────────────
     const bookingsToInsert = selectedSeats.map((seatNum, index) => {
       const name   = document.getElementById(`passName_${index}`)?.value.trim() || 'N/A';
       const age    = parseInt(document.getElementById(`passAge_${index}`)?.value) || null;
@@ -1017,18 +995,84 @@ async function confirmAndPay() {
     const { error: bookingError } = await sb.from('bookings').insert(bookingsToInsert);
     if (bookingError) throw bookingError;
 
-    // ── Success ────────────────────────────────────────
-    const passengerNames = bookingsToInsert.map(b => b.passenger_name).join(', ');
-    alert(`✅ Booking confirmed!\n\n${selectedSeats.length} seat(s) booked for ${passengerNames}.\n₱${totalPrice.toLocaleString()} deducted from wallet.\n\nYour ticket is now in My Tickets.`);
+    // ── INJECT BEAUTIFUL TICKET WITH REAL DATA ──
+    const finalBalance = wallet.balance - totalPrice;
+    const pName = document.getElementById('passName_0')?.value.trim() || 'Guest';
+    const displayDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    // Reset state
-    selectedSeats      = [];
-    currentScheduleId  = null;
+    const successTicketContainer = document.getElementById('successTicketContainer');
+    if (successTicketContainer) {
+      successTicketContainer.innerHTML = `
+        <div class="st-card">
+          <div class="st-header">
+            <div class="st-header-route">
+              ${currentOrigin}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              ${currentDest}
+            </div>
+            <div class="st-header-sub">
+              ${currentBusName} · Seat ${selectedSeats[0]}<br>
+              REF #GR-${String(currentScheduleId).substring(0,8).toUpperCase()}
+            </div>
+          </div>
+
+          <div class="st-body">
+            <div class="st-grid">
+              <div><div class="st-label">Passenger</div><div class="st-value">${pName}</div></div>
+              <div><div class="st-label">Seat</div><div class="st-value">${selectedSeats.join(', ')}</div></div>
+              <div><div class="st-label">Date</div><div class="st-value dark">${displayDate}</div></div>
+              <div><div class="st-label">Operator</div><div class="st-value dark">${currentBusName}</div></div>
+              <div><div class="st-label">Status</div><div class="st-value success">Confirmed ✓</div></div>
+            </div>
+
+            <div class="st-total">
+              <div>
+                <div class="st-total-lbl">Total Paid</div>
+                <div class="st-total-sub">Deducted from Wallet</div>
+              </div>
+              <div class="st-total-amt">₱${totalPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+
+            <div class="st-barcode-area">
+              <svg width="180" height="35" viewBox="0 0 180 35" fill="#1A2940" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="5" width="2" height="30"/><rect x="5" y="10" width="4" height="25"/><rect x="12" y="0" width="2" height="35"/><rect x="17" y="15" width="1" height="20"/><rect x="21" y="5" width="5" height="30"/><rect x="29" y="10" width="2" height="25"/><rect x="34" y="0" width="4" height="35"/><rect x="41" y="8" width="1" height="27"/><rect x="45" y="0" width="3" height="35"/><rect x="51" y="12" width="2" height="23"/><rect x="56" y="5" width="4" height="30"/><rect x="63" y="18" width="2" height="17"/><rect x="68" y="0" width="4" height="35"/><rect x="75" y="10" width="1" height="25"/><rect x="79" y="5" width="3" height="30"/><rect x="85" y="0" width="2" height="35"/><rect x="90" y="15" width="4" height="20"/><rect x="97" y="5" width="2" height="30"/><rect x="102" y="0" width="4" height="35"/><rect x="109" y="10" width="1" height="25"/><rect x="113" y="5" width="5" height="30"/><rect x="121" y="18" width="2" height="17"/><rect x="126" y="0" width="3" height="35"/><rect x="132" y="8" width="2" height="27"/><rect x="137" y="5" width="4" height="30"/><rect x="144" y="15" width="1" height="20"/><rect x="148" y="0" width="4" height="35"/><rect x="155" y="10" width="2" height="25"/><rect x="160" y="5" width="3" height="30"/><rect x="166" y="12" width="2" height="23"/><rect x="171" y="0" width="4" height="35"/><rect x="178" y="5" width="2" height="30"/>
+              </svg>
+              <div class="st-ref">GR-${String(currentScheduleId).substring(0,8).toUpperCase()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    const successWalletContainer = document.getElementById('successWalletContainer');
+    if (successWalletContainer) {
+      successWalletContainer.innerHTML = `
+        <div class="success-wallet">
+          <div class="sw-left">
+            <div class="sw-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            </div>
+            <div>
+              <div class="sw-lbl">Wallet Balance</div>
+              <div class="sw-val">₱${finalBalance.toLocaleString('en-US', {minimumFractionDigits: 2})} remaining</div>
+            </div>
+          </div>
+          <div class="sw-deduct">-₱${totalPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        </div>
+      `;
+    }
+
+    selectedSeats = [];
+    currentScheduleId = null;
     currentTicketPrice = 0;
 
     document.getElementById('bookingFormScreen').style.display = 'none';
-    switchTab('tickets');
-
+    document.getElementById('successScreen').style.display = 'block';
+    
+    // Hide the bottom navigation bar
+    document.querySelector('.mobile-bottom-bar').style.display = 'none';
+    
+    return;
   } catch (err) {
     alert('Error: ' + err.message);
   } finally {
@@ -1048,7 +1092,6 @@ async function loadMyTickets() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
 
-    // Fetch the user's bookings
     const { data: bookings, error } = await sb
       .from('bookings')
       .select(`
@@ -1075,7 +1118,6 @@ async function loadMyTickets() {
       return;
     }
 
-    // ── SMART GROUPING: Combine multiple seats for the same trip into ONE card! ──
     const groupedTrips = {};
     bookings.forEach(b => {
       const scheduleId = b.schedules.id;
@@ -1085,30 +1127,37 @@ async function loadMyTickets() {
           status: b.status,
           created_at: b.created_at,
           schedules: b.schedules,
-          seats: [] // Create an empty array for the seats
+          seats: [] 
         };
       }
-      groupedTrips[scheduleId].seats.push(b.seat_number); // Add the seat to the group
+      groupedTrips[scheduleId].seats.push(b.seat_number); 
     });
 
-    // Convert the grouped object back into an array to draw the HTML
     const tripsArray = Object.values(groupedTrips);
 
-    // Draw the new grouped ticket cards
     listEl.innerHTML = tripsArray.map(trip => {
+      const now = new Date();
+      const departureTime = new Date(trip.schedules.departure_time);
+      const arrivalTime = new Date(trip.schedules.arrival_time);
       const origin = trip.schedules?.origin?.name || "Unknown";
       const dest = trip.schedules?.destination?.name || "Unknown";
       const operator = trip.schedules?.buses?.operator_name || "GoRoute";
       
-      const depTime = trip.schedules?.departure_time ? new Date(trip.schedules.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-      const arrTime = trip.schedules?.arrival_time ? new Date(trip.schedules.arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+      let displayStatus = 'Confirmed';
+      let badgeClass = 'status-confirmed';
+
+      if (now < departureTime) {
+        displayStatus = 'Upcoming';
+        badgeClass = 'status-upcoming';
+      } else if (now > arrivalTime) {
+        displayStatus = 'Completed';
+        badgeClass = 'status-completed';
+      }
+
+      const depTime = departureTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      const arrTime = arrivalTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const displayDate = new Date(trip.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-      let badgeClass = 'status-confirmed';
-      if (trip.status.toLowerCase() === 'upcoming') badgeClass = 'status-upcoming';
-      if (trip.status.toLowerCase() === 'completed') badgeClass = 'status-completed';
-
-      // Join the seats together (e.g., "1A, 1B, 2C")
       const seatString = trip.seats.join(', ');
       const seatCountText = trip.seats.length === 1 ? '1 Seat' : `${trip.seats.length} Seats`;
 
@@ -1116,14 +1165,14 @@ async function loadMyTickets() {
       <div class="ticket-card" style="cursor: pointer;" onclick="openQR('${trip.scheduleId}', '${origin} → ${dest}', '${displayDate} · ${depTime}', '${seatString}')">
         
         <div class="ticket-left">
-          <div class="ticket-no">PHB/Ticket No: ${trip.scheduleId.substring(0,8).toUpperCase()}</div>
+          <div class="ticket-no">PHB/Ticket No: ${String(trip.scheduleId).substring(0,8).toUpperCase()}</div>
           <div class="ticket-route">${origin} <span class="arrow">→</span> ${dest}</div>
           <div class="ticket-time">${depTime} <span class="arrow">→</span> ${arrTime}</div>
           <div class="ticket-meta-info">${operator} · ${seatCountText}</div>
         </div>
         
         <div class="ticket-right">
-          <div class="status-badge ${badgeClass}">${trip.status}</div>
+          <div class="status-badge ${badgeClass}">${displayStatus}</div>
           <div class="ticket-date">${displayDate}</div>
         </div>
         
@@ -1136,36 +1185,31 @@ async function loadMyTickets() {
 }
 
 // ── QR Code Logic ──
-let qrcodeObj = null; // Store the QR code so we can clear it later
+let qrcodeObj = null; 
 
 function openQR(scheduleId, route, dateTime, seats) {
-  // 1. Fill in the popup text
   document.getElementById('qrRoute').innerText = route;
   document.getElementById('qrDate').innerText = dateTime;
   document.getElementById('qrSeats').innerText = `Seats: ${seats}`;
 
-  // 2. Clear out any old QR code image
   const qrContainer = document.getElementById('qrcode-container');
   qrContainer.innerHTML = ''; 
 
-  // 3. Create the data payload for the scanner (Schedule ID and Seats)
   const qrDataPayload = JSON.stringify({ 
     app: "GoRoute",
     schedule: scheduleId,
     seats: seats 
   });
 
-  // 4. Generate the new QR Code
   qrcodeObj = new QRCode(qrContainer, {
     text: qrDataPayload,
     width: 160,
     height: 160,
-    colorDark : "#1A6FB0", // Draw it in GoRoute Blue!
+    colorDark : "#1A6FB0", 
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
 
-  // 5. Show the popup
   document.getElementById('qrModal').style.display = 'flex';
 }
 
@@ -1174,12 +1218,11 @@ function closeQR() {
 }
 
 // ════════════════════════════════════════════════════════
-//   WALLET
+//   WALLET (Dynamic Real-Time Passbook)
 // ════════════════════════════════════════════════════════
 async function loadWallet() {
   const screen = document.getElementById('walletScreen');
   
-  // Show loading state while fetching the real balance
   screen.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text3);">Loading wallet securely...</div>';
 
   const { data: { session } } = await sb.auth.getSession();
@@ -1187,64 +1230,82 @@ async function loadWallet() {
 
   const userId = session.user.id;
 
-  // Fetch the actual real balance from Supabase!
-  let { data: wallet } = await sb.from('wallets').select('*').eq('user_id', userId).single();
+  // 1. Fetch real wallet balance
+  let { data: wallet } = await sb.from('wallets').select('*').eq('user_id', userId).maybeSingle();
 
-  // If new user, create a wallet with ₱5,000
   if (!wallet) {
-    const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 5000 }]).select().single();
+    const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
     wallet = newWallet;
   }
 
-  // Inject the beautiful new UI
+  // 2. Fetch REAL transaction history (bookings)
+  const { data: bookings } = await sb
+    .from('bookings')
+    .select(`
+      price, 
+      created_at, 
+      schedules (
+        origin:origin_id ( name ),
+        destination:destination_id ( name )
+      )
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  // 3. Generate dynamic passbook HTML
+  let passbookHTML = '';
+  
+  if (bookings && bookings.length > 0) {
+    bookings.forEach(b => {
+      const dateObj = new Date(b.created_at);
+      const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+      const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      
+      const origin = b.schedules?.origin?.name || 'Origin';
+      const dest = b.schedules?.destination?.name || 'Destination';
+      
+      passbookHTML += `
+        <div class="transaction-row">
+          <div>
+            <div class="tx-title">Bus ticket — ${origin} to ${dest}</div>
+            <div class="tx-date">${dateStr} · ${timeStr}</div>
+          </div>
+          <div class="tx-amt tx-minus">- ₱${Number(b.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        </div>
+      `;
+    });
+  }
+
+  // 4. Inject the final UI
   screen.innerHTML = `
     <!-- Top Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
       <h2 style="color: var(--blue-dark); font-size: 18px;">My Wallet</h2>
-      <div style="width: 32px; height: 32px; background: #EBF5FD; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--blue-dark);">👤</div>
+      <div style="width: 32px; height: 32px; background: #EBF5FD; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--blue-dark);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
     </div>
 
     <!-- Blue Balance Card -->
     <div class="wallet-card">
       <div class="wallet-title">Wallet Balance</div>
-      <div class="wallet-amount">₱ ${wallet.balance.toLocaleString()}</div>
+      <div class="wallet-amount">₱${wallet.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
       <button class="add-money-btn" onclick="alert('Payment gateway integration coming soon!')">+ Add Money</button>
     </div>
 
-    <!-- Passbook List (Placeholder Data) -->
+    <!-- Passbook List -->
     <div class="passbook-container">
-      <div class="passbook-header">Passbook</div>
+      <div class="passbook-header">Recent Transactions</div>
       
-      <div class="transaction-row">
-        <div>
-          <div class="tx-title">Added money to wallet</div>
-          <div class="tx-date">18 Jan 2025 · 08:40 AM</div>
-        </div>
-        <div class="tx-amt tx-plus">+ ₱ 600</div>
-      </div>
+      ${passbookHTML}
 
+      <!-- Initial Signup Bonus -->
       <div class="transaction-row">
         <div>
-          <div class="tx-title">Bus ticket — Cebu to Manila</div>
-          <div class="tx-date">12 Jan 2025 · 02:15 PM</div>
+          <div class="tx-title">Initial Wallet Deposit</div>
+          <div class="tx-date">Account Creation</div>
         </div>
-        <div class="tx-amt tx-minus">- ₱ 600</div>
-      </div>
-
-      <div class="transaction-row">
-        <div>
-          <div class="tx-title">Cashback earned</div>
-          <div class="tx-date">03 Jan 2025 · 11:06 AM</div>
-        </div>
-        <div class="tx-amt tx-plus">+ ₱ 400</div>
-      </div>
-      
-      <div class="transaction-row">
-        <div>
-          <div class="tx-title">Added money to wallet</div>
-          <div class="tx-date">01 Jan 2025 · 09:00 AM</div>
-        </div>
-        <div class="tx-amt tx-plus">+ ₱ 100</div>
+        <div class="tx-amt tx-plus">+ ₱100,000.00</div>
       </div>
     </div>
   `;
@@ -1275,7 +1336,7 @@ async function loadAccount() {
 async function loadAdminData() {
   const container = document.getElementById('adminBookingsList');
   if (!container) return;
-  container.innerText = 'Loading data…';
+  container.innerText = 'Loading data...';
 
   try {
     const { data: bookings, error } = await sb
@@ -1335,7 +1396,7 @@ async function loadAdminData() {
 
       html += `
         <tr style="border-bottom:1px solid #eee;">
-          <td style="padding:10px 8px;color:var(--text3);font-size:11px;">${b.id.substring(0, 8).toUpperCase()}</td>
+          <td style="padding:10px 8px;color:var(--text3);font-size:11px;">${String(b.id).substring(0, 8).toUpperCase()}</td>
           <td style="padding:10px 8px;font-weight:700;color:var(--blue);">${b.seat_number}</td>
           <td style="padding:10px 8px;">${b.passenger_name || 'N/A'}${b.passenger_age ? ', ' + b.passenger_age : ''}${b.passenger_gender ? ' (' + b.passenger_gender + ')' : ''}</td>
           <td style="padding:10px 8px;font-size:12px;">${route}</td>
@@ -1361,3 +1422,65 @@ async function adminLogout() {
   await sb.auth.signOut();
   window.location.href = 'auth.html';
 }
+
+function applyFilter(type, element) {
+    document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+    element.classList.add('active');
+
+    if (type === 'All') {
+        renderTickets(lastSearchResults);
+        return;
+    }
+
+    const filtered = lastSearchResults.filter(item => item.buses.bus_type === type);
+    renderTickets(filtered);
+}
+
+// ════════════════════════════════════════════════════════
+//   INTERACTIVE UI ELEMENTS (Event Delegation)
+// ════════════════════════════════════════════════════════
+document.addEventListener('click', (e) => {
+
+  // 1. ── Toggle Switch Logic ──
+  const toggle = e.target.closest('.toggle-switch');
+  if (toggle) {
+    toggle.classList.toggle('off');
+  }
+
+  // 2. ── Gender Selection Logic ──
+  const pill = e.target.closest('.ep-gender-pill');
+  if (pill) {
+    document.querySelectorAll('.ep-gender-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  }
+
+  // 3. ── "Save Changes" Button Animation ──
+  const saveBtn = e.target.closest('.ep-btn-save');
+  if (saveBtn) {
+    const originalText = saveBtn.innerText;
+    
+    // Change to loading state
+    saveBtn.innerText = 'Saving...';
+    saveBtn.style.opacity = '0.8';
+    saveBtn.style.pointerEvents = 'none'; 
+    
+    // Simulate a 1-second network delay
+    setTimeout(() => {
+      // Show success state
+      saveBtn.innerText = 'Saved!';
+      saveBtn.style.background = '#22C55E';    
+      saveBtn.style.opacity = '1';
+      
+      // Wait 1 more second, then send them back
+      setTimeout(() => {
+        document.getElementById('editProfileScreen').style.display = 'none';
+        document.getElementById('accountScreen').style.display = 'block';
+        
+        // Reset the button for next time
+        saveBtn.innerText = originalText;
+        saveBtn.style.background = 'var(--blue)';
+        saveBtn.style.pointerEvents = 'auto';
+      }, 800);
+    }, 1000);
+  }
+});

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8"> <!-- This is the magic line -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoRoute | Search Flights & Buses</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,9 @@
 </head>
 <body>
 
-<div class="app">
+
+  
+<div class="shell">
   <div class="header">
     <div class="logo">
       Go<span>Route</span>
@@ -26,7 +28,7 @@
     </button>
   </div>
 
-  <div class="screens" style="grid-template-columns: 1fr; max-width: 400px; margin: 0 auto;">
+  <div class="screens">
     
 
     <!-- 1. Search Screen -->
@@ -82,7 +84,7 @@
           </div>
 
           <!-- Find Buses Button -->
-          <button type="button" class="find-buses-btn" onclick="findBuses()">Find Buses</button>
+          <button class="find-buses-btn" onclick="findBuses()">Find Buses</button>
         </div>
       </div>
     </div>
@@ -101,9 +103,9 @@
           <div class="date-badge">Today</div>
         </div>
         <div class="filter-row">
-          <div class="filter-chip active">All</div>
-          <div class="filter-chip">AC</div>
-          <div class="filter-chip">Sleeper</div>
+          <div class="filter-chip active" onclick="applyFilter('All', this)">All</div>
+          <div class="filter-chip" onclick="applyFilter('AC', this)">AC</div>
+          <div class="filter-chip" onclick="applyFilter('Sleeper', this)">Sleeper</div>
         </div>
         
         <div id="resultsContainer"></div>
@@ -146,7 +148,40 @@
         <button onclick="document.getElementById('seatScreen').style.display='none'; document.getElementById('resultsScreen').style.display='block';" style="width:100%; padding:10px; background:var(--blue-light); color:var(--blue-dark); border:none; border-radius:10px; margin-top:10px; cursor:pointer; font-weight:bold; font-family:'Nunito', sans-serif;">← Back to Results</button>
       </div>
     </div>
+  
+<!-- Final Success Screen Section -->
+    <div id="successScreen" style="display:none; height: 100%; overflow: hidden; background-color: var(--bg);">
+      <div style="display: flex; flex-direction: column; height: 100%; padding: 16px 16px 20px; box-sizing: border-box;">
+        
+        <!-- 1. Permanent Checkmark & Header -->
+        <div style="text-align: center; margin-bottom: 12px; flex-shrink: 0;">
+          <div style="width: 44px; height: 44px; background: #E8F9EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style="font-size: 20px; font-weight: 800; color: #1A2940; margin-bottom: 2px;">Booking Confirmed!</div>
+          <div style="font-size: 12px; color: #64748B;">Your ticket is ready. Have a safe trip!</div>
+        </div>
 
+        <!-- 2. The Data Containers (Centered dynamically) -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0;">
+            <div id="successTicketContainer" style="margin-bottom: 10px;"></div>
+            <div id="successWalletContainer"></div>
+        </div>
+
+        <!-- 3. Permanent Buttons -->
+        <div style="margin-top: 12px; flex-shrink: 0;">
+          <button onclick="switchTab('tickets')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #3B9EE8; color: #fff; border: none; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,158,232,.3);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            View My Ticket
+          </button>
+          <button onclick="switchTab('home')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #fff; color: #1A6FB0; border: 1.5px solid #EBF5FD; cursor: pointer;">
+            Back to Home
+          </button>
+        </div>
+
+      </div>
+    </div>
+    
     <!-- 4. My Tickets Screen -->
     <div id="ticketsScreen" style="display: none;">
       <div class="screen-label">My tickets</div>
@@ -182,22 +217,157 @@
       </div>
     </div>
 
-    <!-- 6. Account Screen -->
+    <!-- 6. Settings (Account) Screen -->
     <div id="accountScreen" style="display: none;">
-      <div class="screen-label">Account</div>
-      <div class="screen wallet-screen" style="text-align: center; padding: 40px 20px;">
-        <div style="width: 80px; height: 80px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
-          👤
-        </div>
-        <h2 style="font-family: 'Poppins', sans-serif; font-size: 20px; color: var(--blue-dark); margin-bottom: 4px;">My Profile</h2>
+      <div class="screen settings-screen">
         
-        <!-- We will inject their Supabase email here -->
-        <p id="accountEmailText" style="font-size: 14px; color: var(--text2); margin-bottom: 40px;">Loading...</p>
+        <div class="settings-header">
+          <div class="settings-title">Settings</div>
+        </div>
 
-        <!-- The new, cleaner Sign Out button -->
-        <button onclick="handleLogout()" style="width: 100%; padding: 12px; background: #FFF0F0; color: var(--accent); border: 1.5px solid #FFCDD2; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s;">
-          Sign Out
-        </button>
+        <div class="profile-summary">
+          <div class="ps-avatar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="ps-info">
+            <div class="ps-name">rj tabarno</div>
+            <div class="ps-email">rjpaulhemodo@gmail.com</div>
+          </div>
+          <div class="ps-edit" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('editProfileScreen').style.display='block';">Edit →</div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('editProfileScreen').style.display='block';">
+            <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+            <div class="si-text">
+              <div class="si-title">My Profile</div>
+              <div class="si-sub">Edit personal information</div>
+            </div>
+            <div class="si-arrow">›</div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+            <div class="si-text">
+              <div class="si-title">Security</div>
+              <div class="si-sub">Password & 2FA</div>
+            </div>
+            <div class="si-arrow">›</div>
+          </div>
+          <div class="settings-item" onclick="switchTab('wallet')">
+            <div class="si-icon ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg></div>
+            <div class="si-text">
+              <div class="si-title">My Wallet</div>
+              <div class="si-sub">Balance: ₱ 500</div>
+            </div>
+            <div class="si-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="si-icon ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+            <div class="si-text">
+              <div class="si-title">Notifications</div>
+              <div class="si-sub">Booking alerts, promos</div>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg></div>
+            <div class="si-text">
+              <div class="si-title">Appearance</div>
+              <div class="si-sub">Light mode</div>
+            </div>
+            <div class="si-arrow">›</div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon ic-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+            <div class="si-text">
+              <div class="si-title">Help & Support</div>
+              <div class="si-sub">FAQs, contact us</div>
+            </div>
+            <div class="si-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="btn-signout" onclick="handleLogout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Sign Out
+          </div>
+        </div>
+
+        <div class="app-version">GoRoute v1.0.0 · Made with ❤️ in PH</div>
+
+      </div>
+    </div>
+
+    <!-- 7. Edit Profile Screen -->
+    <div id="editProfileScreen" style="display: none;">
+      <div class="screen ep-screen">
+        
+        <div class="ep-hero">
+          <div class="ep-header">
+            <div class="ep-back" onclick="document.getElementById('editProfileScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="ep-title">Edit Profile</div>
+          </div>
+          
+          <div class="ep-avatar-wrap">
+            <div class="ep-avatar">
+              <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="ep-cam">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label">Full Name</label>
+          <div class="ep-input-wrap">
+            <div class="ep-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+            <input type="text" class="ep-input" value="rj tabarno">
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label">Email</label>
+          <div class="ep-input-wrap">
+            <div class="ep-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
+            <input type="email" class="ep-input" value="rjpaulhemodo@gmail.com">
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label">Mobile Number</label>
+          <div class="ep-input-wrap">
+            <div class="ep-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+            <input type="text" class="ep-input" value="+63 912 345 6789">
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label">Date of Birth</label>
+          <div class="ep-input-wrap">
+            <div class="ep-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+            <input type="text" class="ep-input" value="Jan 15, 1998">
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label">Gender</label>
+          <div class="ep-gender-row">
+            <div class="ep-gender-pill active">Male</div>
+            <div class="ep-gender-pill">Female</div>
+            <div class="ep-gender-pill">Other</div>
+          </div>
+        </div>
+
+        <button class="ep-btn-save">Save Changes</button>
+        <button class="ep-btn-cancel" onclick="document.getElementById('editProfileScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">Cancel</button>
+
       </div>
     </div>
 
@@ -222,12 +392,12 @@
         <div class="divider"></div>
         <div class="passenger-title" style="margin-top:6px">Contact Information</div>
         <div class="form-row">
-          <label>Mobile</label>
-          <input type="text" class="finput" placeholder="+63 ···" id="contactMobile">
+        <label for="contactMobile">Mobile</label>
+        <input type="text" class="finput" placeholder="+63 ..." id="contactMobile">
         </div>
         <div class="form-row">
-          <label>Email</label>
-          <input type="email" class="finput" placeholder="your@email.com" id="contactEmail">
+        <label for="contactEmail">Email</label>
+        <input type="email" class="finput" placeholder="your@email.com" id="contactEmail">
         </div>
 
         <button class="book-btn" onclick="confirmAndPay()">Pay & Book Ticket</button>
