@@ -18,10 +18,7 @@
   --topbar-h:60px;
 }
 html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
-
 .shell{display:flex;height:100vh;overflow:hidden;}
-
-/* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
 .sidebar::-webkit-scrollbar{width:4px;}
 .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
@@ -45,26 +42,24 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 .sb-user-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);}
 .sb-user-role{font-size:10px;color:rgba(255,255,255,.35);}
 .sb-logout{margin-left:auto;opacity:.4;}
-
-/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:14px;flex-shrink:0;box-shadow:0 1px 4px rgba(59,158,232,.06);}
 .topbar-title{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;color:var(--blue-dark);flex:1;}
 .topbar-title small{font-size:11px;font-weight:500;color:var(--text3);display:block;font-family:'Nunito',sans-serif;margin-top:1px;}
 .search-bar{display:flex;align-items:center;gap:8px;background:var(--blue-pale);border:1.5px solid var(--border);border-radius:22px;padding:8px 16px;width:240px;}
-.search-bar span{font-size:13px;color:var(--text3);}
+.search-bar input{border:none;background:transparent;font-size:13px;color:var(--text);font-family:'Nunito',sans-serif;outline:none;width:100%;}
+.search-bar input::placeholder{color:var(--text3);}
 .tb-icon-btn{width:38px;height:38px;border-radius:50%;background:var(--blue-pale);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
 .tb-icon-btn:hover{background:var(--blue-light);border-color:var(--blue-mid);}
 .notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);border:2px solid #fff;}
 .tb-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-light);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:var(--blue-dark);cursor:pointer;}
-.add-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.add-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .add-btn:hover{background:var(--blue-dark);}
-
 .content{flex:1;overflow-y:auto;padding:24px 28px 32px;}
 .content::-webkit-scrollbar{width:5px;}
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-
-/* STAT CARDS */
+.page{display:none;}
+.page.active{display:block;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
 .stat-card{background:var(--white);border-radius:16px;padding:18px 20px;border:1.5px solid var(--border);box-shadow:var(--shadow);}
 .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
@@ -74,15 +69,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 .stat-trend.warn{background:#FFF4E5;color:#E67E00;}
 .stat-value{font-family:'Poppins',sans-serif;font-size:24px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px;}
 .stat-label{font-size:11px;color:var(--text3);font-weight:600;}
-
-/* MID GRID */
 .mid-grid{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-bottom:22px;}
 .card{background:var(--white);border-radius:16px;padding:18px 20px;border:1.5px solid var(--border);box-shadow:var(--shadow);}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .sec-title{font-size:13px;font-weight:800;color:var(--text);}
 .sec-link{font-size:11px;color:var(--blue);font-weight:700;cursor:pointer;}
-
-/* TABLE */
 .data-table{width:100%;border-collapse:collapse;}
 .data-table th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:0 10px 10px 0;text-align:left;border-bottom:1.5px solid var(--border);}
 .data-table td{font-size:12px;color:var(--text2);padding:10px 10px 10px 0;border-bottom:1px solid var(--border);vertical-align:middle;}
@@ -98,10 +89,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 .pill-pending{background:#FFF4E5;color:#E67E00;}
 .pill-cancelled{background:#FFF0F0;color:var(--accent);}
 .pill-completed{background:#F5F5F5;color:#888;}
+.pill-active{background:var(--green-light);color:var(--green);}
+.pill-maintenance{background:#FFF4E5;color:#E67E00;}
 .action-btn{padding:5px 10px;background:var(--blue-pale);border:1px solid var(--border);border-radius:7px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'Nunito',sans-serif;}
 .action-btn:hover{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue-dark);}
-
-/* SNAPSHOT */
+.action-btn.danger{background:#FFF0F0;border-color:#FFD0D0;color:var(--accent);}
 .snap-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
 .snap-item:last-child{border-bottom:none;}
 .snap-left{flex:1;}
@@ -112,8 +104,6 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 .snap-val.green{color:var(--green);}
 .snap-val.red{color:var(--accent);}
 .snap-val.orange{color:#E67E00;}
-
-/* BOT GRID */
 .bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .user-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);}
 .user-row:last-child{border-bottom:none;}
@@ -121,30 +111,154 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 .u-name{font-size:12px;font-weight:700;color:var(--text);}
 .u-email{font-size:10px;color:var(--text3);}
 .u-time{font-size:10px;color:var(--text3);white-space:nowrap;}
-
 .feed-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .feed-item:last-child{border-bottom:none;}
 .feed-dot-wrap{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .feed-text{font-size:12px;color:var(--text2);line-height:1.5;flex:1;}
 .feed-text strong{color:var(--text);font-weight:700;}
 .feed-ago{font-size:10px;color:var(--text3);white-space:nowrap;margin-left:6px;margin-top:2px;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.page-title{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;color:var(--text);}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--blue);color:#fff;border:none;border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-primary:hover{background:var(--blue-dark);}
+.btn-secondary{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--white);color:var(--text2);border:1.5px solid var(--border);border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-secondary:hover{background:var(--blue-pale);}
+.btn-row{display:flex;gap:8px;}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-select{padding:7px 14px;border:1.5px solid var(--border);border-radius:22px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;color:var(--text2);background:var(--white);cursor:pointer;outline:none;}
+.filter-input{padding:7px 14px;border:1.5px solid var(--border);border-radius:22px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;min-width:180px;}
+.table-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.table-card .data-table th,.table-card .data-table td{padding:11px 14px;}
+.table-card .data-table thead{background:var(--blue-pale);}
+.table-card .data-table th{border-bottom:1.5px solid var(--border);}
+.table-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);}
+.page-btns{display:flex;gap:4px;}
+.page-btn{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--white);font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.page-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.av-blue{background:#EBF5FD;color:var(--blue-dark);}
+.av-orange{background:#FFF4E5;color:#E67E00;}
+.av-green{background:#eafaf1;color:var(--green);}
+.av-red{background:#FFF0F0;color:var(--accent);}
+.av-purple{background:#F3EFFF;color:#7C5CBF;}
+.av-teal{background:#E0F7F7;color:#0a9396;}
+.sched-day-label{text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px;}
+.sched-cell{background:var(--white);border-radius:10px;border:1.5px solid var(--border);padding:8px;min-height:80px;cursor:pointer;transition:border-color .15s;}
+.sched-cell:hover{border-color:var(--blue-mid);}
+.sched-cell.today{border-color:var(--blue);background:var(--blue-pale);}
+.sched-date{font-size:11px;font-weight:800;color:var(--text3);margin-bottom:4px;}
+.sched-cell.today .sched-date{color:var(--blue-dark);}
+.sched-trip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sched-trip.blue{background:var(--blue-light);color:var(--blue-dark);}
+.sched-trip.green{background:var(--green-light);color:var(--green);}
+.sched-trip.orange{background:#FFF4E5;color:#E67E00;}
+.sched-more{font-size:9px;color:var(--text3);font-weight:600;}
+.fleet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.bus-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);box-shadow:var(--shadow);padding:18px 20px;}
+.bus-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.bus-num{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
+.bus-model{font-size:11px;color:var(--text3);margin-top:2px;}
+.bus-icon-wrap{width:44px;height:44px;border-radius:12px;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;}
+.bus-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.bus-stat{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.bus-stat-val{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
+.bus-stat-label{font-size:10px;color:var(--text3);margin-top:2px;}
+.bus-footer{display:flex;align-items:center;justify-content:space-between;}
+.bus-driver{font-size:11px;color:var(--text2);}
+.bus-driver strong{color:var(--text);font-weight:700;}
+.routes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.route-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);box-shadow:var(--shadow);padding:18px 20px;}
+.route-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.route-name{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.route-id{font-size:10px;color:var(--text3);}
+.route-stops{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.route-stop{font-size:11px;font-weight:700;color:var(--blue-dark);background:var(--blue-pale);border-radius:20px;padding:3px 10px;}
+.route-arrow{font-size:11px;color:var(--text3);}
+.route-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.route-meta-item{text-align:center;background:var(--bg);border-radius:10px;padding:8px;}
+.route-meta-val{font-size:14px;font-weight:800;color:var(--text);font-family:'Poppins',sans-serif;}
+.route-meta-label{font-size:9px;color:var(--text3);margin-top:2px;}
+.rev-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:22px;}
+.chart-placeholder{background:var(--white);border-radius:16px;border:1.5px solid var(--border);padding:20px;box-shadow:var(--shadow);}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:180px;padding-top:10px;}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.chart-bar{width:100%;border-radius:6px 6px 0 0;cursor:pointer;}
+.chart-bar:hover{opacity:.8;}
+.chart-bar-label{font-size:9px;color:var(--text3);font-weight:600;}
+.report-list{display:flex;flex-direction:column;gap:10px;}
+.report-item{background:var(--white);border-radius:14px;border:1.5px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.report-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.report-info{flex:1;}
+.report-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.report-desc{font-size:11px;color:var(--text3);}
+.report-meta{font-size:10px;color:var(--text3);text-align:right;white-space:nowrap;margin-right:12px;}
+.report-meta strong{color:var(--text2);display:block;margin-bottom:2px;}
+.settings-grid{display:grid;grid-template-columns:220px 1fr;gap:20px;}
+.settings-nav{display:flex;flex-direction:column;gap:4px;}
+.settings-nav-item{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+.settings-nav-item:hover{background:var(--blue-pale);color:var(--blue-dark);}
+.settings-nav-item.active{background:var(--blue-light);color:var(--blue-dark);font-weight:700;}
+.settings-panel{background:var(--white);border-radius:16px;border:1.5px solid var(--border);padding:24px;box-shadow:var(--shadow);}
+.settings-section{margin-bottom:28px;}
+.settings-section:last-child{margin-bottom:0;}
+.settings-section-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:13px;font-weight:600;color:var(--text);}
+.setting-desc{font-size:11px;color:var(--text3);margin-top:3px;}
+.toggle{width:42px;height:24px;border-radius:12px;background:#DDD;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--blue);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle.on::after{left:21px;}
+.settings-input{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);outline:none;}
+.settings-input:focus{border-color:var(--blue-mid);}
+.settings-input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:20px;padding:28px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-title{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px;}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);outline:none;}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--blue-mid);}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;}
+.modal-cancel{padding:9px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--text2);}
+.modal-save{padding:9px 22px;background:var(--blue);border:none;border-radius:22px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:#fff;}
+.modal-save:hover{background:var(--blue-dark);}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;z-index:2000;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--accent);}
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .shell { flex-direction: column; }
+  .sidebar { 
+    width: 100%; 
+    height: auto; 
+    flex-direction: row; 
+    overflow-x: auto; 
+    padding: 10px;
+  }
+  .sb-logo, .sb-user, .sb-section { display: none; }
+  .sb-nav { display: flex; padding: 0; }
+  .sb-item { margin: 0 5px; white-space: nowrap; }
+  
+  .stats-grid, .mid-grid, .bot-grid, .fleet-grid, .routes-grid, .rev-grid, .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-bar { display: none; /* Hide search on mobile for space */ }
+  .modal { width: 90vw; padding: 20px; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-row">
         <div class="sb-logo-icon">
-          <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-            <rect x="1" y="5" width="16" height="10" rx="3" fill="white" fill-opacity=".9"/>
-            <circle cx="5" cy="16" r="2" fill="white" fill-opacity=".7"/>
-            <circle cx="13" cy="16" r="2" fill="white" fill-opacity=".7"/>
-            <rect x="3" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
-            <rect x="9" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/>
-          </svg>
+          <svg width="20" height="20" viewBox="0 0 18 18" fill="none"><rect x="1" y="5" width="16" height="10" rx="3" fill="white" fill-opacity=".9"/><circle cx="5" cy="16" r="2" fill="white" fill-opacity=".7"/><circle cx="13" cy="16" r="2" fill="white" fill-opacity=".7"/><rect x="3" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/><rect x="9" y="7" width="4" height="4" rx="1" fill="#3B9EE8"/></svg>
         </div>
         <div class="sb-logo-text">Go<span>Route</span></div>
       </div>
@@ -152,326 +266,1148 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     </div>
     <nav class="sb-nav">
       <div class="sb-section">Main</div>
-      <div class="sb-item active">
+      <div class="sb-item active" data-page="dashboard">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 2l7 7" stroke="white" stroke-width="1.4" stroke-linecap="round"/><rect x="3" y="9" width="5" height="7" rx="1" fill="white" fill-opacity=".4" stroke="white" stroke-width="1.1"/><rect x="10" y="9" width="5" height="7" rx="1" fill="white" fill-opacity=".2" stroke="white" stroke-width="1.1"/></svg>
         Dashboard
       </div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="users">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        Users
-        <span class="sb-badge">4</span>
+        Users <span class="sb-badge">Live</span>
       </div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="bookings">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a4 4 0 018 0v1" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="11" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
-        Bookings
-        <span class="sb-badge">12</span>
+        Bookings <span class="sb-badge">Live</span>
       </div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="schedules">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 3V1M12 3V1M2 7h14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         Schedules
       </div>
       <div class="sb-section">Fleet</div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="buses">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="8" rx="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4.5" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="13.5" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/><rect x="3" y="8" width="3" height="3" rx=".7" fill="currentColor" fill-opacity=".4"/><rect x="8" y="8" width="3" height="3" rx=".7" fill="currentColor" fill-opacity=".4"/></svg>
         Bus Fleet
       </div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="routes">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2 12l5-5 3 3 6-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Routes
       </div>
       <div class="sb-section">Finance</div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="revenue">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="3.5" width="15" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 7.5h15M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         Revenue
       </div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="reports">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2 13L6 9l3 3 7-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Reports
       </div>
       <div class="sb-section">System</div>
-      <div class="sb-item">
+      <div class="sb-item" data-page="settings">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M3.93 3.93l1.41 1.41M12.66 12.66l1.41 1.41M3.93 14.07l1.41-1.41M12.66 5.34l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Settings
       </div>
     </nav>
     <div class="sb-user">
       <div class="sb-avatar">MA</div>
-      <div>
-        <div class="sb-user-name">Maria Admin</div>
-        <div class="sb-user-role">Super Admin</div>
-      </div>
-      <div class="sb-logout">
+      <div><div class="sb-user-name">Maria Admin</div><div class="sb-user-role">Super Admin</div></div>
+      <div class="sb-logout" onclick="adminLogout()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/><path d="M11 11l3-3-3-3M14 8H7" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
     <header class="topbar">
-      <div class="topbar-title">
-        Dashboard Overview
-        <small>Thursday, April 30, 2026 &nbsp;·&nbsp; Welcome back, Maria 👋</small>
-      </div>
+      <div class="topbar-title" id="topbarTitle">Dashboard Overview<small id="topbarSub">Saturday, May 2, 2026 &nbsp;·&nbsp; Welcome back, Maria 👋</small></div>
       <div class="search-bar">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#8ba5be" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#8ba5be" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>Search users, bookings, routes…</span>
+        <input type="text" placeholder="Search users, bookings, routes…">
       </div>
-      <button class="add-btn">
+      <button class="add-btn" onclick="openModal('addBooking')">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        New Booking
+        <span id="topAddLabel">New Booking</span>
       </button>
-      <div class="tb-icon-btn">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5.5 5.5 0 015.5 5.5c0 2.2.6 3.4 1.5 4.5H1c.9-1.1 1.5-2.3 1.5-4.5A5.5 5.5 0 018 1.5z" stroke="#4a6080" stroke-width="1.3"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#4a6080" stroke-width="1.3"/></svg>
-        <div class="notif-dot"></div>
-      </div>
+      <div class="tb-icon-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5.5 5.5 0 015.5 5.5c0 2.2.6 3.4 1.5 4.5H1c.9-1.1 1.5-2.3 1.5-4.5A5.5 5.5 0 018 1.5z" stroke="#4a6080" stroke-width="1.3"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#4a6080" stroke-width="1.3"/></svg><div class="notif-dot"></div></div>
       <div class="tb-avatar">MA</div>
     </header>
 
     <div class="content">
 
-      <!-- Stat cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon" style="background:#EBF5FD;">
-              <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="#3B9EE8" stroke-width="1.4"/><path d="M2 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#3B9EE8" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </div>
-            <span class="stat-trend up">▲ 8.4%</span>
-          </div>
-          <div class="stat-value">1,284</div>
-          <div class="stat-label">Total Users</div>
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:#EBF5FD;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="#3B9EE8" stroke-width="1.4"/><path d="M2 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#3B9EE8" stroke-width="1.4" stroke-linecap="round"/></svg></div><span class="stat-trend up">▲ 8.4%</span></div><div class="stat-value">Live</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:#eafaf1;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="11" rx="2" stroke="#27ae60" stroke-width="1.4"/><path d="M5 5V4a4 4 0 018 0v1" stroke="#27ae60" stroke-width="1.4"/></svg></div><span class="stat-trend up">▲ 5.1%</span></div><div class="stat-value">Live</div><div class="stat-label">Bookings Today</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:#FFF4E5;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="3.5" width="15" height="11" rx="2" stroke="#E67E00" stroke-width="1.4"/><path d="M1.5 7.5h15M5 11.5h3.5" stroke="#E67E00" stroke-width="1.4" stroke-linecap="round"/></svg></div><span class="stat-trend up">▲ 12%</span></div><div class="stat-value">Live</div><div class="stat-label">Revenue Today</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:#FFF0F0;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="8" rx="2.5" stroke="#FF6B6B" stroke-width="1.4"/><circle cx="4.5" cy="15" r="1.8" stroke="#FF6B6B" stroke-width="1.2"/><circle cx="13.5" cy="15" r="1.8" stroke="#FF6B6B" stroke-width="1.2"/></svg></div><span class="stat-trend warn">Syncing</span></div><div class="stat-value">Live</div><div class="stat-label">Buses Active</div></div>
         </div>
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon" style="background:#eafaf1;">
-              <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="11" rx="2" stroke="#27ae60" stroke-width="1.4"/><path d="M5 5V4a4 4 0 018 0v1" stroke="#27ae60" stroke-width="1.4"/><circle cx="9" cy="11" r="2" fill="#27ae60" fill-opacity=".3" stroke="#27ae60" stroke-width="1.1"/></svg>
-            </div>
-            <span class="stat-trend up">▲ 5.1%</span>
+        <div class="mid-grid">
+          <div class="card">
+            <div class="sec-head"><div class="sec-title">Recent Bookings</div><span class="sec-link" onclick="navigate('bookings')">View all →</span></div>
+            <table class="data-table">
+              <thead><tr><th>Passenger</th><th>Route</th><th>Departure</th><th>Seat</th><th>Fare</th><th>Status</th><th></th></tr></thead>
+              <tbody id="dash-recent-bookings">
+                <tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--text3);">Waiting for live data...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div class="stat-value">342</div>
-          <div class="stat-label">Bookings Today</div>
+          <div class="card">
+            <div class="sec-head"><div class="sec-title">Today's Snapshot</div></div>
+            <div class="snap-item"><div class="snap-left"><div class="snap-label">Seat Occupancy</div><div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--blue);"></div></div></div><div class="snap-val">74%</div></div>
+            <div class="snap-item"><div class="snap-left"><div class="snap-label">Cancellation Rate</div><div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--accent);"></div></div></div><div class="snap-val red">8%</div></div>
+            <div class="snap-item"><div class="snap-label">On-Time Buses</div><div class="snap-val green">91%</div></div>
+            <div class="snap-item"><div class="snap-label">New Sign-ups Today</div><div class="snap-val">+24</div></div>
+            <div class="snap-item"><div class="snap-label">Wallet Loads Today</div><div class="snap-val">₱ 18,400</div></div>
+            <div class="snap-item"><div class="snap-label">Active Routes</div><div class="snap-val">14</div></div>
+            <div class="snap-item"><div class="snap-label">Buses in Maintenance</div><div class="snap-val orange">2</div></div>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <button style="padding:10px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="showToast('Generating report…')">Generate Report</button>
+              <button style="padding:10px;background:var(--blue-pale);color:var(--blue-dark);border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="showToast('Exporting CSV…','success')">Export CSV</button>
+            </div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon" style="background:#FFF4E5;">
-              <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="3.5" width="15" height="11" rx="2" stroke="#E67E00" stroke-width="1.4"/><path d="M1.5 7.5h15M5 11.5h3.5" stroke="#E67E00" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="bot-grid">
+          <div class="card">
+            <div class="sec-head"><div class="sec-title">New Users</div><span class="sec-link" onclick="navigate('users')">Manage all →</span></div>
+            <div id="dash-new-users">
+               <div style="text-align:center; padding: 20px; color: var(--text3); font-size: 12px;">Waiting for live data...</div>
             </div>
-            <span class="stat-trend up">▲ 12%</span>
           </div>
-          <div class="stat-value">₱ 84,210</div>
-          <div class="stat-label">Revenue Today</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon" style="background:#FFF0F0;">
-              <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="8" rx="2.5" stroke="#FF6B6B" stroke-width="1.4"/><circle cx="4.5" cy="15" r="1.8" stroke="#FF6B6B" stroke-width="1.2"/><circle cx="13.5" cy="15" r="1.8" stroke="#FF6B6B" stroke-width="1.2"/><rect x="3" y="8" width="3" height="3" rx=".7" fill="#FF6B6B" fill-opacity=".3"/><rect x="8" y="8" width="3" height="3" rx=".7" fill="#FF6B6B" fill-opacity=".3"/></svg>
+          <div class="card">
+            <div class="sec-head"><div class="sec-title">Activity Log</div><span class="sec-link">View full log →</span></div>
+            <div id="dash-activity-log">
+               <div style="text-align:center; padding: 20px; color: var(--text3); font-size: 12px;">Waiting for live data...</div>
             </div>
-            <span class="stat-trend warn">2 offline</span>
           </div>
-          <div class="stat-value">58</div>
-          <div class="stat-label">Buses Active</div>
         </div>
       </div>
 
-      <!-- Mid grid -->
-      <div class="mid-grid">
-        <div class="card">
-          <div class="sec-head">
-            <div class="sec-title">Recent Bookings</div>
-            <span class="sec-link">View all →</span>
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <div><div class="page-title">User Management</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live users database</div></div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="showToast('Exporting users…','success')">Export CSV</button>
+            <button class="btn-primary" onclick="openModal('addUser')">+ Add User</button>
           </div>
+        </div>
+        <div class="filter-bar">
+          <select class="filter-select"><option>All Status</option><option>Active</option><option>Pending</option><option>Suspended</option></select>
+          <select class="filter-select"><option>All Roles</option><option>Passenger</option><option>Admin</option></select>
+          <input class="filter-input" type="text" placeholder="Search by name or email…">
+        </div>
+        <div class="table-card">
           <table class="data-table">
-            <thead>
-              <tr>
-                <th>Passenger</th>
-                <th>Route</th>
-                <th>Departure</th>
-                <th>Seat</th>
-                <th>Fare</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
+            <thead><tr><th>User</th><th>Contact</th><th>Role</th><th>Bookings</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
-              <tr>
-                <td><div class="td-name">Juan D. Cruz</div><div class="td-sub">+63 912 345 6789</div></td>
-                <td class="td-route">Cebu → Manila</td>
-                <td>May 1 · 8:00 PM</td>
-                <td>12B</td>
-                <td class="td-price">₱ 650</td>
-                <td><span class="pill pill-confirmed">Confirmed</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">Maria Santos</div><div class="td-sub">+63 917 000 1111</div></td>
-                <td class="td-route">Davao → Cebu</td>
-                <td>May 2 · 6:00 AM</td>
-                <td>4A</td>
-                <td class="td-price">₱ 820</td>
-                <td><span class="pill pill-pending">Pending</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">Pedro Reyes</div><div class="td-sub">+63 918 222 3333</div></td>
-                <td class="td-route">Manila → Cebu</td>
-                <td>Apr 30 · 10:00 PM</td>
-                <td>7C</td>
-                <td class="td-price">₱ 600</td>
-                <td><span class="pill pill-completed">Completed</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">Ana Lim</div><div class="td-sub">+63 920 444 5555</div></td>
-                <td class="td-route">Cebu → Bohol</td>
-                <td>Apr 29 · 7:30 AM</td>
-                <td>2A</td>
-                <td class="td-price">₱ 290</td>
-                <td><span class="pill pill-cancelled">Cancelled</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">Rodel Bautista</div><div class="td-sub">+63 921 888 9999</div></td>
-                <td class="td-route">Cebu → Iloilo</td>
-                <td>May 3 · 9:00 PM</td>
-                <td>19D</td>
-                <td class="td-price">₱ 480</td>
-                <td><span class="pill pill-confirmed">Confirmed</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">Liza Gomez</div><div class="td-sub">+63 922 333 4444</div></td>
-                <td class="td-route">Cebu → Tagbilaran</td>
-                <td>May 4 · 6:00 AM</td>
-                <td>5B</td>
-                <td class="td-price">₱ 320</td>
-                <td><span class="pill pill-confirmed">Confirmed</span></td>
-                <td><button class="action-btn">View</button></td>
-              </tr>
+              <tr><td colspan="8" style="text-align:center; padding: 20px; color: var(--text3);">Loading live users...</td></tr>
             </tbody>
           </table>
+          <div class="table-pagination"><span>Live Database Sync Active</span></div>
         </div>
+      </div>
 
-        <!-- Snapshot -->
+      <!-- BOOKINGS -->
+      <div class="page" id="page-bookings">
+        <div class="page-header">
+          <div><div class="page-title">Bookings</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live bookings database</div></div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export CSV</button>
+            <button class="btn-primary" onclick="openModal('addBooking')">+ New Booking</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <select class="filter-select"><option>All Status</option><option>Confirmed</option><option>Pending</option><option>Completed</option><option>Cancelled</option></select>
+          <select class="filter-select"><option>All Routes</option><option>Cebu → Manila</option><option>Manila → Cebu</option><option>Cebu → Bohol</option><option>Davao → Cebu</option></select>
+          <input class="filter-input" type="date" value="2026-05-02">
+          <input class="filter-input" type="text" placeholder="Search passenger…" style="min-width:160px;">
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Passenger</th><th>Route</th><th>Bus</th><th>Departure</th><th>Seat</th><th>Fare</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="main-bookings-table">
+              <tr><td colspan="9" style="text-align:center; padding: 20px; color: var(--text3);">Loading live bookings...</td></tr>
+            </tbody>
+          </table>
+          <div class="table-pagination"><span>Live Database Sync Active</span></div>
+        </div>
+      </div>
+
+      <!-- SCHEDULES -->
+      <div class="page" id="page-schedules">
+        <div class="page-header">
+          <div><div class="page-title">Schedule Manager</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">May 2026</div></div>
+          <div class="btn-row">
+            <button class="btn-secondary">← April</button>
+            <button class="btn-secondary">June →</button>
+            <button class="btn-primary" onclick="openModal('addSchedule')">+ Add Trip</button>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0;margin-bottom:8px;">
+            <div class="sched-day-label">Sun</div><div class="sched-day-label">Mon</div><div class="sched-day-label">Tue</div><div class="sched-day-label">Wed</div><div class="sched-day-label">Thu</div><div class="sched-day-label">Fri</div><div class="sched-day-label">Sat</div>
+          </div>
+          <div class="schedule-grid">
+            <div class="sched-cell" style="background:var(--bg);opacity:.5;"><div class="sched-date">27</div></div>
+            <div class="sched-cell" style="background:var(--bg);opacity:.5;"><div class="sched-date">28</div></div>
+            <div class="sched-cell" style="background:var(--bg);opacity:.5;"><div class="sched-date">29</div></div>
+            <div class="sched-cell" style="background:var(--bg);opacity:.5;"><div class="sched-date">30</div></div>
+            <div class="sched-cell"><div class="sched-date">1</div></div>
+            <div class="sched-cell today"><div class="sched-date">2 ★</div></div>
+            <div class="sched-cell"><div class="sched-date">3</div></div>
+            <div class="sched-cell"><div class="sched-date">4</div></div>
+            <div class="sched-cell"><div class="sched-date">5</div></div>
+            <div class="sched-cell"><div class="sched-date">6</div></div>
+            <div class="sched-cell"><div class="sched-date">7</div></div>
+            <div class="sched-cell"><div class="sched-date">8</div></div>
+            <div class="sched-cell"><div class="sched-date">9</div></div>
+            <div class="sched-cell"><div class="sched-date">10</div></div>
+            <div class="sched-cell"><div class="sched-date">11</div></div>
+            <div class="sched-cell"><div class="sched-date">12</div></div>
+            <div class="sched-cell"><div class="sched-date">13</div></div>
+            <div class="sched-cell"><div class="sched-date">14</div></div>
+            <div class="sched-cell"><div class="sched-date">15</div></div>
+            <div class="sched-cell"><div class="sched-date">16</div></div>
+            <div class="sched-cell"><div class="sched-date">17</div></div>
+            <div class="sched-cell"><div class="sched-date">18</div></div>
+            <div class="sched-cell"><div class="sched-date">19</div></div>
+            <div class="sched-cell"><div class="sched-date">20</div></div>
+            <div class="sched-cell"><div class="sched-date">21</div></div>
+            <div class="sched-cell"><div class="sched-date">22</div></div>
+            <div class="sched-cell"><div class="sched-date">23</div></div>
+            <div class="sched-cell"><div class="sched-date">24</div></div>
+            <div class="sched-cell"><div class="sched-date">25</div></div>
+            <div class="sched-cell"><div class="sched-date">26</div></div>
+            <div class="sched-cell"><div class="sched-date">27</div></div>
+            <div class="sched-cell"><div class="sched-date">28</div></div>
+            <div class="sched-cell"><div class="sched-date">29</div></div>
+            <div class="sched-cell"><div class="sched-date">30</div></div>
+            <div class="sched-cell"><div class="sched-date">31</div></div>
+          </div>
+        </div>
         <div class="card">
-          <div class="sec-head"><div class="sec-title">Today's Snapshot</div></div>
-          <div class="snap-item">
-            <div class="snap-left">
-              <div class="snap-label">Seat Occupancy</div>
-              <div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--blue);"></div></div>
-            </div>
-            <div class="snap-val">74%</div>
+          <div class="sec-head"><div class="sec-title">Today's Trips — May 2, 2026</div><span class="sec-link">View all</span></div>
+          <table class="data-table"><thead><tr><th>Trip</th><th>Route</th><th>Bus</th><th>Driver</th><th>Departure</th><th>Seats</th><th>Status</th><th></th></tr></thead>
+          <tbody id="main-schedules-table">
+            <tr><td colspan="8" style="text-align:center; padding: 20px; color: var(--text3);">Loading live schedules...</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- BUS FLEET -->
+      <div class="page" id="page-buses">
+        <div class="page-header">
+          <div><div class="page-title">Bus Fleet</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live Database Sync</div></div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export</button>
+            <button class="btn-primary" onclick="openModal('addBus')">+ Add Bus</button>
           </div>
-          <div class="snap-item">
-            <div class="snap-left">
-              <div class="snap-label">Cancellation Rate</div>
-              <div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--accent);"></div></div>
-            </div>
-            <div class="snap-val red">8%</div>
+        </div>
+        <div class="filter-bar">
+          <select class="filter-select"><option>All Status</option><option>Active</option><option>Maintenance</option><option>Retired</option></select>
+          <select class="filter-select"><option>All Types</option><option>Standard (45 seats)</option><option>Premium (50 seats)</option><option>Sleeper (30 beds)</option></select>
+        </div>
+        <div class="fleet-grid">
+           <!-- Live buses from Supabase will be injected here -->
+        </div>
+      </div>
+
+      <!-- ROUTES -->
+      <div class="page" id="page-routes">
+        <div class="page-header">
+          <div><div class="page-title">Routes</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live Database Sync</div></div>
+          <button class="btn-primary" onclick="openModal('addRoute')">+ Add Route</button>
+        </div>
+        <div class="routes-grid">
+           <!-- Live routes from Supabase will be injected here -->
+        </div>
+      </div>
+
+      <!-- REVENUE -->
+      <div class="page" id="page-revenue">
+        <div class="page-header">
+          <div><div class="page-title">Revenue</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live Financial Data</div></div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export Report</button>
           </div>
-          <div class="snap-item"><div class="snap-label">On-Time Buses</div><div class="snap-val green">91%</div></div>
-          <div class="snap-item"><div class="snap-label">New Sign-ups Today</div><div class="snap-val">+24</div></div>
-          <div class="snap-item"><div class="snap-label">Wallet Loads Today</div><div class="snap-val">₱ 18,400</div></div>
-          <div class="snap-item"><div class="snap-label">Active Routes</div><div class="snap-val">14</div></div>
-          <div class="snap-item"><div class="snap-label">Buses in Maintenance</div><div class="snap-val orange">2</div></div>
-          <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button style="padding:10px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Generate Report</button>
-            <button style="padding:10px;background:var(--blue-pale);color:var(--blue-dark);border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Export CSV</button>
+        </div>
+        <div class="rev-grid">
+          <div class="chart-placeholder">
+            <div class="sec-title" style="margin-bottom:20px;">Weekly Revenue</div>
+            <div class="chart-bars">
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:40%;background:var(--blue-mid);"></div><div class="chart-bar-label">Mon</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:60%;background:var(--blue-mid);"></div><div class="chart-bar-label">Tue</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:35%;background:var(--blue-mid);"></div><div class="chart-bar-label">Wed</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:80%;background:var(--blue-mid);"></div><div class="chart-bar-label">Thu</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:55%;background:var(--blue-mid);"></div><div class="chart-bar-label">Fri</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:90%;background:var(--blue);"></div><div class="chart-bar-label">Sat</div></div>
+              <div class="chart-bar-wrap"><div class="chart-bar" style="height:20%;background:var(--blue-pale);"></div><div class="chart-bar-label">Sun</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-title">Quick Stats</div>
+            <div class="snap-item" style="margin-top:10px;"><div class="snap-label">Total Transactions</div><div class="snap-val">Live</div></div>
+            <div class="snap-item"><div class="snap-label">Average Booking</div><div class="snap-val">Live</div></div>
+            <div class="snap-item"><div class="snap-label">Refunds Processed</div><div class="snap-val red">Live</div></div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom grid -->
-      <div class="bot-grid">
-        <div class="card">
-          <div class="sec-head">
-            <div class="sec-title">New Users</div>
-            <span class="sec-link">Manage all →</span>
-          </div>
-          <div class="user-row">
-            <div class="u-avatar" style="background:#EBF5FD;color:var(--blue-dark);">JD</div>
-            <div style="flex:1;"><div class="u-name">Juan Dela Cruz</div><div class="u-email">juan@email.com · +63 912 345 6789</div></div>
-            <span class="pill pill-confirmed" style="margin-right:8px;">Active</span>
-            <div class="u-time">Today</div>
-          </div>
-          <div class="user-row">
-            <div class="u-avatar" style="background:#FFF4E5;color:#E67E00;">MS</div>
-            <div style="flex:1;"><div class="u-name">Maria Santos</div><div class="u-email">maria.s@email.com · +63 917 000 1111</div></div>
-            <span class="pill pill-pending" style="margin-right:8px;">Pending</span>
-            <div class="u-time">Today</div>
-          </div>
-          <div class="user-row">
-            <div class="u-avatar" style="background:#eafaf1;color:var(--green);">PR</div>
-            <div style="flex:1;"><div class="u-name">Pedro Reyes</div><div class="u-email">p.reyes@email.com · +63 918 222 3333</div></div>
-            <span class="pill pill-confirmed" style="margin-right:8px;">Active</span>
-            <div class="u-time">Yesterday</div>
-          </div>
-          <div class="user-row">
-            <div class="u-avatar" style="background:#FFF0F0;color:var(--accent);">AL</div>
-            <div style="flex:1;"><div class="u-name">Ana Lim</div><div class="u-email">ana.lim@email.com · +63 920 444 5555</div></div>
-            <span class="pill pill-confirmed" style="margin-right:8px;">Active</span>
-            <div class="u-time">Apr 28</div>
-          </div>
-          <div class="user-row">
-            <div class="u-avatar" style="background:#F3EFFF;color:#7C5CBF;">RB</div>
-            <div style="flex:1;"><div class="u-name">Rodel Bautista</div><div class="u-email">rodel.b@email.com · +63 921 888 9999</div></div>
-            <span class="pill pill-confirmed" style="margin-right:8px;">Active</span>
-            <div class="u-time">Apr 27</div>
-          </div>
+      <!-- REPORTS -->
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div><div class="page-title">System Reports</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Generate and download analytics</div></div>
         </div>
-
-        <div class="card">
-          <div class="sec-head">
-            <div class="sec-title">Activity Log</div>
-            <span class="sec-link">View full log →</span>
-          </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:var(--green-light);">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="10" height="8" rx="1.5" stroke="#27ae60" stroke-width="1.2"/><path d="M4 4V3a3 3 0 016 0v1" stroke="#27ae60" stroke-width="1.2"/></svg>
+        <div class="report-list">
+          <div class="report-item">
+            <div class="report-icon" style="background:#eafaf1;color:#27ae60;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+            <div class="report-info">
+              <div class="report-name">Daily Booking Summary</div>
+              <div class="report-desc">Comprehensive list of all completed, pending, and cancelled bookings for today.</div>
             </div>
-            <div class="feed-text"><strong>Juan Dela Cruz</strong> booked Seat 12B on Cebu → Manila for May 1</div>
-            <div class="feed-ago">2m ago</div>
+            <div class="report-meta"><strong>PDF / CSV</strong>Last generated: Today</div>
+            <button class="action-btn" onclick="showToast('Generating Daily Report…','success')">Generate</button>
           </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:#EBF5FD;">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="#3B9EE8" stroke-width="1.2"/><path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#3B9EE8" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <div class="report-item">
+            <div class="report-icon" style="background:#FFF4E5;color:#E67E00;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg></div>
+            <div class="report-info">
+              <div class="report-name">Monthly Revenue Analysis</div>
+              <div class="report-desc">Detailed financial breakdown, including wallet top-ups, ticket sales, and refunds.</div>
             </div>
-            <div class="feed-text"><strong>Maria Santos</strong> created a new account — pending verification</div>
-            <div class="feed-ago">14m ago</div>
+            <div class="report-meta"><strong>PDF / Excel</strong>Last generated: May 1</div>
+            <button class="action-btn" onclick="showToast('Generating Revenue Report…','success')">Generate</button>
           </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:#FFF4E5;">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="6" width="12" height="7" rx="2" stroke="#E67E00" stroke-width="1.2"/><circle cx="4" cy="12" r="1.5" stroke="#E67E00" stroke-width="1.1"/><circle cx="10" cy="12" r="1.5" stroke="#E67E00" stroke-width="1.1"/></svg>
+          <div class="report-item">
+            <div class="report-icon" style="background:#EBF5FD;color:#3B9EE8;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg></div>
+            <div class="report-info">
+              <div class="report-name">Route Performance Metrics</div>
+              <div class="report-desc">Occupancy rates and profitability metrics broken down by active routes.</div>
             </div>
-            <div class="feed-text"><strong>Bus #GR-22</strong> schedule updated — May 2 departure moved to 8:30 PM</div>
-            <div class="feed-ago">31m ago</div>
-          </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:#FFF0F0;">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v4M7 9v1" stroke="#FF6B6B" stroke-width="1.5" stroke-linecap="round"/><circle cx="7" cy="7" r="5.5" stroke="#FF6B6B" stroke-width="1.2"/></svg>
-            </div>
-            <div class="feed-text"><strong>Ana Lim</strong> cancelled booking on Cebu → Bohol. Refund ₱ 290 initiated.</div>
-            <div class="feed-ago">1h ago</div>
-          </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:var(--green-light);">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8" rx="1.5" stroke="#27ae60" stroke-width="1.2"/><path d="M1.5 6.5h11" stroke="#27ae60" stroke-width="1.2" stroke-linecap="round"/></svg>
-            </div>
-            <div class="feed-text"><strong>₱ 5,200</strong> wallet top-up processed for Rodel Bautista</div>
-            <div class="feed-ago">2h ago</div>
-          </div>
-          <div class="feed-item">
-            <div class="feed-dot-wrap" style="background:#EBF5FD;">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#3B9EE8" stroke-width="1.2"/><path d="M5 7l1.5 1.5L9 5" stroke="#3B9EE8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="feed-text"><strong>Admin</strong> added new route: Cebu → Tagbilaran (starting May 5, 2026)</div>
-            <div class="feed-ago">3h ago</div>
+            <div class="report-meta"><strong>PDF / CSV</strong>Last generated: Apr 28</div>
+            <button class="action-btn" onclick="showToast('Generating Route Metrics…','success')">Generate</button>
           </div>
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /shell -->
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div><div class="page-title">System Settings</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Manage application preferences</div></div>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-nav">
+            <div class="settings-nav-item active">General</div>
+            <div class="settings-nav-item">Notifications</div>
+            <div class="settings-nav-item">Payment Gateway</div>
+            <div class="settings-nav-item">Security</div>
+            <div class="settings-nav-item" style="color:var(--accent);">Danger Zone</div>
+          </div>
+          <div class="settings-panel">
+            <div class="settings-section">
+              <div class="settings-section-title">General Settings</div>
+              <div class="settings-input-row">
+                <div>
+                  <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">System Name</label>
+                  <input type="text" class="settings-input" value="GoRoute Transport">
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Support Email</label>
+                  <input type="email" class="settings-input" value="support@goroute.com">
+                </div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Features & Toggles</div>
+              <div class="setting-row">
+                <div><div class="setting-label">Allow New Registrations</div><div class="setting-desc">Let new users sign up via the mobile app</div></div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Maintenance Mode</div><div class="setting-desc">Temporarily disable booking functions</div></div>
+                <div class="toggle"></div>
+              </div>
+              <div class="setting-row">
+                <div><div class="setting-label">Auto-Confirm Bookings</div><div class="setting-desc">Skip manual admin approval for wallet payments</div></div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+              <button class="btn-primary" onclick="showToast('Settings saved successfully','success')">Save Changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- MODALS & TOASTS -->
+<div class="modal-overlay" id="globalModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitleText">Add New</div>
+    
+    <!-- We will inject the specific form fields here dynamically -->
+    <div id="modalContent"></div>
+    
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-save" id="modalSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="sysToast">Operation successful!</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+  async function deleteItem(tableName, id) {
+  // 1. Confirm with the user
+  if (!confirm(`Are you sure you want to permanently delete this ${tableName.slice(0, -1)}?`)) return;
+
+  try {
+    // 2. Execute deletion in Supabase
+    const { error } = await _supabase
+      .from(tableName)
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    // 3. UI feedback and refresh
+    showToast(`${tableName.charAt(0).toUpperCase() + tableName.slice(1, -1)} removed successfully`, 'success');
+    
+    // Refresh the current view
+    if (tableName === 'buses') loadLiveBuses();
+    if (tableName === 'routes') loadLiveRoutes();
+    if (tableName === 'schedules') loadLiveSchedules();
+    
+  } catch (err) {
+    console.error('Delete Error:', err.message);
+    showToast(`Error: ${err.message}`, 'error');
+  }
+}
+  // Navigation Logic
+  const sbItems = document.querySelectorAll('.sb-item');
+  const pages = document.querySelectorAll('.page');
+  
+  sbItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const targetPage = item.getAttribute('data-page');
+      if (!targetPage) return;
+      
+      // Update Sidebar
+      sbItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      
+      // Update Content
+      pages.forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + targetPage).classList.add('active');
+      
+      // Update Topbar Title
+      const titles = {
+        'dashboard': 'Dashboard Overview',
+        'users': 'User Management',
+        'bookings': 'Bookings',
+        'schedules': 'Schedule Manager',
+        'buses': 'Bus Fleet',
+        'routes': 'Routes',
+        'revenue': 'Revenue',
+        'reports': 'System Reports',
+        'settings': 'System Settings'
+      };
+      document.getElementById('topbarTitle').innerHTML = titles[targetPage] + '<small id="topbarSub">Saturday, May 2, 2026 &nbsp;·&nbsp; Welcome back, Maria 👋</small>';
+      if (targetPage === 'revenue') loadRevenueData();
+    if (targetPage === 'dashboard') {
+      loadDashboardData();
+      populateActivityLog();
+    }
+    });
+  });
+
+  // Navigate Function (used by text links like "View all")
+  window.navigate = function(targetPage) {
+    const item = document.querySelector(`.sb-item[data-page="${targetPage}"]`);
+    if(item) item.click();
+  };
+
+  // Toast Notification System
+  window.showToast = function(msg, type = 'success') {
+    const toast = document.getElementById('sysToast');
+    toast.textContent = msg;
+    toast.className = `toast show ${type}`;
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  };
+
+  // Modal Logic
+// Modal Logic
+  window.openModal = function(actionType) {
+    const modal = document.getElementById('globalModal');
+    const title = document.getElementById('modalTitleText');
+    const content = document.getElementById('modalContent');
+    const saveBtn = document.getElementById('modalSaveBtn');
+    
+    if (actionType === 'addBus') {
+      title.innerText = 'Register New Bus';
+      content.innerHTML = `
+        <div class="modal-field"><label>Bus Number / Plate</label><input type="text" id="newBusNum" placeholder="e.g. GR-24" required></div>
+        <div class="modal-field"><label>Bus Model</label><input type="text" id="newBusModel" placeholder="e.g. Hino RN8" required></div>
+        <div class="modal-row">
+          <div class="modal-field"><label>Total Seats</label><input type="number" id="newBusSeats" placeholder="45" required></div>
+          <div class="modal-field"><label>Initial Status</label><select id="newBusStatus"><option value="Active">Active</option><option value="Maintenance">Maintenance</option></select></div>
+        </div>
+      `;
+      saveBtn.onclick = saveNewBus;
+    } 
+    else if (actionType === 'addBooking') {
+      title.innerText = 'Create Manual Booking';
+      content.innerHTML = `
+        <div class="modal-field">
+          <label>Select Trip (Schedule)</label>
+          <select id="bookSchedId" required><option>Loading active trips...</option></select>
+        </div>
+        <div class="modal-field"><label>Passenger Name</label><input type="text" id="bookName" placeholder="Full Name" required></div>
+        <div class="modal-row">
+          <div class="modal-field"><label>Seat Number</label><input type="text" id="bookSeat" placeholder="e.g. 1A" required></div>
+          <div class="modal-field"><label>Price (₱)</label><input type="number" id="bookFare" placeholder="850"></div>
+        </div>
+        <div class="modal-field"><label>Contact Mobile</label><input type="text" id="bookMobile" placeholder="+63..."></div>
+      `;
+      async function populateBookingDropdown() {
+    const { data: schedules } = await _supabase.from('schedules').select('id, departure_time, routes(origin, destination)');
+    if (schedules) {
+      document.getElementById('bookSchedId').innerHTML = schedules.map(s => 
+        `<option value="${s.id}">${s.routes.origin} → ${s.routes.destination} (${new Date(s.departure_time).toLocaleString()})</option>`
+      ).join('');
+    }
+  }
+
+  async function saveManualBooking() {
+    const payload = {
+      schedule_id: document.getElementById('bookSchedId').value,
+      passenger_name: document.getElementById('bookName').value,
+      seat_number: document.getElementById('bookSeat').value,
+      price: document.getElementById('bookFare').value,
+      contact_mobile: document.getElementById('bookMobile').value,
+      status: 'Confirmed'
+    };
+    const { error } = await _supabase.from('bookings').insert([payload]);
+    if (!error) { showToast('Booking created!'); closeModal(); loadLiveBookings(); }
+  }// Fetch trips for the dropdown
+      populateBookingDropdown();
+      saveBtn.onclick = saveManualBooking;
+    }
+    else if (actionType === 'addSchedule') {
+      title.innerText = 'Create New Trip';
+      content.innerHTML = `
+        <div class="modal-field">
+          <label>Select Route</label>
+          <select id="schedRouteId" required><option>Loading routes...</option></select>
+        </div>
+        <div class="modal-field">
+          <label>Select Bus</label>
+          <select id="schedBusId" required><option>Loading buses...</option></select>
+        </div>
+        <div class="modal-row">
+          <div class="modal-field">
+            <label>Departure Time</label>
+            <input type="datetime-local" id="schedDepTime" required>
+          </div>
+          <div class="modal-field">
+            <label>Arrival Time</label>
+            <input type="datetime-local" id="schedArrTime" required>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>Fare for this Trip (₱)</label>
+          <input type="number" id="schedPrice" placeholder="Default fare will be used if empty">
+        </div>
+      `;
+      
+      // Load dropdown data
+      populateScheduleDropdowns();
+      saveBtn.onclick = saveNewSchedule;
+    }
+    else if (actionType === 'addRoute') {
+      title.innerText = 'Add New Route';
+      content.innerHTML = `
+        <div class="modal-row">
+          <div class="modal-field">
+            <label>Origin City</label>
+            <select id="newRouteOrigin" required>
+              <option value="" disabled selected>Select origin…</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Destination City</label>
+            <select id="newRouteDest" required>
+              <option value="" disabled selected>Select destination…</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-field">
+            <label>Base Fare (₱)</label>
+            <input type="number" id="newRouteFare" placeholder="e.g. 850" required>
+          </div>
+          <div class="modal-field">
+            <label>Duration (hours)</label>
+            <input type="number" id="newRouteDuration" placeholder="e.g. 4" step="0.5" required>
+          </div>
+        </div>
+      `;
+      populateRouteCityDropdowns();
+      saveBtn.onclick = saveNewRoute;
+    }
+    else {
+        title.innerText = 'Add New Item';
+        content.innerHTML = '<div style="padding:20px; color:var(--text3); text-align:center;">This form is not yet wired to the database.</div>';
+        saveBtn.onclick = closeModal;
+    }
+    
+    modal.classList.add('open');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('globalModal').classList.remove('open');
+  };
+
+  // Settings Toggles Logic — keep existing toggle logic
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+  });
+  
+</script>
+<!-- Add the Supabase CDN -->
+<!-- Add the Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // Initialize Supabase
+  const _supabase = supabase.createClient('https://djyegteotxpiqsycpwuj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeWVndGVvdHhwaXFzeWNwd3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjE0NTMsImV4cCI6MjA5MzAzNzQ1M30.OFRtRheiZBlZ-3twI2o9vjakeETjacrZVJQhEygwZHc');
+
+  // ==========================================
+  // 1. FETCH & DISPLAY USERS
+  // ==========================================
+  async function fetchUsers() {
+    try {
+      const { data, error } = await _supabase.from('users').select('*');
+      if (error) throw error;
+
+      const tableBody = document.querySelector('#page-users .data-table tbody');
+      if(tableBody) tableBody.innerHTML = ''; 
+
+      data.forEach(user => {
+        const initial = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U';
+        const rowHTML = `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="u-avatar av-blue" style="width:32px;height:32px;font-size:11px;">${initial}</div>
+                <div>
+                  <div class="td-name">${user.first_name || 'Unknown'} ${user.last_name || ''}</div>
+                  <div class="td-sub">${user.email || 'No email'}</div>
+                </div>
+              </div>
+            </td>
+            <td>${user.phone || 'N/A'}</td>
+            <td><span class="pill pill-confirmed" style="text-transform: capitalize;">${user.role || 'Passenger'}</span></td>
+            <td>—</td>
+            <td class="td-price">₱ 0</td>
+            <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><button class="action-btn" onclick="showToast('Opening profile…')">View</button></td>
+          </tr>
+        `;
+        if(tableBody) tableBody.insertAdjacentHTML('beforeend', rowHTML);
+      });
+    } catch (error) {
+      console.error('Error fetching users:', error.message);
+    }
+  }
+
+  // ==========================================
+  // 2. FETCH & DISPLAY BUSES
+  // ==========================================
+  async function loadLiveBuses() {
+    try {
+      const { data, error } = await _supabase.from('buses').select('*'); 
+      if (error) throw error;
+
+      const fleetGrid = document.querySelector('#page-buses .fleet-grid');
+      if(fleetGrid) fleetGrid.innerHTML = ''; 
+
+      data.forEach(bus => {
+        let statusColor = 'var(--green)';
+        let statusPillClass = 'pill-active';
+        let iconBg = 'var(--blue-pale)';
+        let iconStroke = '#3B9EE8';
+
+        if (bus.status === 'Maintenance') {
+          statusColor = '#E67E00';
+          statusPillClass = 'pill-maintenance';
+          iconBg = '#FFF4E5';
+          iconStroke = '#E67E00';
+        } else if (bus.status === 'Retired') {
+          statusColor = 'var(--accent)';
+          statusPillClass = 'pill-cancelled';
+          iconBg = '#FFF0F0';
+          iconStroke = '#FF6B6B';
+        }
+
+        const cardHTML = `
+    <div class="bus-card">
+      <div class="bus-card-top">
+        <div>
+          <div class="bus-num">${bus.bus_number || 'Unnamed Bus'}</div>
+          <div class="bus-model">${bus.model || 'Unknown Model'}</div>
+        </div>
+        <!-- ... existing icon wrap ... -->
+      </div>
+      <!-- ... existing bus stats ... -->
+      <div class="bus-footer">
+        <div class="bus-driver">Driver: <strong>Unassigned</strong></div>
+        <span class="pill ${statusPillClass}">${bus.status || 'Active'}</span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="action-btn" style="flex:1;" onclick="openEditModal('buses', '${bus.id}')">Edit</button>
+        <button class="action-btn danger" style="flex:1;" onclick="deleteItem('buses', '${bus.id}')">Delete</button>
+      </div>
+    </div>
+  `;
+  if(fleetGrid) fleetGrid.insertAdjacentHTML('beforeend', cardHTML);
+});
+    } catch (error) {
+      console.error('Error fetching buses:', error.message);
+    }
+  }
+
+  // ==========================================
+  // 3. SAVE NEW BUS
+  // ==========================================
+  async function saveNewBus() {
+    const busNum = document.getElementById('newBusNum').value.trim();
+    const busModel = document.getElementById('newBusModel').value.trim();
+    const busSeats = parseInt(document.getElementById('newBusSeats').value);
+    const busStatus = document.getElementById('newBusStatus').value;
+
+    if (!busNum || !busModel || !busSeats) {
+      showToast('Please fill all fields', 'error');
+      return;
+    }
+
+    const saveBtn = document.getElementById('modalSaveBtn');
+    saveBtn.innerText = 'Saving...';
+    saveBtn.disabled = true;
+
+    try {
+      const { data, error } = await _supabase
+        .from('buses')
+        .insert([{ bus_number: busNum, model: busModel, total_seats: busSeats, status: busStatus }]);
+
+      if (error) throw error;
+
+      showToast('Bus added successfully!', 'success');
+      closeModal();
+      loadLiveBuses(); 
+    } catch (err) {
+      console.error(err);
+      showToast(err.message, 'error');
+    } finally {
+      saveBtn.innerText = 'Save';
+      saveBtn.disabled = false;
+    }
+  }
+
+  // ==========================================
+  // 4. FETCH & DISPLAY DASHBOARD DATA
+  // ==========================================
+  async function loadDashboardData() {
+    try {
+      const { data: usersData, error: userErr1 } = await _supabase.from('users').select('*');
+      if (!userErr1 && document.querySelectorAll('.stat-value')[0]) {
+        document.querySelectorAll('.stat-value')[0].innerText = usersData ? usersData.length : 0;
+      }
+
+      const { data: busesData, error: busErr1 } = await _supabase.from('buses').select('*');
+      if (!busErr1 && document.querySelectorAll('.stat-value')[3]) {
+        const activeCount = busesData ? busesData.filter(b => b.status === 'Active' || !b.status).length : 0;
+        document.querySelectorAll('.stat-value')[3].innerText = activeCount;
+      }
+
+      const { data: newUsers, error: userErr2 } = await _supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (!userErr2 && newUsers) {
+        const dashUsers = document.getElementById('dash-new-users');
+        if(dashUsers) dashUsers.innerHTML = ''; 
+        
+        newUsers.forEach(u => {
+          const initial = u.first_name ? u.first_name.charAt(0).toUpperCase() : 'U';
+          const userHTML = `
+            <div class="user-row">
+              <div class="u-avatar av-blue">${initial}</div>
+              <div style="flex:1;">
+                <div class="u-name">${u.first_name || 'Unknown'} ${u.last_name || ''}</div>
+                <div class="u-email">${u.email || 'No email'}</div>
+              </div>
+              <span class="pill pill-confirmed" style="margin-right:8px; text-transform:capitalize;">${u.role || 'Passenger'}</span>
+              <div class="u-time">Recent</div>
+            </div>
+          `;
+          if(dashUsers) dashUsers.insertAdjacentHTML('beforeend', userHTML);
+        });
+      }
+    } catch (err) {
+      console.error('Error loading dashboard stats:', err.message);
+    }
+  }
+
+  // ==========================================
+  // 5. FETCH & DISPLAY BOOKINGS
+  // ==========================================
+  async function loadLiveBookings() {
+    try {
+      const { data: bookings, error } = await _supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false }); 
+
+      if (error) throw error;
+
+      const mainTable = document.getElementById('main-bookings-table');
+      const dashTable = document.getElementById('dash-recent-bookings');
+      
+      if(mainTable) mainTable.innerHTML = '';
+      if(dashTable) dashTable.innerHTML = '';
+
+      let bookingsToday = 0;
+      let revenueToday = 0;
+      const todayStr = new Date().toDateString();
+
+      if (!bookings || bookings.length === 0) {
+         if(mainTable) mainTable.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px;">No bookings found.</td></tr>';
+         if(dashTable) dashTable.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No bookings found.</td></tr>';
+         if(document.querySelectorAll('.stat-value')[1]) document.querySelectorAll('.stat-value')[1].innerText = '0';
+         if(document.querySelectorAll('.stat-value')[2]) document.querySelectorAll('.stat-value')[2].innerText = '₱ 0';
+         return;
+      }
+
+      bookings.forEach((bk, index) => {
+        if (bk.created_at) {
+          const bkDate = new Date(bk.created_at);
+          if (bkDate.toDateString() === todayStr) {
+            bookingsToday++;
+            if (bk.status === 'Confirmed') {
+              revenueToday += Number(bk.price || 0);
+            }
+          }
+        }
+
+        const bkId = bk.id ? String(bk.id).substring(0,8).toUpperCase() : 'N/A';
+        const passName = bk.passenger_name || 'Guest';
+        const passPhone = bk.contact_mobile || 'N/A';
+        const priceStr = `₱ ${Number(bk.price || 0).toLocaleString()}`;
+        const bkDateStr = bk.created_at ? new Date(bk.created_at).toLocaleDateString() : 'TBD';
+        
+        let statClass = 'pill-pending';
+        if(bk.status === 'Confirmed') statClass = 'pill-confirmed';
+        if(bk.status === 'Cancelled') statClass = 'pill-cancelled';
+        if(bk.status === 'Completed') statClass = 'pill-completed';
+
+        const mainRow = `
+          <tr>
+            <td style="color:var(--text3);font-size:11px;">BK-${bkId}</td>
+            <td><div class="td-name">${passName}</div><div class="td-sub">${passPhone}</div></td>
+            <td class="td-route">Standard Route</td>
+            <td>Assigned Bus</td>
+            <td>${bkDateStr}</td>
+            <td>${bk.seat_number || 'TBD'}</td>
+            <td class="td-price">${priceStr}</td>
+            <td><span class="pill ${statClass}">${bk.status || 'Pending'}</span></td>
+            <td><button class="action-btn">View</button></td>
+          </tr>
+        `;
+        if(mainTable) mainTable.insertAdjacentHTML('beforeend', mainRow);
+
+        if (index < 5) {
+          const dashRow = `
+            <tr>
+              <td><div class="td-name">${passName}</div><div class="td-sub">${passPhone}</div></td>
+              <td class="td-route">Standard Route</td>
+              <td>${bkDateStr}</td>
+              <td>${bk.seat_number || 'TBD'}</td>
+              <td class="td-price">${priceStr}</td>
+              <td><span class="pill ${statClass}">${bk.status || 'Pending'}</span></td>
+              <td><button class="action-btn">View</button></td>
+            </tr>
+          `;
+          if(dashTable) dashTable.insertAdjacentHTML('beforeend', dashRow);
+        }
+      });
+
+      if(document.querySelectorAll('.stat-value')[1]) document.querySelectorAll('.stat-value')[1].innerText = bookingsToday;
+      if(document.querySelectorAll('.stat-value')[2]) document.querySelectorAll('.stat-value')[2].innerText = `₱ ${revenueToday.toLocaleString()}`;
+
+    } catch (err) {
+      console.error('Error fetching bookings:', err.message);
+    }
+  }
+
+  // ==========================================
+  // 6. SAVE NEW ROUTE
+  // ==========================================
+  async function saveNewRoute() {
+    const origin = document.getElementById('newRouteOrigin').value.trim();
+    const dest = document.getElementById('newRouteDest').value.trim();
+    const fare = document.getElementById('newRouteFare').value;
+    const duration = document.getElementById('newRouteDuration').value;
+
+    if (!origin || !dest || !fare || !duration) {
+      return showToast('Please fill all fields', 'error');
+    }
+
+    const saveBtn = document.getElementById('modalSaveBtn');
+    saveBtn.innerText = 'Saving...'; saveBtn.disabled = true;
+
+    try {
+      const { error } = await _supabase.from('routes').insert([{
+        origin: origin,
+        destination: dest,
+        base_fare: fare,
+        duration_hours: duration,
+        status: 'Active'
+      }]);
+
+      if (error) throw error;
+
+      showToast('Route added successfully!', 'success');
+      closeModal();
+      loadLiveRoutes(); 
+    } catch (err) {
+      console.error(err);
+      showToast(err.message, 'error');
+    } finally {
+      saveBtn.innerText = 'Save'; saveBtn.disabled = false;
+    }
+  }
+
+  // ==========================================
+  // 7. FETCH & DISPLAY ROUTES
+  // ==========================================
+  async function loadLiveRoutes() {
+    try {
+      const { data, error } = await _supabase.from('routes').select('*');
+      if (error) throw error;
+
+      const grid = document.querySelector('.routes-grid');
+      if (grid) grid.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        if (grid) grid.innerHTML = '<div style="padding:20px; color:var(--text3); width:100%; text-align:center;">No routes found. Click "+ Add Route" to create one.</div>';
+        return;
+      }
+
+      data.forEach(route => {
+  const routeId = route.id ? String(route.id).substring(0,6).toUpperCase() : 'N/A';
+  const isAct = route.status === 'Active';
+
+  const cardHTML = `
+    <div class="route-card">
+      <!-- ... existing route-head and route-meta ... -->
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="action-btn" onclick="openEditModal('routes', '${route.id}')">Edit</button>
+        <button class="action-btn danger" onclick="deleteItem('routes', '${route.id}')">
+          Remove Route
+        </button>
+      </div>
+    </div>
+  `;
+  if (grid) grid.insertAdjacentHTML('beforeend', cardHTML);
+});
+    } catch (err) {
+      console.error('Error fetching routes:', err.message);
+    }
+  }
+  // Fetch data to fill the dropdowns in the modal
+  async function populateScheduleDropdowns() {
+    const routeSelect = document.getElementById('schedRouteId');
+    const busSelect = document.getElementById('schedBusId');
+
+    const { data: routes } = await _supabase.from('routes').select('id, origin, destination');
+    const { data: buses } = await _supabase.from('buses').select('id, bus_number, model');
+
+    if (routes) {
+      routeSelect.innerHTML = routes.map(r => `<option value="${r.id}">${r.origin} → ${r.destination}</option>`).join('');
+    }
+    if (buses) {
+      busSelect.innerHTML = buses.map(b => `<option value="${b.id}">${b.bus_number} (${b.model})</option>`).join('');
+    }
+  }
+
+  // Save the trip to Supabase
+  async function saveNewSchedule() {
+    const routeId = document.getElementById('schedRouteId').value;
+    const busId = document.getElementById('schedBusId').value;
+    const depTime = document.getElementById('schedDepTime').value;
+    const arrTime = document.getElementById('schedArrTime').value;
+    const price = document.getElementById('schedPrice').value;
+
+    if (!depTime || !arrTime) return showToast('Please select times', 'error');
+
+    const saveBtn = document.getElementById('modalSaveBtn');
+    saveBtn.innerText = 'Scheduling...'; saveBtn.disabled = true;
+
+    try {
+      const { error } = await _supabase.from('schedules').insert([{
+        route_id: routeId,
+        bus_id: busId,
+        departure_time: depTime,
+        arrival_time: arrTime,
+        price: price || 0 // Default to 0 if not set, or you can fetch route base fare
+      }]);
+
+      if (error) throw error;
+      showToast('Trip scheduled successfully!', 'success');
+      closeModal();
+      loadLiveSchedules(); 
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      saveBtn.innerText = 'Save'; saveBtn.disabled = false;
+    }
+  }
+
+  // Fetch and display trips in the Schedules tab
+  async function loadLiveSchedules() {
+    try {
+      const { data, error } = await _supabase
+        .from('schedules')
+        .select('*, routes(origin, destination), buses(bus_number)');
+
+      if (error) throw error;
+      const table = document.getElementById('main-schedules-table');
+      if (table) {
+        table.innerHTML = data.map(s => `
+          <tr>
+            <td>TR-${String(s.id).substring(0,5).toUpperCase()}</td>
+            <td class="td-route">${s.routes?.origin} → ${s.routes?.destination}</td>
+            <td>${s.buses?.bus_number}</td>
+            <td>Unassigned</td>
+            <td>${new Date(s.departure_time).toLocaleString()}</td>
+            <td>Available</td>
+            <td><span class="pill pill-confirmed">Scheduled</span></td>
+            <td><button class="action-btn">Edit</button></td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) { console.error(err); }
+  }
+  // ==========================================
+  // 8. WIRE UP REVENUE CHART & STATS
+  // ==========================================
+  async function loadRevenueData() {
+    try {
+      const { data: bookings, error } = await _supabase
+        .from('bookings')
+        .select('price, created_at')
+        .eq('status', 'Confirmed');
+
+      if (error) throw error;
+
+      let totalRevenue = 0;
+      let totalTx = bookings.length;
+      const revenueByDay = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun distribution
+      
+      bookings.forEach(b => {
+        totalRevenue += Number(b.price || 0);
+        const day = new Date(b.created_at).getDay(); 
+        const index = day === 0 ? 6 : day - 1; // Adjust index for Mon-Sun UI
+        revenueByDay[index] += Number(b.price || 0);
+      });
+
+      // Update Stats on Revenue Page
+      const stats = document.querySelectorAll('#page-revenue .snap-val');
+      if (stats.length) {
+        stats[0].innerText = totalTx;
+        stats[1].innerText = `₱ ${(totalRevenue / (totalTx || 1)).toLocaleString()}`;
+        stats[2].innerText = `0`; // Placeholder for refunds
+      }
+
+      // Update the CSS Heights of the Chart Bars
+      const maxRev = Math.max(...revenueByDay) || 1;
+      const bars = document.querySelectorAll('.chart-bar');
+      revenueByDay.forEach((rev, i) => {
+        if (bars[i]) {
+          const height = (rev / maxRev) * 100;
+          bars[i].style.height = `${Math.max(height, 8)}%`; // Min 8% for visibility
+          bars[i].title = `₱ ${rev.toLocaleString()}`;
+        }
+      });
+    } catch (err) { console.error('Revenue Load Error:', err); }
+  }
+  // ==========================================
+  // CITY DROPDOWN HELPER (mirrors app.js phCities)
+  // ==========================================
+  const phCities = [
+    "Alaminos","Angeles City","Antipolo","Bacoor","Bacolod","Bago","Baguio","Bais","Balanga","Batac",
+    "Batangas City","Bayawan","Baybay","Bayugan","Biñan","Bislig","Bogo","Borongan","Butuan","Cabadbaran",
+    "Cabanatuan","Cabuyao","Cadiz","Cagayan de Oro","Calamba","Calapan","Calasiao","Calbayog","Caloocan",
+    "Candon","Canlaon","Carcar","Catbalogan","Cauayan","Cavite City","Cebu City","Cotabato City","Dagupan",
+    "Danao","Dapitan","Dasmariñas","Davao City","Digos","Dipolog","Dumaguete","El Salvador","Escalante",
+    "Gapan","General Santos","General Trias","Gingoog","Guihulngan","Himamaylan","Ilagan","Iligan",
+    "Iloilo City","Imus","Iriga","Isabela City","Kabankalan","Kidapawan","Koronadal","La Carlota",
+    "Lamitan","Laoag","Lapu-Lapu","Las Piñas","Legazpi","Ligao","Lipa","Lucena","Maasin","Mabalacat",
+    "Mandaluyong","Mandaue","Manila","Marawi","Marikina","Masbate City","Mati","Meycauayan","Muñoz",
+    "Muntinlupa","Naga","Navotas","Olongapo","Ormoc","Oroquieta","Ozamiz","Pagadian","Palayan","Panabo",
+    "Pansol","Parañaque","Pasay","Pasig","Passi","Puerto Princesa","Quezon City","Roxas City","Sagay",
+    "Samal","San Carlos (Negros)","San Carlos (Pangasinan)","San Fernando (La Union)",
+    "San Fernando (Pampanga)","San Jose","San Jose del Monte","San Juan","San Pablo","San Pedro",
+    "Santa Rosa","Santiago","Silay","Sorsogon City","Surigao City","Tabaco","Tabuk","Tacloban",
+    "Tacurong","Tagaytay","Tagbilaran","Taguig","Tagum","Talisay (Cebu)","Talisay (Negros)",
+    "Tanauan","Tandag","Tangub","Tanjay","Tarlac City","Tayabas","Toledo","Trece Martires",
+    "Tuguegarao","Urdaneta","Valencia","Valenzuela","Victorias","Vigan","Zamboanga City"
+  ].sort();
+
+  function populateRouteCityDropdowns() {
+    const originSel = document.getElementById('newRouteOrigin');
+    const destSel   = document.getElementById('newRouteDest');
+    if (!originSel || !destSel) return;
+
+    phCities.forEach(city => {
+      const o = new Option(city, city);
+      const d = new Option(city, city);
+      originSel.appendChild(o);
+      destSel.appendChild(d);
+    });
+
+    // Live validation: prevent same city for both
+    function validateCities() {
+      if (originSel.value && destSel.value && originSel.value === destSel.value) {
+        destSel.setCustomValidity('Origin and destination cannot be the same city.');
+      } else {
+        destSel.setCustomValidity('');
+      }
+    }
+    originSel.addEventListener('change', validateCities);
+    destSel.addEventListener('change', validateCities);
+  }
+
+  // ==========================================
+  // EXECUTE ON LOAD
+  // ==========================================
+  loadLiveBuses();
+  fetchUsers();
+  loadDashboardData();
+  loadLiveBookings();
+  loadLiveRoutes();
+  loadLiveSchedules();
+</script>
 </body>
 </html>

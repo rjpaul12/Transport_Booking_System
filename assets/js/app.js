@@ -474,56 +474,47 @@ async function findBuses() {
     const originName = document.getElementById('searchOrigin').value;
     const destName = document.getElementById('searchDestination').value;
 
-    let rawDateString = window.finalBookingDate || new Date().toISOString().split('T')[0];
-    let searchDate = new Date(rawDateString + "T00:00:00");
-    const startOfDay = new Date(searchDate);
-    startOfDay.setHours(0, 0, 0, 0);
+    if (!originName || !destName) return alert('Select origin and destination');
 
-    const endOfDay = new Date(searchDate);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const originId = await resolveLocationId(originName);
-    const destId = await resolveLocationId(destName);
-
-    if (!originId || !destId) {
-        showNoResults();
-        return;
-    }
+    // FIX: Using correct variable scope and local timezone strings
+    let rawDateString = finalBookingDate || new Date().toISOString().split('T')[0];
+    const startOfDay = `${rawDateString}T00:00:00`;
+    const endOfDay = `${rawDateString}T23:59:59`;
 
     const { data, error } = await sb
         .from('schedules')
         .select(`
             id, price, departure_time, arrival_time,
-            buses ( operator_name, bus_type, total_seats ),
-            origin:locations!origin_id ( name ),
-            destination:locations!destination_id ( name )
+            buses ( bus_number, model, total_seats ),
+            routes!inner ( origin, destination )
         `)
-        .eq('origin_id', originId)
-        .eq('destination_id', destId)
-        .gte('departure_time', startOfDay.toISOString()) 
-        .lte('departure_time', endOfDay.toISOString())   
+        .eq('routes.origin', originName)
+        .eq('routes.destination', destName)
+        .gte('departure_time', startOfDay) 
+        .lte('departure_time', endOfDay)   
         .order('departure_time', { ascending: true });
 
     if (error) {
-        console.error("Supabase Error:", error);
-        return;
+        console.error("Supabase Error:", error.message);
+        return showNoResults();
     }
 
     if (!data || data.length === 0) {
         showNoResults();
     } else {
-        const uniqueData = [];
-        const seenTrips = new Set();
-        data.forEach(bus => {
-            const fingerprint = bus.buses.operator_name + "_" + bus.departure_time;
-            if (!seenTrips.has(fingerprint)) {
-                seenTrips.add(fingerprint);
-                uniqueData.push(bus);
+        // Map the database names to the UI labels
+        const formattedData = data.map(item => ({
+            ...item,
+            origin: { name: item.routes.origin },
+            destination: { name: item.routes.destination },
+            buses: { 
+                operator_name: item.buses.bus_number, 
+                bus_type: item.buses.model, 
+                total_seats: item.buses.total_seats 
             }
-        });
-
-        lastSearchResults = uniqueData; 
-        renderTickets(uniqueData); 
+        }));
+        lastSearchResults = formattedData; 
+        renderTickets(formattedData); 
     }
 }
 
@@ -573,7 +564,7 @@ async function searchBuses(originName, destName, selectedDate) {
 function showNoResults() {
   const resultsContainer = document.getElementById('resultsContainer');
   if (resultsContainer) {
-    resultsContainer.innerHTML = `
+   resultsContainer.innerHTML  = `
       <div style="text-align:center;padding:30px 20px;">
         <div style="font-size:28px;margin-bottom:10px;">🔍</div>
         <div style="font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;">No buses found</div>
@@ -639,7 +630,7 @@ function renderTickets(data) {
         ${schedule.buses?.total_seats || 20}
       )">
         <div class="bus-name">${schedule.buses?.operator_name || '—'}</div>
-        <div class="bus-type">${schedule.buses?.bus_type || '—'} · ${duration}</div>
+        <div class="bus-type">${schedule.buses?.bus_type || 'Standard'} · ${duration}</div>
         <div class="bus-row">
           <div class="time-block">
             <div class="time">${depTime}</div>
@@ -1095,26 +1086,19 @@ async function loadMyTickets() {
     const { data: bookings, error } = await sb
       .from('bookings')
       .select(`
-        id,
-        seat_number,
-        status,
-        created_at,
+        id, seat_number, status, created_at,
         schedules (
-          id,
-          departure_time,
-          arrival_time,
-          buses ( operator_name ),
-          origin:origin_id ( name ),
-          destination:destination_id ( name )
+          id, departure_time, arrival_time,
+          buses ( bus_number ),
+          routes ( origin, destination )
         )
       `)
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
     if (!bookings || bookings.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">No tickets found. Time to book a trip!</div>';
+      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">No tickets found.</div>';
       return;
     }
 
@@ -1133,54 +1117,31 @@ async function loadMyTickets() {
       groupedTrips[scheduleId].seats.push(b.seat_number); 
     });
 
-    const tripsArray = Object.values(groupedTrips);
-
-    listEl.innerHTML = tripsArray.map(trip => {
-      const now = new Date();
-      const departureTime = new Date(trip.schedules.departure_time);
-      const arrivalTime = new Date(trip.schedules.arrival_time);
-      const origin = trip.schedules?.origin?.name || "Unknown";
-      const dest = trip.schedules?.destination?.name || "Unknown";
-      const operator = trip.schedules?.buses?.operator_name || "GoRoute";
+    listEl.innerHTML = Object.values(groupedTrips).map(trip => {
+      const s = trip.schedules;
+      const origin = s.routes?.origin || "Unknown";
+      const dest = s.routes?.destination || "Unknown";
+      const operator = s.buses?.bus_number || "GoRoute";
       
-      let displayStatus = 'Confirmed';
-      let badgeClass = 'status-confirmed';
-
-      if (now < departureTime) {
-        displayStatus = 'Upcoming';
-        badgeClass = 'status-upcoming';
-      } else if (now > arrivalTime) {
-        displayStatus = 'Completed';
-        badgeClass = 'status-completed';
-      }
-
-      const depTime = departureTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      const arrTime = arrivalTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      const depTime = new Date(s.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const displayDate = new Date(trip.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-      const seatString = trip.seats.join(', ');
-      const seatCountText = trip.seats.length === 1 ? '1 Seat' : `${trip.seats.length} Seats`;
-
       return `
-      <div class="ticket-card" style="cursor: pointer;" onclick="openQR('${trip.scheduleId}', '${origin} → ${dest}', '${displayDate} · ${depTime}', '${seatString}')">
-        
+      <div class="ticket-card" onclick="openQR('${trip.scheduleId}', '${origin} → ${dest}', '${displayDate}', '${trip.seats.join(', ')}')">
         <div class="ticket-left">
-          <div class="ticket-no">PHB/Ticket No: ${String(trip.scheduleId).substring(0,8).toUpperCase()}</div>
-          <div class="ticket-route">${origin} <span class="arrow">→</span> ${dest}</div>
-          <div class="ticket-time">${depTime} <span class="arrow">→</span> ${arrTime}</div>
-          <div class="ticket-meta-info">${operator} · ${seatCountText}</div>
+          <div class="ticket-no">REF: ${String(trip.scheduleId).substring(0,8).toUpperCase()}</div>
+          <div class="ticket-route">${origin} → ${dest}</div>
+          <div class="ticket-meta-info">${operator} · ${trip.seats.length} Seats</div>
         </div>
-        
         <div class="ticket-right">
-          <div class="status-badge ${badgeClass}">${displayStatus}</div>
+          <div class="status-badge status-confirmed">${trip.status}</div>
           <div class="ticket-date">${displayDate}</div>
         </div>
-        
-      </div>
-      `}).join('');
+      </div>`;
+    }).join('');
 
   } catch (err) {
-    listEl.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--accent);">Error: ${err.message}</div>`;
+    listEl.innerHTML = `<div class="alert error show">${err.message}</div>`;
   }
 }
 
@@ -1222,61 +1183,40 @@ function closeQR() {
 // ════════════════════════════════════════════════════════
 async function loadWallet() {
   const screen = document.getElementById('walletScreen');
-  
-  screen.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text3);">Loading wallet securely...</div>';
-
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
 
   const userId = session.user.id;
-
-  // 1. Fetch real wallet balance
   let { data: wallet } = await sb.from('wallets').select('*').eq('user_id', userId).maybeSingle();
 
   if (!wallet) {
-    const { data: newWallet } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
-    wallet = newWallet;
+    const { data: nw } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
+    wallet = nw;
   }
 
-  // 2. Fetch REAL transaction history (bookings)
   const { data: bookings } = await sb
     .from('bookings')
     .select(`
-      price, 
-      created_at, 
-      schedules (
-        origin:origin_id ( name ),
-        destination:destination_id ( name )
-      )
+      price, created_at, 
+      schedules ( routes ( origin, destination ) )
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
-  // 3. Generate dynamic passbook HTML
-  let passbookHTML = '';
-  
-  if (bookings && bookings.length > 0) {
-    bookings.forEach(b => {
-      const dateObj = new Date(b.created_at);
-      const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-      const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      
-      const origin = b.schedules?.origin?.name || 'Origin';
-      const dest = b.schedules?.destination?.name || 'Destination';
-      
-      passbookHTML += `
-        <div class="transaction-row">
-          <div>
-            <div class="tx-title">Bus ticket — ${origin} to ${dest}</div>
-            <div class="tx-date">${dateStr} · ${timeStr}</div>
-          </div>
-          <div class="tx-amt tx-minus">- ₱${Number(b.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+  let passbookHTML = (bookings || []).map(b => {
+    const origin = b.schedules?.routes?.origin || 'Origin';
+    const dest = b.schedules?.routes?.destination || 'Destination';
+    return `
+      <div class="transaction-row">
+        <div>
+          <div class="tx-title">${origin} to ${dest}</div>
+          <div class="tx-date">${new Date(b.created_at).toLocaleDateString()}</div>
         </div>
-      `;
-    });
-  }
+        <div class="tx-amt tx-minus">- ₱${Number(b.price).toLocaleString()}</div>
+      </div>`;
+  }).join('');
 
-  // 4. Inject the final UI
+  // Inject the final UI
   screen.innerHTML = `
     <!-- Top Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -1311,6 +1251,7 @@ async function loadWallet() {
   `;
 }
 
+
 // ════════════════════════════════════════════════════════
 //   ACCOUNT
 // ════════════════════════════════════════════════════════
@@ -1318,16 +1259,58 @@ async function loadAccount() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
-    const emailEl = document.getElementById('accountEmailText');
-    if (emailEl) {
-      const name  = session.user.user_metadata?.full_name || '';
-      emailEl.innerHTML = name
-        ? `<strong style="color:var(--blue-dark);display:block;font-size:16px;margin-bottom:4px;">${name}</strong>${session.user.email}`
-        : session.user.email;
+
+    const meta     = session.user.user_metadata || {};
+    const fullName = (meta.full_name || meta.name || '').trim() || 'GoRoute User';
+    const email    = session.user.email || '';
+    const initials = fullName.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'U';
+
+    // Profile summary card
+    const nameEl   = document.getElementById('acctName');
+    const emailEl  = document.getElementById('acctEmail');
+    const avatarEl = document.getElementById('acctAvatar');
+    if (nameEl)  nameEl.textContent  = fullName;
+    if (emailEl) emailEl.textContent = email;
+    if (avatarEl) avatarEl.innerHTML = `<div style="width:44px;height:44px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--blue-dark);">${initials}</div>`;
+
+    // Edit Profile screen — prefill fields
+    const epName  = document.querySelector('#editProfileScreen .ep-input[type="text"]');
+    const epEmail = document.querySelector('#editProfileScreen .ep-input[type="email"]');
+    const epPhone = document.querySelector('#editProfileScreen .ep-input[type="tel"], #editProfileScreen input[type="text"]:nth-of-type(3)');
+    if (epName)  epName.value  = fullName;
+    if (epEmail) { epEmail.value = email; epEmail.readOnly = true; epEmail.style.opacity = '.6'; }
+
+    // Live wallet balance in Settings row
+    const userId = session.user.id;
+    const { data: wallet } = await sb.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+    const walletBal = document.getElementById('acctWalletBal');
+    if (walletBal && wallet) {
+      walletBal.textContent = `Balance: ₱ ${Number(wallet.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     }
+
   } catch (err) {
     console.error(err);
   }
+}
+
+// Appearance helpers
+function setTheme(theme) {
+  if (theme === 'dark') { alert('Dark mode coming soon! 🌙'); return; }
+  document.getElementById('themeLight').style.borderColor = 'var(--blue)';
+  document.getElementById('themeDark').style.borderColor  = 'var(--border)';
+  document.getElementById('acctAppearanceSub').textContent = 'Light mode';
+}
+
+function setFontSize(size) {
+  ['Small','Normal','Large'].forEach(s => {
+    const el = document.getElementById('fs' + s);
+    if (el) el.textContent = '';
+  });
+  const map = { small: 'fsSmall', normal: 'fsNormal', large: 'fsLarge' };
+  const tick = document.getElementById(map[size]);
+  if (tick) tick.textContent = '✓';
+  const sizeMap = { small: '13px', normal: '15px', large: '17px' };
+  document.documentElement.style.fontSize = sizeMap[size];
 }
 
 // ════════════════════════════════════════════════════════
@@ -1340,24 +1323,23 @@ async function loadAdminData() {
 
   try {
     const { data: bookings, error } = await sb
-      .from('bookings')
-      .select(`
-        id,
-        seat_number,
-        passenger_name,
-        passenger_age,
-        passenger_gender,
-        status,
-        price,
-        created_at,
-        schedules (
-          departure_time,
-          buses ( operator_name ),
-          origin:origin_id ( name ),
-          destination:destination_id ( name )
-        )
-      `)
-      .order('created_at', { ascending: false });
+  .from('bookings')
+  .select(`
+    id,
+    seat_number,
+    passenger_name,
+    passenger_age,
+    passenger_gender,
+    status,
+    price,
+    created_at,
+    schedules (
+      departure_time,
+      buses ( bus_number ),
+      routes ( origin, destination )
+    )
+  `)
+  .order('created_at', { ascending: false });
 
     if (error) throw error;
 
@@ -1385,8 +1367,8 @@ async function loadAdminData() {
 
     bookings.forEach(b => {
       const s       = b.schedules;
-      const route   = `${s?.origin?.name || '?'} → ${s?.destination?.name || '?'}`;
-      const busName = s?.buses?.operator_name || '—';
+      const route = `${s?.routes?.origin || '?'} → ${s?.routes?.destination || '?'}`;
+      const busName = s?.buses?.bus_number || '—';
       const dep     = s?.departure_time
         ? new Date(s.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         : '—';
@@ -1418,9 +1400,50 @@ async function loadAdminData() {
   }
 }
 
+// 1. Real Sign Out Logic
 async function adminLogout() {
-  await sb.auth.signOut();
-  window.location.href = 'auth.html';
+  const { error } = await _supabase.auth.signOut();
+  if (error) {
+    showToast(error.message, 'error');
+  } else {
+    showToast('Logged out successfully', 'success');
+    setTimeout(() => window.location.replace('auth_2.html'), 1000);
+  }
+}
+
+// 2. CSV Export Engine
+function downloadCSV(data, filename = 'export.csv') {
+  if (!data || !data.length) return showToast('No data to export', 'error');
+  const headers = Object.keys(data[0]).join(',');
+  const rows = data.map(row => Object.values(row).map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([headers + '\n' + rows], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click();
+}
+
+// 3. Global Search Listener
+document.querySelector('.search-bar input').addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  const activePage = document.querySelector('.page.active');
+  const items = activePage.querySelectorAll('tbody tr, .bus-card, .route-card');
+  items.forEach(item => {
+    item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+  });
+});
+
+// 4. Activity Log Populator
+async function populateActivityLog() {
+  const { data } = await _supabase.from('bookings').select('passenger_name, created_at').limit(5).order('created_at', {ascending: false});
+  if (data) {
+    document.getElementById('dash-activity-log').innerHTML = data.map(log => `
+      <div class="feed-item">
+        <div class="feed-dot-wrap" style="background:var(--blue-light);"><div style="width:6px;height:6px;border-radius:50%;background:var(--blue);"></div></div>
+        <div class="feed-text"><strong>${log.passenger_name}</strong> created a new booking.</div>
+        <div class="feed-ago">${new Date(log.created_at).toLocaleTimeString()}</div>
+      </div>`).join('');
+  }
 }
 
 function applyFilter(type, element) {
@@ -1484,3 +1507,18 @@ document.addEventListener('click', (e) => {
     }, 1000);
   }
 });
+
+async function deleteItem(tableName, id) {
+  if (!confirm('Are you sure you want to remove this item?')) return;
+  
+  const { error } = await _supabase.from(tableName).delete().eq('id', id);
+  if (error) {
+    showToast(error.message, 'error');
+  } else {
+    showToast('Item removed successfully');
+    // Refresh the specific list
+    if (tableName === 'buses') loadLiveBuses();
+    if (tableName === 'routes') loadLiveRoutes();
+    if (tableName === 'schedules') loadLiveSchedules();
+  }
+}

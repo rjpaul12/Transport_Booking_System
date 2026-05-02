@@ -226,12 +226,12 @@
         </div>
 
         <div class="profile-summary">
-          <div class="ps-avatar">
+          <div class="ps-avatar" id="acctAvatar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           </div>
           <div class="ps-info">
-            <div class="ps-name">rj tabarno</div>
-            <div class="ps-email">rjpaulhemodo@gmail.com</div>
+            <div class="ps-name" id="acctName">—</div>
+            <div class="ps-email" id="acctEmail">—</div>
           </div>
           <div class="ps-edit" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('editProfileScreen').style.display='block';">Edit →</div>
         </div>
@@ -245,7 +245,7 @@
             </div>
             <div class="si-arrow">›</div>
           </div>
-          <div class="settings-item">
+          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('securityScreen').style.display='block';">
             <div class="si-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
             <div class="si-text">
               <div class="si-title">Security</div>
@@ -257,7 +257,7 @@
             <div class="si-icon ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg></div>
             <div class="si-text">
               <div class="si-title">My Wallet</div>
-              <div class="si-sub">Balance: ₱ 500</div>
+              <div class="si-sub" id="acctWalletBal">Balance: —</div>
             </div>
             <div class="si-arrow">›</div>
           </div>
@@ -265,22 +265,22 @@
 
         <div class="settings-group">
           <div class="settings-item">
-            <div class="si-icon ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+            <div class="si-icon ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
             <div class="si-text">
               <div class="si-title">Notifications</div>
               <div class="si-sub">Booking alerts, promos</div>
             </div>
-            <div class="toggle-switch"></div>
+            <div class="toggle-switch" id="notifToggle"></div>
           </div>
-          <div class="settings-item">
+          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('appearanceScreen').style.display='block';">
             <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg></div>
             <div class="si-text">
               <div class="si-title">Appearance</div>
-              <div class="si-sub">Light mode</div>
+              <div class="si-sub" id="acctAppearanceSub">Light mode</div>
             </div>
             <div class="si-arrow">›</div>
           </div>
-          <div class="settings-item">
+          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('helpScreen').style.display='block';">
             <div class="si-icon ic-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
             <div class="si-text">
               <div class="si-title">Help & Support</div>
@@ -297,8 +297,135 @@
           </div>
         </div>
 
-        <div class="app-version">GoRoute v1.0.0 · Made with ❤️ in PH</div>
+        <div class="app-version">GoRoute v1.0.0 · Made with ❤️ in PH<br><span style="color:var(--text3);font-size:10px;font-weight:500;">Developed by RJ Paul Tabarno</span></div>
 
+      </div>
+    </div>
+
+    <!-- Security Screen -->
+    <div id="securityScreen" style="display:none;">
+      <div class="screen ep-screen">
+        <div class="ep-hero" style="margin-bottom:24px;">
+          <div class="ep-header">
+            <div class="ep-back" onclick="document.getElementById('securityScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="ep-title">Security</div>
+          </div>
+        </div>
+        <div class="settings-group" style="margin:0 0 16px;">
+          <div class="settings-item" onclick="alert('A password reset link will be sent to your email.')">
+            <div class="si-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+            <div class="si-text"><div class="si-title">Change Password</div><div class="si-sub">Update your login password</div></div>
+            <div class="si-arrow">›</div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+            <div class="si-text"><div class="si-title">Two-Factor Authentication</div><div class="si-sub">Add an extra layer of security</div></div>
+            <div class="toggle-switch off"></div>
+          </div>
+          <div class="settings-item" onclick="alert('All other sessions have been signed out.')">
+            <div class="si-icon ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
+            <div class="si-text"><div class="si-title">Sign Out All Devices</div><div class="si-sub">End all active sessions</div></div>
+            <div class="si-arrow">›</div>
+          </div>
+        </div>
+        <div class="settings-group" style="margin:0;">
+          <div class="settings-item" style="color:#EF4444;" onclick="if(confirm('Delete your account permanently?')) handleLogout()">
+            <div class="si-icon" style="background:#FFF0F0;color:#EF4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg></div>
+            <div class="si-text"><div class="si-title" style="color:#EF4444;">Delete Account</div><div class="si-sub">Permanently remove your account</div></div>
+            <div class="si-arrow" style="color:#EF4444;">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appearance Screen -->
+    <div id="appearanceScreen" style="display:none;">
+      <div class="screen ep-screen">
+        <div class="ep-hero" style="margin-bottom:24px;">
+          <div class="ep-header">
+            <div class="ep-back" onclick="document.getElementById('appearanceScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="ep-title">Appearance</div>
+          </div>
+        </div>
+        <div style="padding:0 4px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Theme</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+            <div id="themeLight" onclick="setTheme('light')" style="border:2px solid var(--blue);border-radius:14px;padding:16px;cursor:pointer;text-align:center;background:#fff;">
+              <div style="width:40px;height:40px;background:#F0F9FF;border-radius:10px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">☀️</div>
+              <div style="font-size:13px;font-weight:800;color:var(--text);">Light</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Default</div>
+            </div>
+            <div id="themeDark" onclick="setTheme('dark')" style="border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;text-align:center;background:#fff;">
+              <div style="width:40px;height:40px;background:#1A2940;border-radius:10px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">🌙</div>
+              <div style="font-size:13px;font-weight:800;color:var(--text);">Dark</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Coming soon</div>
+            </div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Text Size</div>
+          <div class="settings-group" style="margin:0;">
+            <div class="settings-item" onclick="setFontSize('small')"><div class="si-text"><div class="si-title">Small</div><div class="si-sub">Compact view</div></div><div id="fsSmall" class="si-arrow"></div></div>
+            <div class="settings-item" onclick="setFontSize('normal')"><div class="si-text"><div class="si-title">Normal</div><div class="si-sub">Default size</div></div><div id="fsNormal" class="si-arrow">✓</div></div>
+            <div class="settings-item" onclick="setFontSize('large')"><div class="si-text"><div class="si-title">Large</div><div class="si-sub">Easier to read</div></div><div id="fsLarge" class="si-arrow"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help & Support Screen -->
+    <div id="helpScreen" style="display:none;">
+      <div class="screen ep-screen">
+        <div class="ep-hero" style="margin-bottom:24px;">
+          <div class="ep-header">
+            <div class="ep-back" onclick="document.getElementById('helpScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div class="ep-title">Help & Support</div>
+          </div>
+        </div>
+        <div style="padding:0 4px;">
+          <div class="settings-group" style="margin:0 0 16px;">
+            <div class="settings-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+              <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+              <div class="si-text"><div class="si-title">How do I book a ticket?</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+            <div style="display:none;padding:12px 16px 14px;font-size:12px;color:var(--text2);line-height:1.6;background:var(--blue-pale);border-top:1px solid var(--border);">Select your origin and destination from the home screen, choose your travel date, tap "Find Buses", pick a schedule, then select your seat and complete payment.</div>
+            <div class="settings-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+              <div class="si-icon ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg></div>
+              <div class="si-text"><div class="si-title">How does the wallet work?</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+            <div style="display:none;padding:12px 16px 14px;font-size:12px;color:var(--text2);line-height:1.6;background:var(--blue-pale);border-top:1px solid var(--border);">Your GoRoute wallet is preloaded with ₱100,000 for testing. When you book a ticket, the fare is automatically deducted from your balance. Top-up via payment gateway coming soon.</div>
+            <div class="settings-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+              <div class="si-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
+              <div class="si-text"><div class="si-title">Can I cancel my booking?</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+            <div style="display:none;padding:12px 16px 14px;font-size:12px;color:var(--text2);line-height:1.6;background:var(--blue-pale);border-top:1px solid var(--border);">Cancellation and refund policies depend on the bus operator. Please contact support at least 24 hours before your departure for assistance.</div>
+          </div>
+          <div class="settings-group" style="margin:0;">
+            <div class="settings-item" onclick="window.open('mailto:support@goroute.com')">
+              <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
+              <div class="si-text"><div class="si-title">Email Support</div><div class="si-sub">support@goroute.com</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+            <div class="settings-item">
+              <div class="si-icon ic-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+              <div class="si-text"><div class="si-title">Terms of Service</div><div class="si-sub">Read our user agreement</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+            <div class="settings-item">
+              <div class="si-icon ic-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+              <div class="si-text"><div class="si-title">Privacy Policy</div><div class="si-sub">How we handle your data</div></div>
+              <div class="si-arrow">›</div>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--text3);font-weight:600;">GoRoute v1.0.0 · Developed by RJ Paul Tabarno</div>
+        </div>
       </div>
     </div>
 
