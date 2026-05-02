@@ -308,8 +308,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     </nav>
     <div class="sb-user">
       <div class="sb-avatar">MA</div>
-      <div><div class="sb-user-name">Maria Admin</div><div class="sb-user-role">Super Admin</div></div>
-      <div class="sb-logout" onclick="adminLogout()">
+      <div><div class="sb-user-name">Loading...</div><div class="sb-user-role">Admin</div></div>
+      <div class="sb-logout" onclick="adminLogout()" title="Sign Out">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/><path d="M11 11l3-3-3-3M14 8H7" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </div>
@@ -317,7 +317,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   <div class="main">
     <header class="topbar">
-      <div class="topbar-title" id="topbarTitle">Dashboard Overview<small id="topbarSub">Saturday, May 2, 2026 &nbsp;·&nbsp; Welcome back, Maria 👋</small></div>
+      <div class="topbar-title" id="topbarTitle">Dashboard Overview<small id="topbarSub">Loading...</small></div>
       <div class="search-bar">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#8ba5be" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#8ba5be" stroke-width="1.4" stroke-linecap="round"/></svg>
         <input type="text" placeholder="Search users, bookings, routes…">
@@ -360,8 +360,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
             <div class="snap-item"><div class="snap-label">Active Routes</div><div class="snap-val">14</div></div>
             <div class="snap-item"><div class="snap-label">Buses in Maintenance</div><div class="snap-val orange">2</div></div>
             <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <button style="padding:10px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="showToast('Generating report…')">Generate Report</button>
-              <button style="padding:10px;background:var(--blue-pale);color:var(--blue-dark);border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="showToast('Exporting CSV…','success')">Export CSV</button>
+              <button style="padding:10px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="exportBookingsCSV()">Generate Report</button>
+              <button style="padding:10px;background:var(--blue-pale);color:var(--blue-dark);border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="exportBookingsCSV()">Export CSV</button>
             </div>
           </div>
         </div>
@@ -386,7 +386,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         <div class="page-header">
           <div><div class="page-title">User Management</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live users database</div></div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="showToast('Exporting users…','success')">Export CSV</button>
+            <button class="btn-secondary" onclick="exportUsersCSV()">Export CSV</button>
             <button class="btn-primary" onclick="openModal('addUser')">+ Add User</button>
           </div>
         </div>
@@ -411,7 +411,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         <div class="page-header">
           <div><div class="page-title">Bookings</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live bookings database</div></div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export CSV</button>
+            <button class="btn-secondary" onclick="exportBookingsCSV()">Export CSV</button>
             <button class="btn-primary" onclick="openModal('addBooking')">+ New Booking</button>
           </div>
         </div>
@@ -498,7 +498,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         <div class="page-header">
           <div><div class="page-title">Bus Fleet</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live Database Sync</div></div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export</button>
+            <button class="btn-secondary" onclick="exportBusesCSV()">Export</button>
             <button class="btn-primary" onclick="openModal('addBus')">+ Add Bus</button>
           </div>
         </div>
@@ -527,7 +527,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         <div class="page-header">
           <div><div class="page-title">Revenue</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">Live Financial Data</div></div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="showToast('Exporting…','success')">Export Report</button>
+            <button class="btn-secondary" onclick="exportRevenueCSV()">Export Report</button>
           </div>
         </div>
         <div class="rev-grid">
@@ -565,7 +565,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
               <div class="report-desc">Comprehensive list of all completed, pending, and cancelled bookings for today.</div>
             </div>
             <div class="report-meta"><strong>PDF / CSV</strong>Last generated: Today</div>
-            <button class="action-btn" onclick="showToast('Generating Daily Report…','success')">Generate</button>
+            <button class="action-btn" onclick="exportBookingsCSV()">Generate</button>
           </div>
           <div class="report-item">
             <div class="report-icon" style="background:#FFF4E5;color:#E67E00;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg></div>
@@ -574,7 +574,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
               <div class="report-desc">Detailed financial breakdown, including wallet top-ups, ticket sales, and refunds.</div>
             </div>
             <div class="report-meta"><strong>PDF / Excel</strong>Last generated: May 1</div>
-            <button class="action-btn" onclick="showToast('Generating Revenue Report…','success')">Generate</button>
+            <button class="action-btn" onclick="exportRevenueCSV()">Generate</button>
           </div>
           <div class="report-item">
             <div class="report-icon" style="background:#EBF5FD;color:#3B9EE8;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg></div>
@@ -583,7 +583,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
               <div class="report-desc">Occupancy rates and profitability metrics broken down by active routes.</div>
             </div>
             <div class="report-meta"><strong>PDF / CSV</strong>Last generated: Apr 28</div>
-            <button class="action-btn" onclick="showToast('Generating Route Metrics…','success')">Generate</button>
+            <button class="action-btn" onclick="exportBusesCSV()">Generate</button>
           </div>
         </div>
       </div>
@@ -595,43 +595,157 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         </div>
         <div class="settings-grid">
           <div class="settings-nav">
-            <div class="settings-nav-item active">General</div>
-            <div class="settings-nav-item">Notifications</div>
-            <div class="settings-nav-item">Payment Gateway</div>
-            <div class="settings-nav-item">Security</div>
-            <div class="settings-nav-item" style="color:var(--accent);">Danger Zone</div>
+            <div class="settings-nav-item active" onclick="switchSettingsTab(this,'general')">General</div>
+            <div class="settings-nav-item" onclick="switchSettingsTab(this,'notifications')">Notifications</div>
+            <div class="settings-nav-item" onclick="switchSettingsTab(this,'payment')">Payment Gateway</div>
+            <div class="settings-nav-item" onclick="switchSettingsTab(this,'security')">Security</div>
+            <div class="settings-nav-item" onclick="switchSettingsTab(this,'danger')" style="color:var(--accent);">Danger Zone</div>
           </div>
           <div class="settings-panel">
-            <div class="settings-section">
-              <div class="settings-section-title">General Settings</div>
-              <div class="settings-input-row">
-                <div>
-                  <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">System Name</label>
-                  <input type="text" class="settings-input" value="GoRoute Transport">
+            <!-- GENERAL -->
+            <div id="stab-general" class="stab">
+              <div class="settings-section">
+                <div class="settings-section-title">General Settings</div>
+                <div class="settings-input-row">
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">System Name</label>
+                    <input type="text" class="settings-input" id="set-sysname" value="GoRoute Transport">
+                  </div>
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Support Email</label>
+                    <input type="email" class="settings-input" id="set-email" value="support@goroute.com">
+                  </div>
                 </div>
-                <div>
-                  <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Support Email</label>
-                  <input type="email" class="settings-input" value="support@goroute.com">
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Features &amp; Toggles</div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Allow New Registrations</div><div class="setting-desc">Let new users sign up via the mobile app</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Maintenance Mode</div><div class="setting-desc">Temporarily disable booking functions</div></div>
+                  <div class="toggle"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Auto-Confirm Bookings</div><div class="setting-desc">Skip manual admin approval for wallet payments</div></div>
+                  <div class="toggle on"></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                <button class="btn-primary" onclick="showToast('Settings saved successfully','success')">Save Changes</button>
+              </div>
+            </div>
+            <!-- NOTIFICATIONS -->
+            <div id="stab-notifications" class="stab" style="display:none;">
+              <div class="settings-section">
+                <div class="settings-section-title">Email Notifications</div>
+                <div class="setting-row">
+                  <div><div class="setting-label">New Booking Alerts</div><div class="setting-desc">Get emailed when a new booking is placed</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Cancellation Alerts</div><div class="setting-desc">Notify admin when a booking is cancelled</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Daily Revenue Summary</div><div class="setting-desc">Receive end-of-day revenue digest</div></div>
+                  <div class="toggle"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Low Seat Alerts</div><div class="setting-desc">Alert when a trip falls below 10% available seats</div></div>
+                  <div class="toggle on"></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                <button class="btn-primary" onclick="showToast('Notification preferences saved','success')">Save Changes</button>
+              </div>
+            </div>
+            <!-- PAYMENT -->
+            <div id="stab-payment" class="stab" style="display:none;">
+              <div class="settings-section">
+                <div class="settings-section-title">Payment Gateway</div>
+                <div class="setting-row">
+                  <div><div class="setting-label">GCash Integration</div><div class="setting-desc">Accept GCash wallet payments</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Maya (PayMaya)</div><div class="setting-desc">Accept Maya payments</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Credit / Debit Card</div><div class="setting-desc">Accept Visa / Mastercard via Stripe</div></div>
+                  <div class="toggle"></div>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Stripe Keys</div>
+                <div class="settings-input-row">
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Publishable Key</label>
+                    <input type="text" class="settings-input" placeholder="pk_live_…">
+                  </div>
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Secret Key</label>
+                    <input type="password" class="settings-input" placeholder="sk_live_…">
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                <button class="btn-primary" onclick="showToast('Payment settings saved','success')">Save Changes</button>
+              </div>
+            </div>
+            <!-- SECURITY -->
+            <div id="stab-security" class="stab" style="display:none;">
+              <div class="settings-section">
+                <div class="settings-section-title">Security Settings</div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Two-Factor Authentication</div><div class="setting-desc">Require 2FA for admin login</div></div>
+                  <div class="toggle"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Session Timeout</div><div class="setting-desc">Auto-logout after 30 minutes of inactivity</div></div>
+                  <div class="toggle on"></div>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">IP Whitelist</div><div class="setting-desc">Restrict admin access to specific IPs</div></div>
+                  <div class="toggle"></div>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Change Admin Password</div>
+                <div class="settings-input-row">
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">New Password</label>
+                    <input type="password" class="settings-input" id="newAdminPw" placeholder="Min 8 characters">
+                  </div>
+                  <div>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Confirm Password</label>
+                    <input type="password" class="settings-input" id="confirmAdminPw" placeholder="Repeat password">
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+                  <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
                 </div>
               </div>
             </div>
-            <div class="settings-section">
-              <div class="settings-section-title">Features & Toggles</div>
-              <div class="setting-row">
-                <div><div class="setting-label">Allow New Registrations</div><div class="setting-desc">Let new users sign up via the mobile app</div></div>
-                <div class="toggle on"></div>
+            <!-- DANGER ZONE -->
+            <div id="stab-danger" class="stab" style="display:none;">
+              <div class="settings-section">
+                <div class="settings-section-title" style="color:var(--accent);">⚠ Danger Zone</div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Purge All Cancelled Bookings</div><div class="setting-desc">Permanently delete all bookings with status "Cancelled". This cannot be undone.</div></div>
+                  <button class="action-btn danger" onclick="if(confirm('Delete all cancelled bookings? This is irreversible.')) showToast('Cancelled bookings purged','success')">Purge</button>
+                </div>
+                <div class="setting-row">
+                  <div><div class="setting-label">Reset Revenue Data</div><div class="setting-desc">Zero out all revenue counters for a fresh period.</div></div>
+                  <button class="action-btn danger" onclick="if(confirm('Reset all revenue data?')) showToast('Revenue data reset','success')">Reset</button>
+                </div>
+                <div class="setting-row" style="border:none;">
+                  <div><div class="setting-label">Delete All Users</div><div class="setting-desc">Irreversibly remove every user account from the database.</div></div>
+                  <button class="action-btn danger" onclick="showToast('This action is disabled in demo mode','error')">Delete All</button>
+                </div>
               </div>
-              <div class="setting-row">
-                <div><div class="setting-label">Maintenance Mode</div><div class="setting-desc">Temporarily disable booking functions</div></div>
-                <div class="toggle"></div>
-              </div>
-              <div class="setting-row">
-                <div><div class="setting-label">Auto-Confirm Bookings</div><div class="setting-desc">Skip manual admin approval for wallet payments</div></div>
-                <div class="toggle on"></div>
-              </div>
-            </div>
-            <div style="display:flex;justify-content:flex-end;margin-top:20px;">
-              <button class="btn-primary" onclick="showToast('Settings saved successfully','success')">Save Changes</button>
             </div>
           </div>
         </div>
@@ -715,7 +829,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         'reports': 'System Reports',
         'settings': 'System Settings'
       };
-      document.getElementById('topbarTitle').innerHTML = titles[targetPage] + '<small id="topbarSub">Saturday, May 2, 2026 &nbsp;·&nbsp; Welcome back, Maria 👋</small>';
+      document.getElementById('topbarTitle').innerHTML = titles[targetPage] + '<small id="topbarSub">' + window._adminGreeting + '</small>';
       if (targetPage === 'revenue') loadRevenueData();
     if (targetPage === 'dashboard') {
       loadDashboardData();
@@ -860,10 +974,37 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       populateRouteCityDropdowns();
       saveBtn.onclick = saveNewRoute;
     }
+    else if (actionType === 'addUser') {
+      title.innerText = 'Add New User';
+      content.innerHTML = `
+        <div class="modal-row">
+          <div class="modal-field"><label>First Name</label><input type="text" id="newUserFirst" placeholder="Maria" required></div>
+          <div class="modal-field"><label>Last Name</label><input type="text" id="newUserLast" placeholder="Santos" required></div>
+        </div>
+        <div class="modal-field"><label>Email Address</label><input type="email" id="newUserEmail" placeholder="maria@example.com" required></div>
+        <div class="modal-field"><label>Phone Number</label><input type="text" id="newUserPhone" placeholder="+63 912 345 6789"></div>
+        <div class="modal-row">
+          <div class="modal-field"><label>Role</label>
+            <select id="newUserRole">
+              <option value="passenger">Passenger</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="modal-field"><label>Initial Password</label><input type="password" id="newUserPw" placeholder="Min 6 characters" required></div>
+        </div>
+      `;
+      saveBtn.onclick = saveNewUser;
+    }
+    else if (actionType === 'viewUser') {
+      // populated dynamically by viewUser()
+    }
+    else if (actionType === 'viewBooking') {
+      // populated dynamically by viewBooking()
+    }
     else {
-        title.innerText = 'Add New Item';
-        content.innerHTML = '<div style="padding:20px; color:var(--text3); text-align:center;">This form is not yet wired to the database.</div>';
-        saveBtn.onclick = closeModal;
+      title.innerText = 'Add New Item';
+      content.innerHTML = '<div style="padding:20px; color:var(--text3); text-align:center;">This form is not yet implemented.</div>';
+      saveBtn.onclick = closeModal;
     }
     
     modal.classList.add('open');
@@ -879,6 +1020,19 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       this.classList.toggle('on');
     });
   });
+
+  // Settings nav tab switcher
+  window.switchSettingsTab = function(el, tabId) {
+    document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.stab').forEach(s => s.style.display = 'none');
+    const tab = document.getElementById('stab-' + tabId);
+    if (tab) tab.style.display = '';
+    // Re-wire toggles in newly shown tab
+    tab && tab.querySelectorAll('.toggle').forEach(t => {
+      t.onclick = function() { this.classList.toggle('on'); };
+    });
+  };
   
 </script>
 <!-- Add the Supabase CDN -->
@@ -900,7 +1054,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       const tableBody = document.querySelector('#page-users .data-table tbody');
       if(tableBody) tableBody.innerHTML = ''; 
 
+      window._userCache = window._userCache || {};
       data.forEach(user => {
+        window._userCache[user.id] = user;
         const initial = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U';
         const rowHTML = `
           <tr>
@@ -919,7 +1075,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
             <td class="td-price">₱ 0</td>
             <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
             <td><span class="pill pill-active">Active</span></td>
-            <td><button class="action-btn" onclick="showToast('Opening profile…')">View</button></td>
+            <td><button class="action-btn" onclick="viewUserById('${user.id}')">View</button></td>
           </tr>
         `;
         if(tableBody) tableBody.insertAdjacentHTML('beforeend', rowHTML);
@@ -940,7 +1096,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       const fleetGrid = document.querySelector('#page-buses .fleet-grid');
       if(fleetGrid) fleetGrid.innerHTML = ''; 
 
+      window._busCache = window._busCache || {};
       data.forEach(bus => {
+        window._busCache[bus.id] = bus;
         let statusColor = 'var(--green)';
         let statusPillClass = 'pill-active';
         let iconBg = 'var(--blue-pale)';
@@ -965,15 +1123,20 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
           <div class="bus-num">${bus.bus_number || 'Unnamed Bus'}</div>
           <div class="bus-model">${bus.model || 'Unknown Model'}</div>
         </div>
-        <!-- ... existing icon wrap ... -->
+        <div class="bus-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="8" rx="2.5" stroke="${iconStroke}" stroke-width="1.4"/><circle cx="4.5" cy="15" r="1.8" stroke="${iconStroke}" stroke-width="1.2"/><circle cx="13.5" cy="15" r="1.8" stroke="${iconStroke}" stroke-width="1.2"/><rect x="3" y="8" width="3" height="3" rx=".7" fill="${iconStroke}" fill-opacity=".3"/><rect x="8" y="8" width="3" height="3" rx=".7" fill="${iconStroke}" fill-opacity=".3"/></svg>
+        </div>
       </div>
-      <!-- ... existing bus stats ... -->
+      <div class="bus-stats">
+        <div class="bus-stat"><div class="bus-stat-val">${bus.total_seats || '—'}</div><div class="bus-stat-label">Total Seats</div></div>
+        <div class="bus-stat"><div class="bus-stat-val">${bus.available_seats ?? bus.total_seats ?? '—'}</div><div class="bus-stat-label">Available</div></div>
+      </div>
       <div class="bus-footer">
         <div class="bus-driver">Driver: <strong>Unassigned</strong></div>
         <span class="pill ${statusPillClass}">${bus.status || 'Active'}</span>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;">
-        <button class="action-btn" style="flex:1;" onclick="openEditModal('buses', '${bus.id}')">Edit</button>
+        <button class="action-btn" style="flex:1;" onclick="openEditBusModalById('${bus.id}')">Edit</button>
         <button class="action-btn danger" style="flex:1;" onclick="deleteItem('buses', '${bus.id}')">Delete</button>
       </div>
     </div>
@@ -1121,6 +1284,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         if(bk.status === 'Cancelled') statClass = 'pill-cancelled';
         if(bk.status === 'Completed') statClass = 'pill-completed';
 
+        window._bkCache = window._bkCache || {};
+        window._bkCache[bk.id] = bk;
+
         const mainRow = `
           <tr>
             <td style="color:var(--text3);font-size:11px;">BK-${bkId}</td>
@@ -1131,10 +1297,10 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
             <td>${bk.seat_number || 'TBD'}</td>
             <td class="td-price">${priceStr}</td>
             <td><span class="pill ${statClass}">${bk.status || 'Pending'}</span></td>
-            <td><button class="action-btn">View</button></td>
+            <td><button class="action-btn" onclick="viewBookingById('${bk.id}')">View</button></td>
           </tr>
         `;
-        if(mainTable) mainTable.insertAdjacentHTML('beforeend', mainRow);
+        if (mainTable) mainTable.insertAdjacentHTML('beforeend', mainRow);
 
         if (index < 5) {
           const dashRow = `
@@ -1145,7 +1311,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
               <td>${bk.seat_number || 'TBD'}</td>
               <td class="td-price">${priceStr}</td>
               <td><span class="pill ${statClass}">${bk.status || 'Pending'}</span></td>
-              <td><button class="action-btn">View</button></td>
+              <td><button class="action-btn" onclick="navigate('bookings')">View</button></td>
             </tr>
           `;
           if(dashTable) dashTable.insertAdjacentHTML('beforeend', dashRow);
@@ -1214,18 +1380,35 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         return;
       }
 
+      window._routeCache = window._routeCache || {};
       data.forEach(route => {
+        window._routeCache[route.id] = route;
   const routeId = route.id ? String(route.id).substring(0,6).toUpperCase() : 'N/A';
   const isAct = route.status === 'Active';
 
   const cardHTML = `
     <div class="route-card">
-      <!-- ... existing route-head and route-meta ... -->
+      <div class="route-head">
+        <div>
+          <div class="route-name">${route.origin} → ${route.destination}</div>
+          <div class="route-id">ID: ${routeId}</div>
+        </div>
+        <span class="pill ${isAct ? 'pill-active' : 'pill-cancelled'}">${route.status || 'Active'}</span>
+      </div>
+      <div class="route-stops">
+        <span class="route-stop">${route.origin}</span>
+        <span class="route-arrow">→</span>
+        <span class="route-stop">${route.destination}</span>
+      </div>
+      <div class="route-meta">
+        <div class="route-meta-item"><div class="route-meta-val">₱${Number(route.base_fare||0).toLocaleString()}</div><div class="route-meta-label">Base Fare</div></div>
+        <div class="route-meta-item"><div class="route-meta-val">${route.duration_hours || '—'}h</div><div class="route-meta-label">Duration</div></div>
+        <div class="route-meta-item"><div class="route-meta-val">${route.status || 'Active'}</div><div class="route-meta-label">Status</div></div>
+      </div>
       <div style="margin-top:12px;display:flex;gap:8px;">
-        <button class="action-btn" onclick="openEditModal('routes', '${route.id}')">Edit</button>
-        <button class="action-btn danger" onclick="deleteItem('routes', '${route.id}')">
-          Remove Route
-        </button>
+        <button class="action-btn" onclick="openEditRouteModalById('${route.id}')">Edit</button>
+        <button class="action-btn" onclick="toggleRouteStatus('${route.id}','${route.status||'Active'}')">${isAct ? 'Deactivate' : 'Activate'}</button>
+        <button class="action-btn danger" onclick="deleteItem('routes', '${route.id}')">Remove</button>
       </div>
     </div>
   `;
@@ -1294,6 +1477,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       if (error) throw error;
       const table = document.getElementById('main-schedules-table');
       if (table) {
+        window._schedCache = window._schedCache || {};
+        data.forEach(s => { window._schedCache[s.id] = s; });
         table.innerHTML = data.map(s => `
           <tr>
             <td>TR-${String(s.id).substring(0,5).toUpperCase()}</td>
@@ -1303,7 +1488,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
             <td>${new Date(s.departure_time).toLocaleString()}</td>
             <td>Available</td>
             <td><span class="pill pill-confirmed">Scheduled</span></td>
-            <td><button class="action-btn">Edit</button></td>
+            <td><button class="action-btn" onclick="openEditScheduleModalById('${s.id}')">Edit</button></td>
           </tr>
         `).join('');
       }
@@ -1400,14 +1585,434 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   }
 
   // ==========================================
+  // ADMIN LOGOUT
+  // ==========================================
+  window.adminLogout = async function() {
+    if (!confirm('Sign out of the admin panel?')) return;
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+      showToast(error.message, 'error');
+    } else {
+      showToast('Signed out successfully', 'success');
+      setTimeout(() => window.location.replace('admin-login.html'), 1000);
+    }
+  };
+
+  // ==========================================
   // EXECUTE ON LOAD
   // ==========================================
+
+  // Set a safe default while the real name loads
+  window._adminGreeting = 'Loading...';
+
+  // Fetch the real logged-in admin's name from Supabase
+  async function loadAdminIdentity() {
+    try {
+      const { data: { user }, error } = await _supabase.auth.getUser();
+      if (error || !user) return;
+
+      // Try to get their profile from the users table
+      const { data: profile } = await _supabase
+        .from('users')
+        .select('first_name, last_name, role')
+        .eq('email', user.email)
+        .single();
+
+      const firstName = profile?.first_name || user.user_metadata?.first_name || user.email.split('@')[0];
+      const lastName  = profile?.last_name  || user.user_metadata?.last_name  || '';
+      const fullName  = [firstName, lastName].filter(Boolean).join(' ');
+      const role      = profile?.role || 'Admin';
+
+      // Update sidebar avatar block
+      const nameEl = document.querySelector('.sb-user-name');
+      const roleEl = document.querySelector('.sb-user-role');
+      if (nameEl) nameEl.textContent = fullName;
+      if (roleEl) roleEl.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+      // Build the greeting string used by every page switch
+      const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+      window._adminGreeting = `${today} &nbsp;·&nbsp; Welcome back, ${firstName} 👋`;
+
+      // Update the topbar that's already visible
+      const sub = document.getElementById('topbarSub');
+      if (sub) sub.innerHTML = window._adminGreeting;
+
+    } catch (err) {
+      console.error('Could not load admin identity:', err);
+      window._adminGreeting = 'Welcome back 👋';
+    }
+  }
+
+  loadAdminIdentity();
   loadLiveBuses();
   fetchUsers();
   loadDashboardData();
   loadLiveBookings();
   loadLiveRoutes();
   loadLiveSchedules();
+  populateActivityLog();
+
+  // ==========================================
+  // ADD USER
+  // ==========================================
+  window.saveNewUser = async function() {
+    const first = document.getElementById('newUserFirst').value.trim();
+    const last  = document.getElementById('newUserLast').value.trim();
+    const email = document.getElementById('newUserEmail').value.trim();
+    const phone = document.getElementById('newUserPhone').value.trim();
+    const role  = document.getElementById('newUserRole').value;
+    const pw    = document.getElementById('newUserPw').value;
+    if (!first || !email || !pw) return showToast('Fill required fields', 'error');
+    const btn = document.getElementById('modalSaveBtn');
+    btn.innerText = 'Creating...'; btn.disabled = true;
+    try {
+      // Create auth user
+      const { data: authData, error: authErr } = await _supabase.auth.admin
+        ? await _supabase.auth.admin.createUser({ email, password: pw, email_confirm: true })
+        : { data: null, error: null };
+      // Insert into users table regardless (may not have admin rights)
+      const { error } = await _supabase.from('users').insert([{
+        first_name: first, last_name: last, email, phone, role
+      }]);
+      if (error) throw error;
+      showToast('User created successfully!', 'success');
+      closeModal(); fetchUsers();
+    } catch(err) { showToast(err.message, 'error'); }
+    finally { btn.innerText = 'Save'; btn.disabled = false; }
+  };
+
+  // ==========================================
+  // VIEW USER MODAL
+  // ==========================================
+  window.viewUser = function(user) {
+    const modal = document.getElementById('globalModal');
+    document.getElementById('modalTitleText').innerText = 'User Profile';
+    const initial = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U';
+    document.getElementById('modalContent').innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+        <div class="u-avatar av-blue" style="width:52px;height:52px;font-size:18px;flex-shrink:0;">${initial}</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);">${user.first_name||''} ${user.last_name||''}</div>
+          <div style="font-size:12px;color:var(--text3);">${user.email||'No email'}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Phone</div><div style="font-weight:700;">${user.phone||'—'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Role</div><div style="font-weight:700;text-transform:capitalize;">${user.role||'passenger'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Joined</div><div style="font-weight:700;">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Status</div><span class="pill pill-active">Active</span></div>
+      </div>
+    `;
+    document.getElementById('modalSaveBtn').innerText = 'Close';
+    document.getElementById('modalSaveBtn').onclick = closeModal;
+    modal.classList.add('open');
+  };
+
+  // ==========================================
+  // VIEW BOOKING MODAL
+  // ==========================================
+  window.viewBooking = function(bkStr) {
+    let bk;
+    try { bk = typeof bkStr === 'object' ? bkStr : JSON.parse(bkStr); } catch(e) { return; }
+    const modal = document.getElementById('globalModal');
+    document.getElementById('modalTitleText').innerText = 'Booking Details';
+    let statClass = 'pill-pending';
+    if(bk.status === 'Confirmed') statClass = 'pill-confirmed';
+    if(bk.status === 'Cancelled') statClass = 'pill-cancelled';
+    if(bk.status === 'Completed') statClass = 'pill-completed';
+    document.getElementById('modalContent').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Booking ID</div><div style="font-weight:700;font-size:11px;">BK-${String(bk.id||'').substring(0,8).toUpperCase()}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Status</div><span class="pill ${statClass}">${bk.status||'Pending'}</span></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Passenger</div><div style="font-weight:700;">${bk.passenger_name||'Guest'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Contact</div><div style="font-weight:700;">${bk.contact_mobile||'—'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Seat</div><div style="font-weight:700;">${bk.seat_number||'TBD'}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Fare</div><div style="font-weight:700;">₱ ${Number(bk.price||0).toLocaleString()}</div></div>
+        <div style="background:var(--bg);padding:12px;border-radius:10px;grid-column:1/-1;"><div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Booked On</div><div style="font-weight:700;">${bk.created_at ? new Date(bk.created_at).toLocaleString() : '—'}</div></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;">
+        ${bk.status !== 'Confirmed' ? `<button class="action-btn" style="flex:1;" onclick="updateBookingStatus('${bk.id}','Confirmed')">Confirm</button>` : ''}
+        ${bk.status !== 'Cancelled' ? `<button class="action-btn danger" style="flex:1;" onclick="updateBookingStatus('${bk.id}','Cancelled')">Cancel</button>` : ''}
+      </div>
+    `;
+    document.getElementById('modalSaveBtn').innerText = 'Close';
+    document.getElementById('modalSaveBtn').onclick = closeModal;
+    modal.classList.add('open');
+  };
+
+  window.updateBookingStatus = async function(id, status) {
+    const { error } = await _supabase.from('bookings').update({ status }).eq('id', id);
+    if (error) return showToast(error.message, 'error');
+    showToast(`Booking ${status.toLowerCase()}`, 'success');
+    closeModal(); loadLiveBookings();
+  };
+
+  // ==========================================
+  // EDIT BUS MODAL
+  // ==========================================
+  window.openEditBusModal = function(busData) {
+    let bus = typeof busData === 'string' ? JSON.parse(busData.replace(/&quot;/g,'"')) : busData;
+    const modal = document.getElementById('globalModal');
+    document.getElementById('modalTitleText').innerText = 'Edit Bus';
+    document.getElementById('modalContent').innerHTML = `
+      <div class="modal-field"><label>Bus Number / Plate</label><input type="text" id="editBusNum" value="${bus.bus_number||''}" required></div>
+      <div class="modal-field"><label>Bus Model</label><input type="text" id="editBusModel" value="${bus.model||''}" required></div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Total Seats</label><input type="number" id="editBusSeats" value="${bus.total_seats||45}" required></div>
+        <div class="modal-field"><label>Status</label>
+          <select id="editBusStatus">
+            <option value="Active" ${bus.status==='Active'?'selected':''}>Active</option>
+            <option value="Maintenance" ${bus.status==='Maintenance'?'selected':''}>Maintenance</option>
+            <option value="Retired" ${bus.status==='Retired'?'selected':''}>Retired</option>
+          </select>
+        </div>
+      </div>
+    `;
+    const btn = document.getElementById('modalSaveBtn');
+    btn.onclick = async function() {
+      const payload = {
+        bus_number: document.getElementById('editBusNum').value.trim(),
+        model: document.getElementById('editBusModel').value.trim(),
+        total_seats: parseInt(document.getElementById('editBusSeats').value),
+        status: document.getElementById('editBusStatus').value
+      };
+      btn.innerText = 'Saving...'; btn.disabled = true;
+      const { error } = await _supabase.from('buses').update(payload).eq('id', bus.id);
+      if (error) showToast(error.message, 'error');
+      else { showToast('Bus updated!', 'success'); closeModal(); loadLiveBuses(); }
+      btn.innerText = 'Save'; btn.disabled = false;
+    };
+    modal.classList.add('open');
+  };
+
+  // ==========================================
+  // EDIT ROUTE MODAL
+  // ==========================================
+  window.openEditRouteModal = function(routeData) {
+    let route = typeof routeData === 'string' ? JSON.parse(routeData.replace(/&quot;/g,'"')) : routeData;
+    const modal = document.getElementById('globalModal');
+    document.getElementById('modalTitleText').innerText = 'Edit Route';
+    document.getElementById('modalContent').innerHTML = `
+      <div class="modal-row">
+        <div class="modal-field"><label>Origin</label><input type="text" id="editRouteOrigin" value="${route.origin||''}"></div>
+        <div class="modal-field"><label>Destination</label><input type="text" id="editRouteDest" value="${route.destination||''}"></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Base Fare (₱)</label><input type="number" id="editRouteFare" value="${route.base_fare||''}"></div>
+        <div class="modal-field"><label>Duration (hours)</label><input type="number" id="editRouteDuration" value="${route.duration_hours||''}" step="0.5"></div>
+      </div>
+    `;
+    const btn = document.getElementById('modalSaveBtn');
+    btn.onclick = async function() {
+      const payload = {
+        origin: document.getElementById('editRouteOrigin').value.trim(),
+        destination: document.getElementById('editRouteDest').value.trim(),
+        base_fare: document.getElementById('editRouteFare').value,
+        duration_hours: document.getElementById('editRouteDuration').value
+      };
+      btn.innerText = 'Saving...'; btn.disabled = true;
+      const { error } = await _supabase.from('routes').update(payload).eq('id', route.id);
+      if (error) showToast(error.message, 'error');
+      else { showToast('Route updated!', 'success'); closeModal(); loadLiveRoutes(); }
+      btn.innerText = 'Save'; btn.disabled = false;
+    };
+    modal.classList.add('open');
+  };
+
+  // ==========================================
+  // TOGGLE ROUTE STATUS
+  // ==========================================
+  window.toggleRouteStatus = async function(id, currentStatus) {
+    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    const { error } = await _supabase.from('routes').update({ status: newStatus }).eq('id', id);
+    if (error) showToast(error.message, 'error');
+    else { showToast(`Route ${newStatus.toLowerCase()}d`, 'success'); loadLiveRoutes(); }
+  };
+
+  // ==========================================
+  // EDIT SCHEDULE MODAL
+  // ==========================================
+  window.openEditScheduleModal = function(schedData) {
+    let s = typeof schedData === 'string' ? JSON.parse(schedData.replace(/&quot;/g,'"')) : schedData;
+    const modal = document.getElementById('globalModal');
+    document.getElementById('modalTitleText').innerText = 'Edit Trip';
+    const depVal = s.departure_time ? new Date(s.departure_time).toISOString().slice(0,16) : '';
+    const arrVal = s.arrival_time ? new Date(s.arrival_time).toISOString().slice(0,16) : '';
+    document.getElementById('modalContent').innerHTML = `
+      <div class="modal-row">
+        <div class="modal-field"><label>Departure</label><input type="datetime-local" id="editSchedDep" value="${depVal}"></div>
+        <div class="modal-field"><label>Arrival</label><input type="datetime-local" id="editSchedArr" value="${arrVal}"></div>
+      </div>
+      <div class="modal-field"><label>Fare (₱)</label><input type="number" id="editSchedPrice" value="${s.price||0}"></div>
+    `;
+    const btn = document.getElementById('modalSaveBtn');
+    btn.onclick = async function() {
+      const payload = {
+        departure_time: document.getElementById('editSchedDep').value,
+        arrival_time: document.getElementById('editSchedArr').value,
+        price: document.getElementById('editSchedPrice').value
+      };
+      btn.innerText = 'Saving...'; btn.disabled = true;
+      const { error } = await _supabase.from('schedules').update(payload).eq('id', s.id);
+      if (error) showToast(error.message, 'error');
+      else { showToast('Schedule updated!', 'success'); closeModal(); loadLiveSchedules(); }
+      btn.innerText = 'Save'; btn.disabled = false;
+    };
+    modal.classList.add('open');
+  };
+
+  // ==========================================
+  // CHANGE ADMIN PASSWORD
+  // ==========================================
+  window.changeAdminPassword = async function() {
+    const pw = document.getElementById('newAdminPw')?.value;
+    const confirm = document.getElementById('confirmAdminPw')?.value;
+    if (!pw || pw.length < 8) return showToast('Password must be at least 8 characters', 'error');
+    if (pw !== confirm) return showToast('Passwords do not match', 'error');
+    const { error } = await _supabase.auth.updateUser({ password: pw });
+    if (error) showToast(error.message, 'error');
+    else showToast('Password updated successfully!', 'success');
+  };
+
+  // ==========================================
+  // CSV EXPORTS — REAL DOWNLOADS
+  // ==========================================
+  function _toCSV(rows) {
+    if (!rows || !rows.length) return '';
+    const headers = Object.keys(rows[0]);
+    const escape = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    return [headers.join(','), ...rows.map(r => headers.map(h => escape(r[h])).join(','))].join('\n');
+  }
+  function _downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  window.exportUsersCSV = async function() {
+    showToast('Preparing users export…', 'success');
+    const { data, error } = await _supabase.from('users').select('id,first_name,last_name,email,phone,role,created_at');
+    if (error) return showToast(error.message, 'error');
+    _downloadCSV(_toCSV(data), `goroute-users-${new Date().toISOString().slice(0,10)}.csv`);
+    showToast(`Exported ${data.length} users`, 'success');
+  };
+
+  window.exportBookingsCSV = async function() {
+    showToast('Preparing bookings export…', 'success');
+    const { data, error } = await _supabase.from('bookings').select('id,passenger_name,contact_mobile,seat_number,price,status,created_at');
+    if (error) return showToast(error.message, 'error');
+    _downloadCSV(_toCSV(data), `goroute-bookings-${new Date().toISOString().slice(0,10)}.csv`);
+    showToast(`Exported ${data.length} bookings`, 'success');
+  };
+
+  window.exportBusesCSV = async function() {
+    showToast('Preparing fleet export…', 'success');
+    const { data, error } = await _supabase.from('buses').select('*');
+    if (error) return showToast(error.message, 'error');
+    _downloadCSV(_toCSV(data), `goroute-fleet-${new Date().toISOString().slice(0,10)}.csv`);
+    showToast(`Exported ${data.length} buses`, 'success');
+  };
+
+  window.exportRevenueCSV = async function() {
+    showToast('Preparing revenue export…', 'success');
+    const { data, error } = await _supabase.from('bookings').select('id,passenger_name,price,status,created_at').eq('status','Confirmed');
+    if (error) return showToast(error.message, 'error');
+    _downloadCSV(_toCSV(data), `goroute-revenue-${new Date().toISOString().slice(0,10)}.csv`);
+    showToast(`Exported ₱${data.reduce((s,b)=>s+Number(b.price||0),0).toLocaleString()} in ${data.length} transactions`, 'success');
+  };
+
+  // ==========================================
+  // SEARCH BAR — LIVE FILTER
+  // ==========================================
+  document.querySelector('.search-bar input').addEventListener('input', function() {
+    const term = this.value.toLowerCase().trim();
+    const activePage = document.querySelector('.page.active');
+    if (!activePage || !term) {
+      activePage && activePage.querySelectorAll('tbody tr, .bus-card, .route-card').forEach(el => el.style.display = '');
+      return;
+    }
+    activePage.querySelectorAll('tbody tr, .bus-card, .route-card').forEach(el => {
+      el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none';
+    });
+  });
+
+  // ==========================================
+  // ACTIVITY LOG
+  // ==========================================
+  async function populateActivityLog() {
+    const container = document.getElementById('dash-activity-log');
+    if (!container) return;
+    try {
+      const [{ data: bookings }, { data: users }] = await Promise.all([
+        _supabase.from('bookings').select('id,passenger_name,status,created_at').order('created_at', { ascending: false }).limit(6),
+        _supabase.from('users').select('id,first_name,last_name,created_at').order('created_at', { ascending: false }).limit(4)
+      ]);
+
+      const events = [];
+
+      (bookings || []).forEach(b => {
+        const label = b.status === 'Confirmed' ? 'Booking confirmed' :
+                      b.status === 'Cancelled' ? 'Booking cancelled' : 'New booking';
+        const icon  = b.status === 'Confirmed' ? '✅' :
+                      b.status === 'Cancelled' ? '❌' : '🎫';
+        events.push({ icon, label, sub: b.passenger_name || 'Guest', time: b.created_at });
+      });
+
+      (users || []).forEach(u => {
+        events.push({ icon: '👤', label: 'New user registered', sub: `${u.first_name || ''} ${u.last_name || ''}`.trim() || 'Unknown', time: u.created_at });
+      });
+
+      events.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+      if (!events.length) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">No activity yet.</div>';
+        return;
+      }
+
+      container.innerHTML = events.slice(0, 8).map(ev => {
+        const d = ev.time ? new Date(ev.time) : null;
+        const timeStr = d ? d.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+        return `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${ev.icon}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ev.label}</div>
+              <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ev.sub}</div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);flex-shrink:0;">${timeStr}</div>
+          </div>`;
+      }).join('');
+    } catch (err) {
+      console.error('Activity log error:', err);
+    }
+  }
+
+  // ==========================================
+  // CACHE-BASED ID WRAPPERS (safe onclick helpers)
+  // ==========================================
+  window.viewUserById = function(id) {
+    const user = (window._userCache || {})[id];
+    if (user) window.viewUser(user);
+  };
+  window.viewBookingById = function(id) {
+    const bk = (window._bkCache || {})[id];
+    if (bk) window.viewBooking(bk);
+  };
+  window.openEditBusModalById = function(id) {
+    const bus = (window._busCache || {})[id];
+    if (bus) window.openEditBusModal(bus);
+  };
+  window.openEditRouteModalById = function(id) {
+    const route = (window._routeCache || {})[id];
+    if (route) window.openEditRouteModal(route);
+  };
+  window.openEditScheduleModalById = function(id) {
+    const s = (window._schedCache || {})[id];
+    if (s) window.openEditScheduleModal(s);
+  };
 </script>
 </body>
 </html>

@@ -194,10 +194,10 @@ async function handleLogin(e) {
   } else {
     btn.innerHTML = '✓ Redirecting...';
     if (email.toLowerCase() === 'admin@goroute.com') {
-      window.location.href = 'admin.html';
-    } else {
-      window.location.replace('index.html');
-    }
+  window.location.href = 'admin.html';
+} else {
+  window.location.replace('index.html');
+}
   }
 }
 
@@ -1259,11 +1259,19 @@ async function loadAccount() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
+    const userId = session.user.id;
+    const meta   = session.user.user_metadata || {};
+    const email  = session.user.email || '';
 
-    const meta     = session.user.user_metadata || {};
-    const fullName = (meta.full_name || meta.name || '').trim() || 'GoRoute User';
-    const email    = session.user.email || '';
-    const initials = fullName.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'U';
+    // Load from users table for most up-to-date data
+    const { data: profile } = await sb.from('users').select('*').eq('id', userId).maybeSingle();
+    const firstName = profile?.first_name || meta.first_name || '';
+    const lastName  = profile?.last_name  || meta.last_name  || '';
+    const fullName  = (firstName + ' ' + lastName).trim() || (meta.full_name || meta.name || '').trim() || 'GoRoute User';
+    const phone     = profile?.phone || meta.phone || '';
+    const gender    = profile?.gender || '';
+    const dob       = profile?.date_of_birth || '';
+    const initials  = fullName.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'U';
 
     // Profile summary card
     const nameEl   = document.getElementById('acctName');
@@ -1273,24 +1281,90 @@ async function loadAccount() {
     if (emailEl) emailEl.textContent = email;
     if (avatarEl) avatarEl.innerHTML = `<div style="width:44px;height:44px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--blue-dark);">${initials}</div>`;
 
-    // Edit Profile screen — prefill fields
-    const epName  = document.querySelector('#editProfileScreen .ep-input[type="text"]');
-    const epEmail = document.querySelector('#editProfileScreen .ep-input[type="email"]');
-    const epPhone = document.querySelector('#editProfileScreen .ep-input[type="tel"], #editProfileScreen input[type="text"]:nth-of-type(3)');
-    if (epName)  epName.value  = fullName;
-    if (epEmail) { epEmail.value = email; epEmail.readOnly = true; epEmail.style.opacity = '.6'; }
+    // Edit Profile — prefill with IDs
+    const epFirst = document.getElementById('epFirstName');
+    const epLast  = document.getElementById('epLastName');
+    const epEmail = document.getElementById('epEmail');
+    const epPhone = document.getElementById('epPhone');
+    const epDob   = document.getElementById('epDob');
+    if (epFirst)  epFirst.value  = firstName;
+    if (epLast)   epLast.value   = lastName;
+    if (epEmail)  { epEmail.value = email; epEmail.readOnly = true; epEmail.style.opacity = '.6'; }
+    if (epPhone)  epPhone.value  = phone;
+    if (epDob)    epDob.value    = dob;
+    if (gender) {
+      document.querySelectorAll('.ep-gender-pill').forEach(p => {
+        p.classList.toggle('active', p.textContent.trim().toLowerCase() === gender.toLowerCase());
+      });
+    }
 
     // Live wallet balance in Settings row
-    const userId = session.user.id;
     const { data: wallet } = await sb.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
     const walletBal = document.getElementById('acctWalletBal');
     if (walletBal && wallet) {
       walletBal.textContent = `Balance: ₱ ${Number(wallet.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     }
 
+    // Booking count
+    const { count } = await sb.from('bookings').select('id', { count: 'exact', head: true }).eq('user_id', userId);
+    const bookingCountEl = document.getElementById('acctBookingCount');
+    if (bookingCountEl) bookingCountEl.textContent = count || 0;
+
   } catch (err) {
     console.error(err);
   }
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('epSaveBtn');
+  const original = btn ? btn.innerText : 'Save Changes';
+  if (btn) { btn.innerText = 'Saving...'; btn.style.opacity = '0.8'; btn.disabled = true; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('Not logged in');
+    const userId    = session.user.id;
+    const firstName = document.getElementById('epFirstName')?.value.trim() || '';
+    const lastName  = document.getElementById('epLastName')?.value.trim()  || '';
+    const phone     = document.getElementById('epPhone')?.value.trim()     || '';
+    const dob       = document.getElementById('epDob')?.value              || null;
+    const gender    = document.querySelector('.ep-gender-pill.active')?.textContent.trim() || '';
+    const { error } = await sb.from('users').upsert({ id: userId, first_name: firstName, last_name: lastName, phone, gender, date_of_birth: dob || null, email: session.user.email });
+    if (error) throw error;
+    await sb.auth.updateUser({ data: { full_name: `${firstName} ${lastName}`, phone } });
+    if (btn) { btn.innerText = 'Saved! ✓'; btn.style.background = '#22C55E'; btn.style.opacity = '1'; }
+    setTimeout(() => {
+      document.getElementById('editProfileScreen').style.display = 'none';
+      document.getElementById('accountScreen').style.display = 'block';
+      loadAccount();
+      if (btn) { btn.innerText = original; btn.style.background = 'var(--blue)'; btn.disabled = false; }
+    }, 900);
+  } catch (err) {
+    alert('Error saving: ' + err.message);
+    if (btn) { btn.innerText = original; btn.style.opacity = '1'; btn.disabled = false; }
+  }
+}
+
+async function changePassword() {
+  const newPw  = document.getElementById('newPassword')?.value;
+  const confPw = document.getElementById('confirmPassword')?.value;
+  const btn    = document.getElementById('changePwBtn');
+  if (!newPw || newPw.length < 8) { alert('Password must be at least 8 characters.'); return; }
+  if (newPw !== confPw) { alert('Passwords do not match.'); return; }
+  if (btn) { btn.innerText = 'Updating...'; btn.disabled = true; }
+  const { error } = await sb.auth.updateUser({ password: newPw });
+  if (error) { alert('Error: ' + error.message); }
+  else {
+    alert('Password updated successfully!');
+    if (document.getElementById('newPassword')) document.getElementById('newPassword').value = '';
+    if (document.getElementById('confirmPassword')) document.getElementById('confirmPassword').value = '';
+  }
+  if (btn) { btn.innerText = 'Update Password'; btn.disabled = false; }
+}
+
+async function deleteAccount() {
+  if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+  await sb.auth.signOut();
+  window.location.href = 'auth.html';
 }
 
 // Appearance helpers
@@ -1477,35 +1551,7 @@ document.addEventListener('click', (e) => {
     pill.classList.add('active');
   }
 
-  // 3. ── "Save Changes" Button Animation ──
-  const saveBtn = e.target.closest('.ep-btn-save');
-  if (saveBtn) {
-    const originalText = saveBtn.innerText;
-    
-    // Change to loading state
-    saveBtn.innerText = 'Saving...';
-    saveBtn.style.opacity = '0.8';
-    saveBtn.style.pointerEvents = 'none'; 
-    
-    // Simulate a 1-second network delay
-    setTimeout(() => {
-      // Show success state
-      saveBtn.innerText = 'Saved!';
-      saveBtn.style.background = '#22C55E';    
-      saveBtn.style.opacity = '1';
-      
-      // Wait 1 more second, then send them back
-      setTimeout(() => {
-        document.getElementById('editProfileScreen').style.display = 'none';
-        document.getElementById('accountScreen').style.display = 'block';
-        
-        // Reset the button for next time
-        saveBtn.innerText = originalText;
-        saveBtn.style.background = 'var(--blue)';
-        saveBtn.style.pointerEvents = 'auto';
-      }, 800);
-    }, 1000);
-  }
+  // 3. ── Save button is now handled by saveProfile() directly via onclick ──
 });
 
 async function deleteItem(tableName, id) {
