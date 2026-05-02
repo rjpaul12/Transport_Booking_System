@@ -1616,7 +1616,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         .from('users')
         .select('first_name, last_name, role')
         .eq('email', user.email)
-        .single();
+        .maybeSingle();
 
       const firstName = profile?.first_name || user.user_metadata?.first_name || user.email.split('@')[0];
       const lastName  = profile?.last_name  || user.user_metadata?.last_name  || '';

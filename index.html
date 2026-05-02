@@ -149,39 +149,6 @@
       </div>
     </div>
   
-<!-- Final Success Screen Section -->
-    <div id="successScreen" style="display:none; height: 100%; overflow: hidden; background-color: var(--bg);">
-      <div style="display: flex; flex-direction: column; height: 100%; padding: 16px 16px 20px; box-sizing: border-box;">
-        
-        <!-- 1. Permanent Checkmark & Header -->
-        <div style="text-align: center; margin-bottom: 12px; flex-shrink: 0;">
-          <div style="width: 44px; height: 44px; background: #E8F9EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div style="font-size: 20px; font-weight: 800; color: #1A2940; margin-bottom: 2px;">Booking Confirmed!</div>
-          <div style="font-size: 12px; color: #64748B;">Your ticket is ready. Have a safe trip!</div>
-        </div>
-
-        <!-- 2. The Data Containers (Centered dynamically) -->
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0;">
-            <div id="successTicketContainer" style="margin-bottom: 10px;"></div>
-            <div id="successWalletContainer"></div>
-        </div>
-
-        <!-- 3. Permanent Buttons -->
-        <div style="margin-top: 12px; flex-shrink: 0;">
-          <button onclick="switchTab('tickets')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #3B9EE8; color: #fff; border: none; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,158,232,.3);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            View My Ticket
-          </button>
-          <button onclick="switchTab('home')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #fff; color: #1A6FB0; border: 1.5px solid #EBF5FD; cursor: pointer;">
-            Back to Home
-          </button>
-        </div>
-
-      </div>
-    </div>
-    
     <!-- 4. My Tickets Screen -->
     <div id="ticketsScreen" style="display: none;">
       <div class="screen-label">My tickets</div>
@@ -198,8 +165,6 @@
 
       </div>
     </div>
-
-  </div>
 
   <!-- 5. Wallet Screen -->
     <div id="walletScreen" style="display: none;">
@@ -544,6 +509,31 @@
         <button onclick="document.getElementById('bookingFormScreen').style.display='none'; document.getElementById('seatScreen').style.display='block';" style="width:100%; padding:9px; background:var(--blue-light); color:var(--blue-dark); border:none; border-radius:10px; margin-top:10px; cursor:pointer; font-family:'Nunito', sans-serif; font-weight:700; font-size:12px;">← Back to Seats</button>
       </div>
     </div>
+
+    <!-- 8. Booking Confirmed Screen -->
+    <div id="successScreen" style="display:none;">
+      <div class="screen-label">Booking confirmed</div>
+      <div class="screen" style="padding: 16px;">
+        <div style="text-align: center; margin-bottom: 12px;">
+          <div style="width: 44px; height: 44px; background: #E8F9EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style="font-size: 20px; font-weight: 800; color: #1A2940; margin-bottom: 2px;">Booking Confirmed!</div>
+          <div style="font-size: 12px; color: #64748B;">Your ticket is ready. Have a safe trip!</div>
+        </div>
+        <div id="successTicketContainer" style="margin-bottom: 10px;"></div>
+        <div id="successWalletContainer" style="margin-bottom: 12px;"></div>
+        <button onclick="switchTab('tickets')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #3B9EE8; color: #fff; border: none; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,158,232,.3);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          View My Ticket
+        </button>
+        <button onclick="switchTab('home')" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; background: #fff; color: #1A6FB0; border: 1.5px solid #EBF5FD; cursor: pointer;">
+          Back to Home
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /.screens -->
 
   <!-- ─── Functional Bottom Navigation ─── -->
   <div class="mobile-bottom-bar">

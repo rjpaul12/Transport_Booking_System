@@ -1497,15 +1497,18 @@ function downloadCSV(data, filename = 'export.csv') {
   a.click();
 }
 
-// 3. Global Search Listener
-document.querySelector('.search-bar input').addEventListener('input', (e) => {
-  const term = e.target.value.toLowerCase();
-  const activePage = document.querySelector('.page.active');
-  const items = activePage.querySelectorAll('tbody tr, .bus-card, .route-card');
-  items.forEach(item => {
-    item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+// 3. Global Search Listener (admin only)
+const _adminSearchInput = document.querySelector('.search-bar input');
+if (_adminSearchInput) {
+  _adminSearchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const activePage = document.querySelector('.page.active');
+    const items = activePage ? activePage.querySelectorAll('tbody tr, .bus-card, .route-card') : [];
+    items.forEach(item => {
+      item.style.display = item.innerText.toLowerCase().includes(term) ? '' : 'none';
+    });
   });
-});
+}
 
 // 4. Activity Log Populator
 async function populateActivityLog() {
