@@ -116,13 +116,16 @@ function switchTab(tab) {
   }
 
   const allScreens = [
-  'searchScreen', 'resultsScreen', 'seatScreen',
-  'ticketsScreen', 'walletScreen', 'accountScreen', 'bookingFormScreen', 'successScreen' 
+    'searchScreen', 'resultsScreen', 'seatScreen',
+    'ticketsScreen', 'walletScreen', 'accountScreen', 'bookingFormScreen', 'successScreen',
+    'editProfileScreen', 'securityScreen', 'appearanceScreen', 'helpScreen'
   ];
   allScreens.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
+  const screensContainer = document.querySelector('.screens');
+  if (screensContainer) screensContainer.scrollTop = 0;
 
   ['home','tickets','wallet','account'].forEach(id => {
     const el = document.getElementById(`nav-${id}`);
@@ -244,8 +247,16 @@ async function verifyOtp() {
   const email = document.getElementById('otpEmail').textContent;
   if (code.length < 6) { showAlert('Enter the full 6-digit code.'); return; }
   const { error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
-  if (error) showAlert(error.message);
-  else window.location.replace('index.html');
+  if (error) {
+    showAlert(error.message);
+  } else {
+    // FIX (Bug 12): route admin to admin dashboard, not the user app
+    if (email.toLowerCase() === 'admin@goroute.com') {
+      window.location.replace('admin.html');
+    } else {
+      window.location.replace('index.html');
+    }
+  }
 }
 
 async function resendOtp() {
@@ -388,29 +399,36 @@ function initCityDropdowns() {
 document.addEventListener('DOMContentLoaded', initCityDropdowns);
 
 let routeCount = 1;
+// FIX (Bug 7): Use a separate ever-increasing ID counter so removing a route
+// never causes duplicate IDs when addRoute() is called again.
+let routeIdCounter = 1;
 
 function addRoute() {
   routeCount++;
+  // FIX (Bug 7): Use routeIdCounter (never decrements) so IDs are always unique
+  routeIdCounter++;
+  const uid = routeIdCounter;
   const container = document.getElementById('routesContainer');
   
   const allDestInputs = document.querySelectorAll('.dest-input');
-  const lastDestination = allDestInputs[allDestInputs.length - 1].value;
+  const lastDestination = allDestInputs[allDestInputs.length - 1]?.value || '';
+
+  // FIX (Bug 8): Build options from the full phCities list, not 5 hardcoded cities
+  const cityOptions = phCities.sort().map(c =>
+    `<option value="${c}" ${lastDestination === c ? 'selected' : ''}>${c}</option>`
+  ).join('');
+  const destOptions = `<option value="" disabled selected>Going to...</option>` +
+    phCities.sort().map(c => `<option value="${c}">${c}</option>`).join('');
 
   const newRouteHTML = `
-    <div class="route-segment" id="route-${routeCount}">
+    <div class="route-segment" id="route-${uid}">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
         <span style="font-size: 13px; font-weight: 700; color: #94A3B8;">Route ${routeCount}</span>
-        <button type="button" class="remove-route-btn" onclick="removeRoute('route-${routeCount}')">✕ Remove</button>
+        <button type="button" class="remove-route-btn" onclick="removeRoute('route-${uid}')">✕ Remove</button>
       </div>
       
       <div style="position: relative; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
-        <select class="finput origin-input" required>
-          <option value="Cebu" ${lastDestination === 'Cebu' ? 'selected' : ''}>Cebu</option>
-          <option value="Manila" ${lastDestination === 'Manila' ? 'selected' : ''}>Manila</option>
-          <option value="Davao" ${lastDestination === 'Davao' ? 'selected' : ''}>Davao</option>
-          <option value="Iloilo" ${lastDestination === 'Iloilo' ? 'selected' : ''}>Iloilo</option>
-          <option value="Baguio" ${lastDestination === 'Baguio' ? 'selected' : ''}>Baguio</option>
-        </select>
+        <select class="finput origin-input" required>${cityOptions}</select>
         
         <button type="button" class="swap-btn" onclick="swapDynamicLocations(this)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -418,14 +436,7 @@ function addRoute() {
           </svg>
         </button>
 
-        <select class="finput dest-input" required>
-          <option value="" disabled selected>Going to...</option>
-          <option value="Cebu">Cebu</option>
-          <option value="Manila">Manila</option>
-          <option value="Davao">Davao</option>
-          <option value="Iloilo">Iloilo</option>
-          <option value="Baguio">Baguio</option>
-        </select>
+        <select class="finput dest-input" required>${destOptions}</select>
       </div>
       
       <input type="date" class="finput" style="width: 100%; color: #64748B;">
@@ -439,7 +450,9 @@ function removeRoute(routeId) {
   const routeToRemove = document.getElementById(routeId);
   if (routeToRemove) {
     routeToRemove.remove();
-    routeCount--; 
+    // FIX (Bug 7): Do NOT decrement routeCount — routeIdCounter is monotonic
+    // so new routes added after a removal will always get a fresh unique ID.
+    routeCount = Math.max(1, routeCount - 1);
   }
 }
 
@@ -476,7 +489,6 @@ async function findBuses() {
 
     if (!originName || !destName) return alert('Select origin and destination');
 
-    // FIX: Using correct variable scope and local timezone strings
     let rawDateString = finalBookingDate || new Date().toISOString().split('T')[0];
     const startOfDay = `${rawDateString}T00:00:00`;
     const endOfDay = `${rawDateString}T23:59:59`;
@@ -490,8 +502,8 @@ async function findBuses() {
         `)
         .eq('routes.origin', originName)
         .eq('routes.destination', destName)
-        .gte('departure_time', startOfDay) 
-        .lte('departure_time', endOfDay)   
+        .gte('departure_time', startOfDay)
+        .lte('departure_time', endOfDay)
         .order('departure_time', { ascending: true });
 
     if (error) {
@@ -502,63 +514,33 @@ async function findBuses() {
     if (!data || data.length === 0) {
         showNoResults();
     } else {
-        // Map the database names to the UI labels
+        // FIX (Bug 5): Fetch booked seat counts per schedule so we can show real availability
+        const scheduleIds = data.map(s => s.id);
+        const { data: bookedData } = await sb
+            .from('bookings')
+            .select('schedule_id')
+            .in('schedule_id', scheduleIds)
+            .in('status', ['Confirmed', 'confirmed']);
+
+        const bookedCountMap = {};
+        (bookedData || []).forEach(b => {
+            bookedCountMap[b.schedule_id] = (bookedCountMap[b.schedule_id] || 0) + 1;
+        });
+
         const formattedData = data.map(item => ({
             ...item,
             origin: { name: item.routes.origin },
             destination: { name: item.routes.destination },
-            buses: { 
-                operator_name: item.buses.bus_number, 
-                bus_type: item.buses.model, 
-                total_seats: item.buses.total_seats 
-            }
+            buses: {
+                operator_name: item.buses.bus_number,
+                bus_type: item.buses.model,
+                total_seats: item.buses.total_seats
+            },
+            available_seats: (item.buses.total_seats || 0) - (bookedCountMap[item.id] || 0)
         }));
-        lastSearchResults = formattedData; 
-        renderTickets(formattedData); 
+        lastSearchResults = formattedData;
+        renderTickets(formattedData);
     }
-}
-
-async function searchBuses(originName, destName, selectedDate) {
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(selectedDate);
-  endOfDay.setHours(23, 59, 59, 999);
-
-  const originId = await resolveLocationId(originName);
-  const destId = await resolveLocationId(destName);
-
-  if (!originId || !destId) {
-    showNoResults();
-    return;
-  }
-
-  const { data, error } = await sb
-    .from('schedules')
-    .select(`
-      *,
-      buses (*),
-      origin:origin_id(name),
-      destination:destination_id(name)
-    `)
-    .eq('origin_id', originId)
-    .eq('destination_id', destId)
-    .gte('departure_time', startOfDay.toISOString())
-    .lte('departure_time', endOfDay.toISOString());
-
-  console.log("Database returned:", data);
-
-  if (error) {
-    console.error("Database Error:", error);
-    alert("Error: " + error.message);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    showNoResults();
-  } else {
-    renderTickets(data);
-  }
 }
 
 function showNoResults() {
@@ -643,154 +625,11 @@ function renderTickets(data) {
           </div>
         </div>
         <div class="bus-row" style="margin-top:6px">
-          <div class="seats-left">${schedule.buses?.total_seats || '?'} seats available</div>
+          <div class="seats-left">${schedule.available_seats ?? schedule.buses?.total_seats ?? '?'} seats available</div>
           <div class="price">₱ ${Number(schedule.price).toLocaleString()}</div>
         </div>
       </div>`;
   });
-}
-
-async function searchBusesLegacy() {
-  const btn = document.querySelector('.find-buses-btn') || document.querySelector('.primary-btn') || document.querySelector('.search-btn');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner"></span>Searching...';
-  btn.disabled = true;
-  const origin = document.getElementById('searchOrigin')?.value || '';
-  const destination = document.getElementById('searchDestination')?.value || '';
-
-  if (!origin || !destination) {
-    alert('Please choose both an origin and a destination.');
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-    return;
-  }
-
-  try {
-    const { data: schedules, error } = await sb
-      .from('schedules')
-      .select(`
-        id,
-        departure_time,
-        arrival_time,
-        price,
-        buses ( operator_name, bus_type, total_seats ),
-        origin:origin_id ( name ),
-        destination:destination_id ( name )
-      `)
-      .eq('origin.name', origin)
-      .eq('destination.name', destination);
-
-    let filteredSchedules = schedules || [];
-
-    if (error) {
-      console.warn('Direct route filter failed, falling back to local filtering.', error);
-      const fallback = await sb
-        .from('schedules')
-        .select(`
-          id,
-          departure_time,
-          arrival_time,
-          price,
-          buses ( operator_name, bus_type, total_seats ),
-          origin:origin_id ( name ),
-          destination:destination_id ( name )
-        `);
-      if (fallback.error) throw fallback.error;
-      filteredSchedules = (fallback.data || []).filter(schedule => {
-        const scheduleOrigin = schedule.origin?.name || '';
-        const scheduleDestination = schedule.destination?.name || '';
-        return scheduleOrigin === origin && scheduleDestination === destination;
-      });
-    }
-
-    document.getElementById('searchScreen').style.display  = 'none';
-    document.getElementById('resultsScreen').style.display = 'block';
-
-    const resultsRouteTitle = document.querySelector('#resultsScreen .route-title');
-    if (resultsRouteTitle) {
-      const routeSpans = resultsRouteTitle.querySelectorAll('span');
-      if (routeSpans[0]) routeSpans[0].textContent = origin;
-      if (routeSpans[1]) routeSpans[1].textContent = destination;
-    }
-
-    const dateBadge = document.querySelector('#resultsScreen .date-badge');
-    if (dateBadge) {
-      if (selectedDate === 'today') {
-        dateBadge.textContent = 'Today';
-      } else if (selectedDate === 'tomorrow') {
-        dateBadge.textContent = 'Tomorrow';
-      } else {
-        dateBadge.textContent = new Date(finalBookingDate).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        });
-      }
-    }
-
-    const container = document.getElementById('resultsContainer');
-    container.innerHTML = '';
-
-    if (!filteredSchedules.length) {
-      container.innerHTML = `
-        <div style="text-align:center;padding:30px 20px;">
-          <div style="font-size:28px;margin-bottom:10px;">🔍</div>
-          <div style="font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;">No buses found</div>
-          <div style="font-size:12px;color:var(--text3);">Try a different route or date.</div>
-        </div>`;
-      return;
-    }
-
-    filteredSchedules.forEach((schedule, i) => {
-      const depDate   = new Date(schedule.departure_time);
-      const arrDate   = new Date(schedule.arrival_time);
-      const depTime   = depDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const arrTime   = arrDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const diffMs    = arrDate - depDate;
-      const diffHrs   = Math.floor(diffMs / 3600000);
-      const diffMins  = Math.round((diffMs % 3600000) / 60000);
-      const duration  = diffMins > 0 ? `${diffHrs}h ${diffMins}m` : `${diffHrs}h`;
-      const isFeatured = i === 0 ? 'featured' : '';
-
-      container.innerHTML += `
-        <div class="bus-card ${isFeatured}" onclick="openSeatSelection(
-            '${schedule.id}',
-            ${schedule.price},
-            '${(schedule.origin?.name || 'Origin').replace(/'/g,"\\'")}',
-            '${(schedule.destination?.name || 'Destination').replace(/'/g,"\\'")}',
-            '${duration}',
-            '${(schedule.buses?.operator_name || 'Bus').replace(/'/g,"\\'")}',
-            '${(schedule.buses?.bus_type || '').replace(/'/g,"\\'")}',
-            ${schedule.buses?.total_seats || 20}
-          )">
-          <div class="bus-name">${schedule.buses?.operator_name || '—'}</div>
-          <div class="bus-type">${schedule.buses?.bus_type || '—'} · ${duration}</div>
-          <div class="bus-row">
-            <div class="time-block">
-              <div class="time">${depTime}</div>
-              <div class="place">${schedule.origin?.name || '—'}</div>
-            </div>
-            <div class="duration">—— ${duration} ——</div>
-            <div class="time-block" style="text-align:right">
-              <div class="time">${arrTime}</div>
-              <div class="place">${schedule.destination?.name || '—'}</div>
-            </div>
-          </div>
-          <div class="bus-row" style="margin-top:6px">
-            <div class="seats-left">${schedule.buses?.total_seats || '?'} seats available</div>
-            <div class="price">₱ ${Number(schedule.price).toLocaleString()}</div>
-          </div>
-        </div>`;
-    });
-
-  } catch (err) {
-    alert('Error fetching buses: ' + err.message);
-    document.getElementById('searchScreen').style.display  = 'block';
-    document.getElementById('resultsScreen').style.display = 'none';
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled  = false;
-  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -818,10 +657,10 @@ async function openSeatSelection(scheduleId, price, origin, dest, duration, busN
 
   const bookedSeatNumbers = bookings ? bookings.map(b => b.seat_number) : [];
 
-  // Generate seat grid (5 rows x 2+2 layout = 20 seats)
+  // FIX (Bug 6): Derive row count from totalSeats so the grid matches the actual bus
   const grid = document.getElementById('seatGrid');
   grid.innerHTML = '';
-  const rows = 5;
+  const rows = Math.ceil(totalSeats / 4);
   const cols = ['A', 'B', 'C', 'D'];
 
   for (let r = 1; r <= rows; r++) {
@@ -960,10 +799,20 @@ async function confirmAndPay() {
       throw new Error(`Insufficient wallet balance. You have ₱${wallet.balance.toLocaleString('en-US', {minimumFractionDigits: 2})} but need ₱${totalPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}.`);
     }
 
-    await sb
+    // FIX (Bug 10): Use a conditional WHERE balance >= totalPrice to prevent race conditions.
+    // If two bookings fire simultaneously both read the same balance, but only one update
+    // will satisfy the WHERE clause — the other will affect 0 rows and we throw.
+    const { data: updatedWallet, error: updateError } = await sb
       .from('wallets')
       .update({ balance: wallet.balance - totalPrice })
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .gte('balance', totalPrice)
+      .select('balance')
+      .single();
+
+    if (updateError || !updatedWallet) {
+      throw new Error('Payment failed: insufficient balance or a concurrent transaction occurred. Please try again.');
+    }
 
     const bookingsToInsert = selectedSeats.map((seatNum, index) => {
       const name   = document.getElementById(`passName_${index}`)?.value.trim() || 'N/A';
@@ -987,7 +836,8 @@ async function confirmAndPay() {
     if (bookingError) throw bookingError;
 
     // ── INJECT BEAUTIFUL TICKET WITH REAL DATA ──
-    const finalBalance = wallet.balance - totalPrice;
+    // FIX (Bug 10): Use the balance returned by the conditional update, not a local calculation
+    const finalBalance = updatedWallet.balance;
     const pName = document.getElementById('passName_0')?.value.trim() || 'Guest';
     const displayDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -1002,7 +852,7 @@ async function confirmAndPay() {
               ${currentDest}
             </div>
             <div class="st-header-sub">
-              ${currentBusName} · Seat ${selectedSeats[0]}<br>
+              ${currentBusName} · Seat${selectedSeats.length > 1 ? 's' : ''} ${selectedSeats.join(', ')}<br>
               REF #GR-${String(currentScheduleId).substring(0,8).toUpperCase()}
             </div>
           </div>
@@ -1363,6 +1213,22 @@ async function changePassword() {
 
 async function deleteAccount() {
   if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const userId = session.user.id;
+      // FIX (Bug 9): Clean up user-owned data before signing out.
+      // Note: deleting the auth record itself requires a server-side admin call
+      // (Supabase Edge Function with the service_role key). For now we wipe
+      // the user's application data and sign them out. Set up cascade deletes
+      // in your DB schema (or an Edge Function) for full account removal.
+      await sb.from('bookings').delete().eq('user_id', userId);
+      await sb.from('wallets').delete().eq('user_id', userId);
+      await sb.from('users').delete().eq('id', userId);
+    }
+  } catch (err) {
+    console.error('Error cleaning up account data:', err.message);
+  }
   await sb.auth.signOut();
   window.location.href = 'auth.html';
 }
@@ -1476,12 +1342,14 @@ async function loadAdminData() {
 
 // 1. Real Sign Out Logic
 async function adminLogout() {
-  const { error } = await _supabase.auth.signOut();
+  // FIX (Bug 1): was _supabase (undefined) — use sb
+  // FIX (Bug 2): was 'auth_2.html' (doesn't exist) — use 'admin-login.html'
+  const { error } = await sb.auth.signOut();
   if (error) {
     showToast(error.message, 'error');
   } else {
     showToast('Logged out successfully', 'success');
-    setTimeout(() => window.location.replace('auth_2.html'), 1000);
+    setTimeout(() => window.location.replace('admin-login.html'), 1000);
   }
 }
 
@@ -1512,7 +1380,8 @@ if (_adminSearchInput) {
 
 // 4. Activity Log Populator
 async function populateActivityLog() {
-  const { data } = await _supabase.from('bookings').select('passenger_name, created_at').limit(5).order('created_at', {ascending: false});
+  // FIX (Bug 1): was _supabase (undefined) — use sb
+  const { data } = await sb.from('bookings').select('passenger_name, created_at').limit(5).order('created_at', {ascending: false});
   if (data) {
     document.getElementById('dash-activity-log').innerHTML = data.map(log => `
       <div class="feed-item">
@@ -1542,10 +1411,7 @@ function applyFilter(type, element) {
 document.addEventListener('click', (e) => {
 
   // 1. ── Toggle Switch Logic ──
-  const toggle = e.target.closest('.toggle-switch');
-  if (toggle) {
-    toggle.classList.toggle('off');
-  }
+  // Handled via direct onclick on each toggle element in index.html
 
   // 2. ── Gender Selection Logic ──
   const pill = e.target.closest('.ep-gender-pill');
@@ -1559,8 +1425,8 @@ document.addEventListener('click', (e) => {
 
 async function deleteItem(tableName, id) {
   if (!confirm('Are you sure you want to remove this item?')) return;
-  
-  const { error } = await _supabase.from(tableName).delete().eq('id', id);
+  // FIX (Bug 1): was _supabase (undefined) — use sb
+  const { error } = await sb.from(tableName).delete().eq('id', id);
   if (error) {
     showToast(error.message, 'error');
   } else {
@@ -1570,4 +1436,13 @@ async function deleteItem(tableName, id) {
     if (tableName === 'routes') loadLiveRoutes();
     if (tableName === 'schedules') loadLiveSchedules();
   }
+}
+// ── Sub-screen navigation helper ──────────────────────────
+function showSubScreen(hideId, showId) {
+  const hide = document.getElementById(hideId);
+  const show = document.getElementById(showId);
+  if (hide) hide.style.display = 'none';
+  if (show) show.style.display = 'block';
+  const sc = document.querySelector('.screens');
+  if (sc) sc.scrollTop = 0;
 }

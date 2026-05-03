@@ -312,6 +312,143 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ─── Splash Screen ─── */
+    .splash-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, var(--blue-dark) 0%, var(--blue) 55%, #6DBAF1 100%);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      overflow: hidden;
+    }
+    .splash-screen.hidden {
+      pointer-events: none;
+      animation: splashFadeOut .35s ease forwards;
+    }
+    @keyframes splashFadeOut {
+      to { opacity: 0; transform: scale(1.04); }
+    }
+    .splash-top {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px 28px;
+      position: relative;
+    }
+    .splash-top::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      top: -80px; right: -80px;
+    }
+    .splash-top::after {
+      content: '';
+      position: absolute;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+      bottom: 20px; left: -40px;
+    }
+    .splash-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      position: relative; z-index: 1;
+    }
+    .splash-logo-icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,.18);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .splash-wordmark {
+      font-family: 'Poppins', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.3px;
+    }
+    .splash-wordmark span { color: rgba(255,255,255,.55); }
+    .splash-bus {
+      position: relative; z-index: 1;
+      margin-bottom: 28px;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,.2));
+    }
+    .splash-tagline {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      line-height: 1.25;
+      margin-bottom: 10px;
+      position: relative; z-index: 1;
+    }
+    .splash-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      line-height: 1.6;
+      max-width: 260px;
+      position: relative; z-index: 1;
+    }
+    .splash-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 24px;
+      position: relative; z-index: 1;
+    }
+    .splash-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.35);
+    }
+    .splash-dot.active {
+      width: 22px;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .splash-bottom {
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding: 24px 28px 32px;
+    }
+    .splash-get-started {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #fff;
+      color: var(--blue-dark);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    }
+    .splash-get-started:active { transform: scale(.98); }
+    .splash-have-account {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,.7);
+    }
+    .splash-have-account a {
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
     /* ─── Terms ─── */
     .terms-row {
       display: flex;
@@ -327,6 +464,55 @@
 <body>
 
 <div class="phone">
+
+  <!-- ── Splash / Onboarding ── -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-top">
+      <div class="splash-logo">
+        <div class="splash-logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="1" y="7" width="22" height="12" rx="3" fill="rgba(255,255,255,.9)"/>
+            <rect x="3"  y="9" width="4" height="4" rx="1" fill="#3B9EE8"/>
+            <rect x="9"  y="9" width="4" height="4" rx="1" fill="#3B9EE8"/>
+            <rect x="15" y="9" width="4" height="4" rx="1" fill="#3B9EE8"/>
+            <circle cx="6"  cy="21" r="2" fill="rgba(255,255,255,.9)"/>
+            <circle cx="18" cy="21" r="2" fill="rgba(255,255,255,.9)"/>
+          </svg>
+        </div>
+        <div class="splash-wordmark">Go<span>Route</span></div>
+      </div>
+
+      <svg class="splash-bus" width="220" height="110" viewBox="0 0 80 50" fill="none">
+        <rect x="2"  y="12" width="72" height="28" rx="6" fill="rgba(255,255,255,.2)"/>
+        <rect x="2"  y="12" width="72" height="28" rx="6" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+        <rect x="6"  y="16" width="14" height="12" rx="2" fill="rgba(255,255,255,.6)"/>
+        <rect x="24" y="16" width="14" height="12" rx="2" fill="rgba(255,255,255,.6)"/>
+        <rect x="42" y="16" width="14" height="12" rx="2" fill="rgba(255,255,255,.6)"/>
+        <rect x="58" y="16" width="12" height="12" rx="2" fill="rgba(255,255,255,.6)"/>
+        <rect x="2"  y="33" width="72" height="7"  rx="3" fill="rgba(0,0,0,.12)"/>
+        <circle cx="16" cy="42" r="5" fill="rgba(0,0,0,.25)"/>
+        <circle cx="16" cy="42" r="2.5" fill="rgba(255,255,255,.6)"/>
+        <circle cx="58" cy="42" r="5" fill="rgba(0,0,0,.25)"/>
+        <circle cx="58" cy="42" r="2.5" fill="rgba(255,255,255,.6)"/>
+        <rect x="60" y="20" width="4" height="8" rx="1" fill="#FFA552"/>
+        <rect x="0"  y="22" width="4" height="4"  rx="1" fill="#FF6B6B"/>
+      </svg>
+
+      <div class="splash-tagline">Travel anywhere,<br>anytime</div>
+      <div class="splash-sub">Thousands of buses at your fingertips. Book seats and travel stress-free.</div>
+
+      <div class="splash-dots">
+        <div class="splash-dot active"></div>
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+      </div>
+    </div>
+
+    <div class="splash-bottom">
+      <button class="splash-get-started" onclick="dismissSplash('signup')">Get Started</button>
+      <div class="splash-have-account">Already have an account? <a href="#" onclick="dismissSplash('login'); return false;">Sign In</a></div>
+    </div>
+  </div>
 
   <!-- ── Hero ── -->
   <div class="auth-hero">
@@ -463,6 +649,14 @@
 
 <script src="assets/js/app.js"></script>
 <script>
+  // ── Splash dismiss ──
+  function dismissSplash(tab) {
+    const splash = document.getElementById('splashScreen');
+    splash.classList.add('hidden');
+    splash.addEventListener('animationend', () => splash.remove(), { once: true });
+    if (tab) switchAuthTab(tab);
+  }
+
   // ── Tab switcher ──
   function switchAuthTab(tab) {
     document.getElementById('loginForm').classList.toggle('active', tab === 'login');

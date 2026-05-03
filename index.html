@@ -199,11 +199,11 @@
             <div class="ps-email" id="acctEmail">—</div>
             <div style="margin-top:4px;font-size:10px;color:var(--text3);font-weight:600;"><span id="acctBookingCount">0</span> booking(s)</div>
           </div>
-          <div class="ps-edit" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('editProfileScreen').style.display='block';">Edit →</div>
+          <div class="ps-edit" onclick="showSubScreen('accountScreen','editProfileScreen')">Edit →</div>
         </div>
 
         <div class="settings-group">
-          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('editProfileScreen').style.display='block';">
+          <div class="settings-item" onclick="showSubScreen('accountScreen','editProfileScreen')">
             <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
             <div class="si-text">
               <div class="si-title">My Profile</div>
@@ -211,7 +211,7 @@
             </div>
             <div class="si-arrow">›</div>
           </div>
-          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('securityScreen').style.display='block';">
+          <div class="settings-item" onclick="showSubScreen('accountScreen','securityScreen')">
             <div class="si-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
             <div class="si-text">
               <div class="si-title">Security</div>
@@ -236,9 +236,9 @@
               <div class="si-title">Notifications</div>
               <div class="si-sub">Booking alerts, promos</div>
             </div>
-            <div class="toggle-switch" id="notifToggle"></div>
+            <div class="toggle-switch" id="notifToggle" onclick="this.classList.toggle('off')"></div>
           </div>
-          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('appearanceScreen').style.display='block';">
+          <div class="settings-item" onclick="showSubScreen('accountScreen','appearanceScreen')">
             <div class="si-icon ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg></div>
             <div class="si-text">
               <div class="si-title">Appearance</div>
@@ -246,7 +246,7 @@
             </div>
             <div class="si-arrow">›</div>
           </div>
-          <div class="settings-item" onclick="document.getElementById('accountScreen').style.display='none'; document.getElementById('helpScreen').style.display='block';">
+          <div class="settings-item" onclick="showSubScreen('accountScreen','helpScreen')">
             <div class="si-icon ic-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
             <div class="si-text">
               <div class="si-title">Help & Support</div>
@@ -273,7 +273,7 @@
       <div class="screen ep-screen">
         <div class="ep-hero" style="margin-bottom:24px;">
           <div class="ep-header">
-            <div class="ep-back" onclick="document.getElementById('securityScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+            <div class="ep-back" onclick="showSubScreen('securityScreen','accountScreen')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
             <div class="ep-title">Security</div>
@@ -320,7 +320,7 @@
       <div class="screen ep-screen">
         <div class="ep-hero" style="margin-bottom:24px;">
           <div class="ep-header">
-            <div class="ep-back" onclick="document.getElementById('appearanceScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+            <div class="ep-back" onclick="showSubScreen('appearanceScreen','accountScreen')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
             <div class="ep-title">Appearance</div>
@@ -355,7 +355,7 @@
       <div class="screen ep-screen">
         <div class="ep-hero" style="margin-bottom:24px;">
           <div class="ep-header">
-            <div class="ep-back" onclick="document.getElementById('helpScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+            <div class="ep-back" onclick="showSubScreen('helpScreen','accountScreen')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
             <div class="ep-title">Help & Support</div>
@@ -409,7 +409,7 @@
       <div class="screen ep-screen">
         <div class="ep-hero">
           <div class="ep-header">
-            <div class="ep-back" onclick="document.getElementById('editProfileScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">
+            <div class="ep-back" onclick="showSubScreen('editProfileScreen','accountScreen')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </div>
             <div class="ep-title">Edit Profile</div>
@@ -471,7 +471,7 @@
         </div>
 
         <button id="epSaveBtn" class="ep-btn-save" onclick="saveProfile()">Save Changes</button>
-        <button class="ep-btn-cancel" onclick="document.getElementById('editProfileScreen').style.display='none'; document.getElementById('accountScreen').style.display='block';">Cancel</button>
+        <button class="ep-btn-cancel" onclick="showSubScreen('editProfileScreen','accountScreen')">Cancel</button>
       </div>
     </div>
 
