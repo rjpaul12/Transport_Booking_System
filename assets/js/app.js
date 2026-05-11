@@ -4,16 +4,67 @@
    ════════════════════════════════════════════════════════ */
 
 // ── Supabase Init ───────────────────────────────────────
-// SECURITY NOTE: These credentials are the Supabase *anon* key which is
-// intentionally designed to be exposed on the client — access is controlled
-// by Row Level Security (RLS) policies in your Supabase project.
-// However, you should still move these into environment variables using your
-// build tool (e.g. Vite: import.meta.env.VITE_SUPABASE_URL) or a backend
-// proxy, so the values are not hard-coded in version control.
-// NEVER expose your service_role key on the frontend under any circumstances.
 const SUPABASE_URL     = 'https://djyegteotxpiqsycpwuj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeWVndGVvdHhwaXFzeWNwd3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjE0NTMsImV4cCI6MjA5MzAzNzQ1M30.OFRtRheiZBlZ-3twI2o9vjakeETjacrZVJQhEygwZHc';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function createGoRouteSupabaseClient(url, key, options = {}) {
+  const memory = new Map();
+
+  const memoryStorage = {
+    getItem: (storageKey) => memory.has(storageKey) ? memory.get(storageKey) : null,
+    setItem: (storageKey, value) => memory.set(storageKey, String(value)),
+    removeItem: (storageKey) => memory.delete(storageKey),
+  };
+
+  const cookieStorage = {
+    getItem(storageKey) {
+      if (typeof document === 'undefined') return null;
+      const encodedKey = encodeURIComponent(storageKey) + '=';
+      const cookies = document.cookie ? document.cookie.split('; ') : [];
+      for (const cookie of cookies) {
+        if (cookie.startsWith(encodedKey)) {
+          return decodeURIComponent(cookie.slice(encodedKey.length));
+        }
+      }
+      return null;
+    },
+    setItem(storageKey, value) {
+      if (typeof document === 'undefined') return;
+      const maxAge = 60 * 60 * 24 * 365;
+      document.cookie = `${encodeURIComponent(storageKey)}=${encodeURIComponent(String(value))}; path=/; max-age=${maxAge}; SameSite=Lax`;
+    },
+    removeItem(storageKey) {
+      if (typeof document === 'undefined') return;
+      document.cookie = `${encodeURIComponent(storageKey)}=; path=/; max-age=0; SameSite=Lax`;
+    },
+  };
+
+  const authStorage = (() => {
+    if (typeof document === 'undefined') return memoryStorage;
+    try {
+      const probeKey = '__goroute_supabase_probe__';
+      document.cookie = `${probeKey}=1; path=/; max-age=60; SameSite=Lax`;
+      const supported = document.cookie.includes(`${probeKey}=1`);
+      document.cookie = `${probeKey}=; path=/; max-age=0; SameSite=Lax`;
+      return supported ? cookieStorage : memoryStorage;
+    } catch {
+      return memoryStorage;
+    }
+  })();
+
+  return supabase.createClient(url, key, {
+    ...options,
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: authStorage,
+      ...options.auth,
+    },
+  });
+}
+
+const sb = createGoRouteSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let lastSearchResults = []; // This stores the full list of buses found
 
 // ── Seat State ──────────────────────────────────────────
@@ -217,7 +268,6 @@ async function handleSignup(e) {
   const btn = document.getElementById('signupBtn');
   btn.innerHTML = '<span class="spinner"></span>Creating account...';
   btn.disabled = true;
-
 
   const first = document.getElementById('signupFirst').value.trim();
   const last  = document.getElementById('signupLast').value.trim();
@@ -540,11 +590,11 @@ async function findBuses() {
             origin: { name: item.routes.origin },
             destination: { name: item.routes.destination },
             buses: {
-                operator_name: item.buses?.bus_number || 'Unassigned',
-                bus_type: item.buses?.model || 'Standard',
-                total_seats: item.buses?.total_seats || 45
+                operator_name: item.buses.bus_number,
+                bus_type: item.buses.model,
+                total_seats: item.buses.total_seats
             },
-            available_seats: (item.buses?.total_seats || 45) - (bookedCountMap[item.id] || 0)
+            available_seats: (item.buses.total_seats || 0) - (bookedCountMap[item.id] || 0)
         }));
         lastSearchResults = formattedData;
         renderTickets(formattedData);
@@ -562,16 +612,24 @@ function showNoResults() {
       </div>`;
   }
 
-  document.getElementById('searchScreen').style.display = 'none';
+  ['searchScreen','resultsScreen','seatScreen','ticketsScreen','walletScreen',
+   'accountScreen','bookingFormScreen','successScreen',
+   'editProfileScreen','securityScreen','appearanceScreen','helpScreen'
+  ].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   document.getElementById('resultsScreen').style.display = 'block';
+  const sc2 = document.querySelector('.screens'); if (sc2) sc2.scrollTop = 0;
 }
 
 function renderTickets(data) {
   const resultsContainer = document.getElementById('resultsContainer');
   if (!resultsContainer) return;
 
-  document.getElementById('searchScreen').style.display = 'none';
+  ['searchScreen','resultsScreen','seatScreen','ticketsScreen','walletScreen',
+   'accountScreen','bookingFormScreen','successScreen',
+   'editProfileScreen','securityScreen','appearanceScreen','helpScreen'
+  ].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   document.getElementById('resultsScreen').style.display = 'block';
+  const sc = document.querySelector('.screens'); if (sc) sc.scrollTop = 0;
 
   const routeTitle = document.querySelector('#resultsScreen .route-title');
   if (routeTitle && data[0]) {
@@ -721,47 +779,35 @@ function updateSeatFooter() {
 //   BOOKING FORM
 // ════════════════════════════════════════════════════════
 function showBookingForm() {
-  if (!selectedSeats || selectedSeats.length === 0) {
+  if (selectedSeats.length === 0) {
     alert('Please select at least one seat to continue.');
     return;
   }
 
+  const origin = document.getElementById('seatOrigin').innerText;
+  const dest   = document.getElementById('seatDest').innerText;
+  const total  = selectedSeats.length * currentTicketPrice;
+
+  document.getElementById('formRoute').innerText      = `${origin} → ${dest}`;
+  document.getElementById('formBusInfo').innerText    = `${currentBusName} · Seats: ${selectedSeats.join(', ')}`;
+  document.getElementById('formTotalPrice').innerText = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+  document.getElementById('formSeatCount').innerText  = `${selectedSeats.length} seat${selectedSeats.length !== 1 ? 's' : ''}`;
+
   const container = document.getElementById('passengerFieldsContainer');
-  if (!container) {
-    alert("System Error: Form container missing from HTML!");
-    return;
-  }
-
-  // ── Populate booking form topbar with real data ──────────
-  const totalPrice = selectedSeats.length * currentTicketPrice;
-
-  const formRouteEl      = document.getElementById('formRoute');
-  const formBusInfoEl    = document.getElementById('formBusInfo');
-  const formTotalPriceEl = document.getElementById('formTotalPrice');
-  const formSeatCountEl  = document.getElementById('formSeatCount');
-
-  if (formRouteEl)      formRouteEl.textContent      = `${currentOrigin} → ${currentDest}`;
-  if (formBusInfoEl)    formBusInfoEl.textContent    = `${currentBusName} · Seats: ${selectedSeats.join(', ')}`;
-  if (formTotalPriceEl) formTotalPriceEl.textContent = `₱ ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  if (formSeatCountEl)  formSeatCountEl.textContent  = `${selectedSeats.length} seat${selectedSeats.length !== 1 ? 's' : ''}`;
-
-  // ── Build all passenger blocks in one string, then set once ──
-  let html = '';
+  container.innerHTML = '';
   selectedSeats.forEach((seat, index) => {
-    html += `
-      <div class="passenger-block" style="background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border);">
-        <div class="passenger-title" style="color:var(--blue-dark); font-weight:800; font-size:12px; margin-bottom:10px;">
-          Passenger ${index + 1} — Seat ${seat}
+    container.innerHTML += `
+      <div class="passenger-block">
+        <div class="passenger-title">Passenger ${index + 1} — Seat ${seat}</div>
+        <div class="form-row">
+          <label for="passName_${index}">Full Name</label>
+          <input type="text" class="finput" placeholder="Enter full name" id="passName_${index}" required>
         </div>
         <div class="form-row">
-          <label for="passName_${index}" style="font-size:10px; font-weight:700; color:var(--text3); display:block; margin-bottom:4px;">FULL NAME</label>
-          <input type="text" class="finput" id="passName_${index}" placeholder="Enter full name" required>
-        </div>
-        <div class="form-row" style="margin-top:10px;">
-          <label for="passAge_${index}" style="font-size:10px; font-weight:700; color:var(--text3); display:block; margin-bottom:4px;">AGE & GENDER</label>
-          <div style="display:flex; gap:8px;">
-            <input type="number" class="finput" id="passAge_${index}" style="flex:1;" placeholder="Age" min="1" max="120">
-            <select class="finput" id="passGender_${index}" style="flex:1.5;" aria-label="Gender">
+          <label for="passAge_${index}">Age</label>
+          <div style="display:flex;gap:8px;">
+            <input type="number" class="finput" style="flex:1;" placeholder="Age" id="passAge_${index}" min="1" max="120">
+            <select class="finput" style="flex:1.5;" id="passGender_${index}">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
@@ -769,16 +815,18 @@ function showBookingForm() {
           </div>
         </div>
       </div>
+      ${index < selectedSeats.length - 1 ? '<div class="divider"></div>' : ''}
     `;
   });
-  container.innerHTML = html; // single assignment — no loop re-parsing
 
-  // ── Switch screens ────────────────────────────────────────
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session?.user) {
+      document.getElementById('contactEmail').value = data.session.user.email;
+    }
+  });
+
   document.getElementById('seatScreen').style.display        = 'none';
   document.getElementById('bookingFormScreen').style.display = 'block';
-
-  const screensEl = document.querySelector('.screens');
-  if (screensEl) screensEl.scrollTop = 0;
 }
 
 // ════════════════════════════════════════════════════════
@@ -832,24 +880,10 @@ async function confirmAndPay() {
       throw new Error('Payment failed: insufficient balance or a concurrent transaction occurred. Please try again.');
     }
 
-    // FIX (Bug 5 — Data Validation): Enforce required passenger fields before
-    // attempting any DB insert. Previously the code defaulted to 'N/A' / null
-    // and allowed incomplete records to be written to the database.
-    for (let index = 0; index < selectedSeats.length; index++) {
-      const nameVal = document.getElementById(`passName_${index}`)?.value.trim();
-      const ageVal  = document.getElementById(`passAge_${index}`)?.value.trim();
-      if (!nameVal) {
-        throw new Error(`Please enter the full name for Passenger ${index + 1} (Seat ${selectedSeats[index]}).`);
-      }
-      if (!ageVal || isNaN(parseInt(ageVal)) || parseInt(ageVal) < 1 || parseInt(ageVal) > 120) {
-        throw new Error(`Please enter a valid age (1–120) for Passenger ${index + 1} (Seat ${selectedSeats[index]}).`);
-      }
-    }
-
     const bookingsToInsert = selectedSeats.map((seatNum, index) => {
-      const name   = document.getElementById(`passName_${index}`).value.trim();
-      const age    = parseInt(document.getElementById(`passAge_${index}`).value);
-      const gender = document.getElementById(`passGender_${index}`)?.value || 'Other';
+      const name   = document.getElementById(`passName_${index}`)?.value.trim() || 'N/A';
+      const age    = parseInt(document.getElementById(`passAge_${index}`)?.value) || null;
+      const gender = document.getElementById(`passGender_${index}`)?.value || 'N/A';
       return {
         schedule_id:      currentScheduleId,
         user_id:          userId,
@@ -959,11 +993,15 @@ async function confirmAndPay() {
 // ════════════════════════════════════════════════════════
 async function loadMyTickets() {
   const listEl = document.getElementById('myTicketsList');
+  if (!listEl) return;
   listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">Loading tickets...</div>';
 
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">Please sign in to view your tickets.</div>';
+      return;
+    }
 
     const { data: bookings, error } = await sb
       .from('bookings')
@@ -986,26 +1024,39 @@ async function loadMyTickets() {
 
     const groupedTrips = {};
     bookings.forEach(b => {
-      const scheduleId = b.schedules.id;
+      if (!b || !b.id) return;
+
+      const schedule = b.schedules || null;
+      const scheduleId = schedule?.id || `booking-${b.id}`;
       if (!groupedTrips[scheduleId]) {
         groupedTrips[scheduleId] = {
           scheduleId: scheduleId,
           status: b.status,
           created_at: b.created_at,
-          schedules: b.schedules,
-          seats: [] 
+          schedules: schedule,
+          origin: schedule?.routes?.origin || 'Unknown',
+          destination: schedule?.routes?.destination || 'Unknown',
+          operator: schedule?.buses?.bus_number || 'GoRoute',
+          departure_time: schedule?.departure_time || b.created_at,
+          seats: []
         };
       }
-      groupedTrips[scheduleId].seats.push(b.seat_number); 
+      groupedTrips[scheduleId].seats.push(b.seat_number || '—');
     });
 
-    listEl.innerHTML = Object.values(groupedTrips).map(trip => {
-      const s = trip.schedules;
-      const origin = s.routes?.origin || "Unknown";
-      const dest = s.routes?.destination || "Unknown";
-      const operator = s.buses?.bus_number || "GoRoute";
-      
-      const depTime = new Date(s.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const trips = Object.values(groupedTrips);
+    if (trips.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">No tickets found.</div>';
+      return;
+    }
+
+    listEl.innerHTML = trips.map(trip => {
+      const origin = trip.origin || 'Unknown';
+      const dest = trip.destination || 'Unknown';
+      const operator = trip.operator || 'GoRoute';
+      const depTime = trip.departure_time
+        ? new Date(trip.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        : '—';
       const displayDate = new Date(trip.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
       return `
@@ -1013,7 +1064,7 @@ async function loadMyTickets() {
         <div class="ticket-left">
           <div class="ticket-no">REF: ${String(trip.scheduleId).substring(0,8).toUpperCase()}</div>
           <div class="ticket-route">${origin} → ${dest}</div>
-          <div class="ticket-meta-info">${operator} · ${trip.seats.length} Seats</div>
+          <div class="ticket-meta-info">${operator} · ${trip.seats.length} Seat${trip.seats.length !== 1 ? 's' : ''}${depTime !== '—' ? ` · ${depTime}` : ''}</div>
         </div>
         <div class="ticket-right">
           <div class="status-badge status-confirmed">${trip.status}</div>
@@ -1141,27 +1192,59 @@ async function loadAccount() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
+    const userId = session.user.id;
+    const meta   = session.user.user_metadata || {};
+    const email  = session.user.email || '';
 
-    const { data: profile } = await sb.from('users').select('*').eq('id', session.user.id).maybeSingle();
-    
-    // 1. Safeguard for element IDs
+    // Load from users table for most up-to-date data
+    const { data: profile } = await sb.from('users').select('*').eq('id', userId).maybeSingle();
+    const firstName = profile?.first_name || meta.first_name || '';
+    const lastName  = profile?.last_name  || meta.last_name  || '';
+    const fullName  = (firstName + ' ' + lastName).trim() || (meta.full_name || meta.name || '').trim() || 'GoRoute User';
+    const phone     = profile?.phone || meta.phone || '';
+    const gender    = profile?.gender || '';
+    const dob       = profile?.date_of_birth || '';
+    const initials  = fullName.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'U';
+
+    // Profile summary card
+    const nameEl   = document.getElementById('acctName');
+    const emailEl  = document.getElementById('acctEmail');
+    const avatarEl = document.getElementById('acctAvatar');
+    if (nameEl)  nameEl.textContent  = fullName;
+    if (emailEl) emailEl.textContent = email;
+    if (avatarEl) avatarEl.innerHTML = `<div style="width:44px;height:44px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--blue-dark);">${initials}</div>`;
+
+    // Edit Profile — prefill with IDs
     const epFirst = document.getElementById('epFirstName');
     const epLast  = document.getElementById('epLastName');
     const epEmail = document.getElementById('epEmail');
-    
-    // 2. ONLY set values if the elements actually exist in HTML
-    if (epFirst) epFirst.value = profile?.first_name || '';
-    if (epLast)  epLast.value  = profile?.last_name || '';
-    if (epEmail) epEmail.value = session.user.email;
-
-    // 3. Ensure the dashboard stats don't crash the script
-    const bookingCountEl = document.getElementById('acctBookingCount');
-    if (bookingCountEl) {
-       const { count } = await sb.from('bookings').select('id', { count: 'exact', head: true }).eq('user_id', session.user.id);
-       bookingCountEl.textContent = count || 0;
+    const epPhone = document.getElementById('epPhone');
+    const epDob   = document.getElementById('epDob');
+    if (epFirst)  epFirst.value  = firstName;
+    if (epLast)   epLast.value   = lastName;
+    if (epEmail)  { epEmail.value = email; epEmail.readOnly = true; epEmail.style.opacity = '.6'; }
+    if (epPhone)  epPhone.value  = phone;
+    if (epDob)    epDob.value    = dob;
+    if (gender) {
+      document.querySelectorAll('.ep-gender-pill').forEach(p => {
+        p.classList.toggle('active', p.textContent.trim().toLowerCase() === gender.toLowerCase());
+      });
     }
+
+    // Live wallet balance in Settings row
+    const { data: wallet } = await sb.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+    const walletBal = document.getElementById('acctWalletBal');
+    if (walletBal && wallet) {
+      walletBal.textContent = `Balance: ₱ ${Number(wallet.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+
+    // Booking count
+    const { count } = await sb.from('bookings').select('id', { count: 'exact', head: true }).eq('user_id', userId);
+    const bookingCountEl = document.getElementById('acctBookingCount');
+    if (bookingCountEl) bookingCountEl.textContent = count || 0;
+
   } catch (err) {
-    console.error("Profile Load Error:", err);
+    console.error(err);
   }
 }
 

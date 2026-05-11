@@ -320,7 +320,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       <div class="topbar-title" id="topbarTitle">Dashboard Overview<small id="topbarSub">Loading...</small></div>
       <div class="search-bar">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#8ba5be" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#8ba5be" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <input id="global-search-input" type="text" aria-label="Global search" placeholder="Search users, bookings, routes…">
+        <input type="text" placeholder="Search users, bookings, routes…">
       </div>
       <button class="add-btn" onclick="openModal('addBooking')">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -391,9 +391,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
           </div>
         </div>
         <div class="filter-bar">
-          <select id="filter-user-status" class="filter-select" aria-label="Filter users by status"><option>All Status</option><option>Active</option><option>Pending</option><option>Suspended</option></select>
-          <select id="filter-user-role" class="filter-select" aria-label="Filter users by role"><option>All Roles</option><option>Passenger</option><option>Admin</option></select>
-          <input id="search-user-input" class="filter-input" type="text" aria-label="Search users" placeholder="Search by name or email…">
+          <select class="filter-select"><option>All Status</option><option>Active</option><option>Pending</option><option>Suspended</option></select>
+          <select class="filter-select"><option>All Roles</option><option>Passenger</option><option>Admin</option></select>
+          <input class="filter-input" type="text" placeholder="Search by name or email…">
         </div>
         <div class="table-card">
           <table class="data-table">
@@ -416,10 +416,10 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
           </div>
         </div>
         <div class="filter-bar">
-          <select id="filter-booking-status" class="filter-select" aria-label="Filter bookings by status"><option>All Status</option><option>Confirmed</option><option>Pending</option><option>Completed</option><option>Cancelled</option></select>
-          <select id="filter-booking-route" class="filter-select" aria-label="Filter bookings by route"><option>All Routes</option><option>Cebu → Manila</option><option>Manila → Cebu</option><option>Cebu → Bohol</option><option>Davao → Cebu</option></select>
-          <input id="filter-booking-date" class="filter-input" type="date" aria-label="Filter bookings by date" value="2026-05-02">
-          <input id="search-booking-input" class="filter-input" type="text" aria-label="Search passenger name" placeholder="Search passenger…" style="min-width:160px;">
+          <select class="filter-select"><option>All Status</option><option>Confirmed</option><option>Pending</option><option>Completed</option><option>Cancelled</option></select>
+          <select class="filter-select"><option>All Routes</option><option>Cebu → Manila</option><option>Manila → Cebu</option><option>Cebu → Bohol</option><option>Davao → Cebu</option></select>
+          <input class="filter-input" type="date" value="2026-05-02">
+          <input class="filter-input" type="text" placeholder="Search passenger…" style="min-width:160px;">
         </div>
         <div class="table-card">
           <table class="data-table">
@@ -503,8 +503,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
           </div>
         </div>
         <div class="filter-bar">
-          <select id="filter-bus-status" class="filter-select" aria-label="Filter buses by status"><option>All Status</option><option>Active</option><option>Maintenance</option><option>Retired</option></select>
-          <select id="filter-bus-type" class="filter-select" aria-label="Filter buses by type"><option>All Types</option><option>Standard (45 seats)</option><option>Premium (50 seats)</option><option>Sleeper (30 beds)</option></select>
+          <select class="filter-select"><option>All Status</option><option>Active</option><option>Maintenance</option><option>Retired</option></select>
+          <select class="filter-select"><option>All Types</option><option>Standard (45 seats)</option><option>Premium (50 seats)</option><option>Sleeper (30 beds)</option></select>
         </div>
         <div class="fleet-grid">
            <!-- Live buses from Supabase will be injected here -->
@@ -608,11 +608,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
                 <div class="settings-section-title">General Settings</div>
                 <div class="settings-input-row">
                   <div>
-                    <label for="set-sysname" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">System Name</label>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">System Name</label>
                     <input type="text" class="settings-input" id="set-sysname" value="GoRoute Transport">
                   </div>
                   <div>
-                    <label for="set-email" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Support Email</label>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Support Email</label>
                     <input type="email" class="settings-input" id="set-email" value="support@goroute.com">
                   </div>
                 </div>
@@ -682,12 +682,12 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
                 <div class="settings-section-title">Stripe Keys</div>
                 <div class="settings-input-row">
                   <div>
-                    <label for="stripe-pk" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Publishable Key</label>
-                    <input type="text" id="stripe-pk" class="settings-input" placeholder="pk_live_…">
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Publishable Key</label>
+                    <input type="text" class="settings-input" placeholder="pk_live_…">
                   </div>
                   <div>
-                    <label for="stripe-sk" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Secret Key</label>
-                    <input type="password" id="stripe-sk" class="settings-input" placeholder="sk_live_…">
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Secret Key</label>
+                    <input type="password" class="settings-input" placeholder="sk_live_…">
                   </div>
                 </div>
               </div>
@@ -716,11 +716,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
                 <div class="settings-section-title">Change Admin Password</div>
                 <div class="settings-input-row">
                   <div>
-                    <label for="newAdminPw" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">New Password</label>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">New Password</label>
                     <input type="password" class="settings-input" id="newAdminPw" placeholder="Min 8 characters">
                   </div>
                   <div>
-                    <label for="confirmAdminPw" style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Confirm Password</label>
+                    <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block;">Confirm Password</label>
                     <input type="password" class="settings-input" id="confirmAdminPw" placeholder="Repeat password">
                   </div>
                 </div>
@@ -743,12 +743,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
                 </div>
                 <div class="setting-row" style="border:none;">
                   <div><div class="setting-label">Delete All Users</div><div class="setting-desc">Irreversibly remove every user account from the database.</div></div>
-                  <!-- FIX (Bug 4 — Unimplemented Feature): Previously this button only showed a
-                       toast saying "disabled in demo mode". It now calls a real async function
-                       that deletes all rows from bookings, wallets, and users tables in order,
-                       respecting FK constraints. The auth records require a server-side admin
-                       call (Supabase Edge Function with service_role key) and are noted below. -->
-                  <button class="action-btn danger" onclick="deleteAllUsers()">Delete All</button>
+                  <button class="action-btn danger" onclick="showToast('This action is disabled in demo mode','error')">Delete All</button>
                 </div>
               </div>
             </div>
@@ -785,7 +780,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   try {
     // 2. Execute deletion in Supabase
-    const { error } = await sb
+    const { error } = await _supabase
       .from(tableName)
       .delete()
       .eq('id', id);
@@ -850,26 +845,6 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   };
 
   // Toast Notification System
-  // FIX (Bug 4): Real implementation of "Delete All Users".
-  // Deletes application data (bookings → wallets → users) in FK-safe order.
-  // Note: removing the Supabase Auth record itself requires a service_role key
-  // that must never be exposed on the frontend — wire up an Edge Function for that.
-  window.deleteAllUsers = async function() {
-    if (!confirm('WARNING: This will permanently delete ALL user records, wallets, and bookings. This cannot be undone. Are you absolutely sure?')) return;
-    try {
-      showToast('Deleting user data…', 'success');
-      // Delete child records first to prevent foreign key errors
-      await sb.from('bookings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-      await sb.from('wallets').delete().neq('user_id', '00000000-0000-0000-0000-000000000000');
-      await sb.from('users').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-      
-      showToast('All user application data deleted.', 'success');
-      if (typeof fetchUsers === 'function') fetchUsers(); // Refresh table
-    } catch (err) {
-      showToast('Error: ' + err.message, 'error');
-    }
-  };
-
   window.showToast = function(msg, type = 'success') {
     const toast = document.getElementById('sysToast');
     toast.textContent = msg;
@@ -890,31 +865,31 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     if (actionType === 'addBus') {
       title.innerText = 'Register New Bus';
       content.innerHTML = `
-        <div class="modal-field"><label for="newBusNum">Bus Number / Plate</label><input type="text" id="newBusNum" placeholder="e.g. GR-24" required></div>
-        <div class="modal-field"><label for="newBusModel">Bus Model</label><input type="text" id="newBusModel" placeholder="e.g. Hino RN8" required></div>
+        <div class="modal-field"><label>Bus Number / Plate</label><input type="text" id="newBusNum" placeholder="e.g. GR-24" required></div>
+        <div class="modal-field"><label>Bus Model</label><input type="text" id="newBusModel" placeholder="e.g. Hino RN8" required></div>
         <div class="modal-row">
-          <div class="modal-field"><label for="newBusSeats">Total Seats</label><input type="number" id="newBusSeats" placeholder="45" required></div>
-          <div class="modal-field"><label for="newBusStatus">Initial Status</label><select id="newBusStatus"><option value="Active">Active</option><option value="Maintenance">Maintenance</option></select></div>
+          <div class="modal-field"><label>Total Seats</label><input type="number" id="newBusSeats" placeholder="45" required></div>
+          <div class="modal-field"><label>Initial Status</label><select id="newBusStatus"><option value="Active">Active</option><option value="Maintenance">Maintenance</option></select></div>
         </div>
       `;
       saveBtn.onclick = saveNewBus;
-    }
+    } 
     else if (actionType === 'addBooking') {
       title.innerText = 'Create Manual Booking';
       content.innerHTML = `
         <div class="modal-field">
-          <label for="bookSchedId">Select Trip (Schedule)</label>
+          <label>Select Trip (Schedule)</label>
           <select id="bookSchedId" required><option>Loading active trips...</option></select>
         </div>
-        <div class="modal-field"><label for="bookName">Passenger Name</label><input type="text" id="bookName" placeholder="Full Name" required></div>
+        <div class="modal-field"><label>Passenger Name</label><input type="text" id="bookName" placeholder="Full Name" required></div>
         <div class="modal-row">
-          <div class="modal-field"><label for="bookSeat">Seat Number</label><input type="text" id="bookSeat" placeholder="e.g. 1A" required></div>
-          <div class="modal-field"><label for="bookFare">Price (₱)</label><input type="number" id="bookFare" placeholder="850"></div>
+          <div class="modal-field"><label>Seat Number</label><input type="text" id="bookSeat" placeholder="e.g. 1A" required></div>
+          <div class="modal-field"><label>Price (₱)</label><input type="number" id="bookFare" placeholder="850"></div>
         </div>
-        <div class="modal-field"><label for="bookMobile">Contact Mobile</label><input type="text" id="bookMobile" placeholder="+63..."></div>
+        <div class="modal-field"><label>Contact Mobile</label><input type="text" id="bookMobile" placeholder="+63..."></div>
       `;
       async function populateBookingDropdown() {
-    const { data: schedules } = await sb.from('schedules').select('id, departure_time, routes(origin, destination)');
+    const { data: schedules } = await _supabase.from('schedules').select('id, departure_time, routes(origin, destination)');
     if (schedules) {
       document.getElementById('bookSchedId').innerHTML = schedules.map(s => 
         `<option value="${s.id}">${s.routes.origin} → ${s.routes.destination} (${new Date(s.departure_time).toLocaleString()})</option>`
@@ -931,7 +906,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       contact_mobile: document.getElementById('bookMobile').value,
       status: 'Confirmed'
     };
-    const { error } = await sb.from('bookings').insert([payload]);
+    const { error } = await _supabase.from('bookings').insert([payload]);
     if (!error) { showToast('Booking created!'); closeModal(); loadLiveBookings(); }
   }// Fetch trips for the dropdown
       populateBookingDropdown();
@@ -941,25 +916,25 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       title.innerText = 'Create New Trip';
       content.innerHTML = `
         <div class="modal-field">
-          <label for="schedRouteId">Select Route</label>
+          <label>Select Route</label>
           <select id="schedRouteId" required><option>Loading routes...</option></select>
         </div>
         <div class="modal-field">
-          <label for="schedBusId">Select Bus</label>
+          <label>Select Bus</label>
           <select id="schedBusId" required><option>Loading buses...</option></select>
         </div>
         <div class="modal-row">
           <div class="modal-field">
-            <label for="schedDepTime">Departure Time</label>
+            <label>Departure Time</label>
             <input type="datetime-local" id="schedDepTime" required>
           </div>
           <div class="modal-field">
-            <label for="schedArrTime">Arrival Time</label>
+            <label>Arrival Time</label>
             <input type="datetime-local" id="schedArrTime" required>
           </div>
         </div>
         <div class="modal-field">
-          <label for="schedPrice">Fare for this Trip (₱)</label>
+          <label>Fare for this Trip (₱)</label>
           <input type="number" id="schedPrice" placeholder="Default fare will be used if empty">
         </div>
       `;
@@ -973,13 +948,13 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       content.innerHTML = `
         <div class="modal-row">
           <div class="modal-field">
-            <label for="newRouteOrigin">Origin City</label>
+            <label>Origin City</label>
             <select id="newRouteOrigin" required>
               <option value="" disabled selected>Select origin…</option>
             </select>
           </div>
           <div class="modal-field">
-            <label for="newRouteDest">Destination City</label>
+            <label>Destination City</label>
             <select id="newRouteDest" required>
               <option value="" disabled selected>Select destination…</option>
             </select>
@@ -987,11 +962,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         </div>
         <div class="modal-row">
           <div class="modal-field">
-            <label for="newRouteFare">Base Fare (₱)</label>
+            <label>Base Fare (₱)</label>
             <input type="number" id="newRouteFare" placeholder="e.g. 850" required>
           </div>
           <div class="modal-field">
-            <label for="newRouteDuration">Duration (hours)</label>
+            <label>Duration (hours)</label>
             <input type="number" id="newRouteDuration" placeholder="e.g. 4" step="0.5" required>
           </div>
         </div>
@@ -1003,19 +978,19 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       title.innerText = 'Add New User';
       content.innerHTML = `
         <div class="modal-row">
-          <div class="modal-field"><label for="newUserFirst">First Name</label><input type="text" id="newUserFirst" placeholder="Maria" required></div>
-          <div class="modal-field"><label for="newUserLast">Last Name</label><input type="text" id="newUserLast" placeholder="Santos" required></div>
+          <div class="modal-field"><label>First Name</label><input type="text" id="newUserFirst" placeholder="Maria" required></div>
+          <div class="modal-field"><label>Last Name</label><input type="text" id="newUserLast" placeholder="Santos" required></div>
         </div>
-        <div class="modal-field"><label for="newUserEmail">Email Address</label><input type="email" id="newUserEmail" placeholder="maria@example.com" required></div>
-        <div class="modal-field"><label for="newUserPhone">Phone Number</label><input type="text" id="newUserPhone" placeholder="+63 912 345 6789"></div>
+        <div class="modal-field"><label>Email Address</label><input type="email" id="newUserEmail" placeholder="maria@example.com" required></div>
+        <div class="modal-field"><label>Phone Number</label><input type="text" id="newUserPhone" placeholder="+63 912 345 6789"></div>
         <div class="modal-row">
-          <div class="modal-field"><label for="newUserRole">Role</label>
+          <div class="modal-field"><label>Role</label>
             <select id="newUserRole">
               <option value="passenger">Passenger</option>
               <option value="admin">Admin</option>
             </select>
           </div>
-          <div class="modal-field"><label for="newUserPw">Initial Password</label><input type="password" id="newUserPw" placeholder="Min 6 characters" required></div>
+          <div class="modal-field"><label>Initial Password</label><input type="password" id="newUserPw" placeholder="Min 6 characters" required></div>
         </div>
       `;
       saveBtn.onclick = saveNewUser;
@@ -1062,23 +1037,75 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 </script>
 <!-- Add the Supabase CDN -->
 <!-- Add the Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase.js"></script>
 
 <script>
   // Initialize Supabase
-  // FIX (Bug 3 — Inconsistent Client Name): Renamed from '_supabase' to 'sb'
-  // to match the variable name used everywhere else in the project (app.js,
-  // auth.html, admin-login.html). Using '_supabase' was causing ReferenceErrors
-  // when any shared code snippet from the user environment was called here.
-  // SECURITY NOTE: Move these to build-time env vars (never use service_role key client-side).
-  const sb = supabase.createClient('https://djyegteotxpiqsycpwuj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeWVndGVvdHhwaXFzeWNwd3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjE0NTMsImV4cCI6MjA5MzAzNzQ1M30.OFRtRheiZBlZ-3twI2o9vjakeETjacrZVJQhEygwZHc');
+  function createGoRouteSupabaseClient(url, key, options = {}) {
+    const memory = new Map();
+
+    const memoryStorage = {
+      getItem: (storageKey) => memory.has(storageKey) ? memory.get(storageKey) : null,
+      setItem: (storageKey, value) => memory.set(storageKey, String(value)),
+      removeItem: (storageKey) => memory.delete(storageKey),
+    };
+
+    const cookieStorage = {
+      getItem(storageKey) {
+        if (typeof document === 'undefined') return null;
+        const encodedKey = encodeURIComponent(storageKey) + '=';
+        const cookies = document.cookie ? document.cookie.split('; ') : [];
+        for (const cookie of cookies) {
+          if (cookie.startsWith(encodedKey)) {
+            return decodeURIComponent(cookie.slice(encodedKey.length));
+          }
+        }
+        return null;
+      },
+      setItem(storageKey, value) {
+        if (typeof document === 'undefined') return;
+        const maxAge = 60 * 60 * 24 * 365;
+        document.cookie = `${encodeURIComponent(storageKey)}=${encodeURIComponent(String(value))}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      },
+      removeItem(storageKey) {
+        if (typeof document === 'undefined') return;
+        document.cookie = `${encodeURIComponent(storageKey)}=; path=/; max-age=0; SameSite=Lax`;
+      },
+    };
+
+    const authStorage = (() => {
+      if (typeof document === 'undefined') return memoryStorage;
+      try {
+        const probeKey = '__goroute_supabase_probe__';
+        document.cookie = `${probeKey}=1; path=/; max-age=60; SameSite=Lax`;
+        const supported = document.cookie.includes(`${probeKey}=1`);
+        document.cookie = `${probeKey}=; path=/; max-age=0; SameSite=Lax`;
+        return supported ? cookieStorage : memoryStorage;
+      } catch {
+        return memoryStorage;
+      }
+    })();
+
+    return supabase.createClient(url, key, {
+      ...options,
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: authStorage,
+        ...options.auth,
+      },
+    });
+  }
+
+  const _supabase = createGoRouteSupabaseClient('https://djyegteotxpiqsycpwuj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeWVndGVvdHhwaXFzeWNwd3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjE0NTMsImV4cCI6MjA5MzAzNzQ1M30.OFRtRheiZBlZ-3twI2o9vjakeETjacrZVJQhEygwZHc');
 
   // ==========================================
   // 1. FETCH & DISPLAY USERS
   // ==========================================
   async function fetchUsers() {
     try {
-      const { data, error } = await sb.from('users').select('*');
+      const { data, error } = await _supabase.from('users').select('*');
       if (error) throw error;
 
       const tableBody = document.querySelector('#page-users .data-table tbody');
@@ -1120,7 +1147,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   async function loadLiveBuses() {
     try {
-      const { data, error } = await sb.from('buses').select('*'); 
+      const { data, error } = await _supabase.from('buses').select('*'); 
       if (error) throw error;
 
       const fleetGrid = document.querySelector('#page-buses .fleet-grid');
@@ -1197,7 +1224,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     saveBtn.disabled = true;
 
     try {
-      const { data, error } = await sb
+      const { data, error } = await _supabase
         .from('buses')
         .insert([{ bus_number: busNum, model: busModel, total_seats: busSeats, status: busStatus }]);
 
@@ -1220,18 +1247,18 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   async function loadDashboardData() {
     try {
-      const { data: usersData, error: userErr1 } = await sb.from('users').select('*');
+      const { data: usersData, error: userErr1 } = await _supabase.from('users').select('*');
       if (!userErr1 && document.querySelectorAll('.stat-value')[0]) {
         document.querySelectorAll('.stat-value')[0].innerText = usersData ? usersData.length : 0;
       }
 
-      const { data: busesData, error: busErr1 } = await sb.from('buses').select('*');
+      const { data: busesData, error: busErr1 } = await _supabase.from('buses').select('*');
       if (!busErr1 && document.querySelectorAll('.stat-value')[3]) {
         const activeCount = busesData ? busesData.filter(b => b.status === 'Active' || !b.status).length : 0;
         document.querySelectorAll('.stat-value')[3].innerText = activeCount;
       }
 
-      const { data: newUsers, error: userErr2 } = await sb
+      const { data: newUsers, error: userErr2 } = await _supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false })
@@ -1267,7 +1294,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   async function loadLiveBookings() {
     try {
-      const { data: bookings, error } = await sb
+      const { data: bookings, error } = await _supabase
         .from('bookings')
         .select('*')
         .order('created_at', { ascending: false }); 
@@ -1373,7 +1400,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     saveBtn.innerText = 'Saving...'; saveBtn.disabled = true;
 
     try {
-      const { error } = await sb.from('routes').insert([{
+      const { error } = await _supabase.from('routes').insert([{
         origin: origin,
         destination: dest,
         base_fare: fare,
@@ -1399,7 +1426,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   async function loadLiveRoutes() {
     try {
-      const { data, error } = await sb.from('routes').select('*');
+      const { data, error } = await _supabase.from('routes').select('*');
       if (error) throw error;
 
       const grid = document.querySelector('.routes-grid');
@@ -1453,8 +1480,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     const routeSelect = document.getElementById('schedRouteId');
     const busSelect = document.getElementById('schedBusId');
 
-    const { data: routes } = await sb.from('routes').select('id, origin, destination');
-    const { data: buses } = await sb.from('buses').select('id, bus_number, model');
+    const { data: routes } = await _supabase.from('routes').select('id, origin, destination');
+    const { data: buses } = await _supabase.from('buses').select('id, bus_number, model');
 
     if (routes) {
       routeSelect.innerHTML = routes.map(r => `<option value="${r.id}">${r.origin} → ${r.destination}</option>`).join('');
@@ -1478,7 +1505,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     saveBtn.innerText = 'Scheduling...'; saveBtn.disabled = true;
 
     try {
-      const { error } = await sb.from('schedules').insert([{
+      const { error } = await _supabase.from('schedules').insert([{
         route_id: routeId,
         bus_id: busId,
         departure_time: depTime,
@@ -1500,7 +1527,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // Fetch and display trips in the Schedules tab
   async function loadLiveSchedules() {
     try {
-      const { data, error } = await sb
+      const { data, error } = await _supabase
         .from('schedules')
         .select('*, routes(origin, destination), buses(bus_number)');
 
@@ -1529,7 +1556,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   async function loadRevenueData() {
     try {
-      const { data: bookings, error } = await sb
+      const { data: bookings, error } = await _supabase
         .from('bookings')
         .select('price, created_at')
         .eq('status', 'Confirmed');
@@ -1619,7 +1646,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   window.adminLogout = async function() {
     if (!confirm('Sign out of the admin panel?')) return;
-    const { error } = await sb.auth.signOut();
+    const { error } = await _supabase.auth.signOut();
     if (error) {
       showToast(error.message, 'error');
     } else {
@@ -1637,56 +1664,75 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   // Fetch the real logged-in admin's name from Supabase
   async function loadAdminIdentity() {
-  try {
-    const { data: { user }, error } = await sb.auth.getUser();
+    try {
+      const { data: { user }, error } = await _supabase.auth.getUser();
+      if (error || !user) return;
 
-    // 1. Kick out unauthenticated users
-    if (error || !user) {
-      await sb.auth.signOut();
-      window.location.replace('admin-login.html');
-      return;
+      // Try to get their profile from the users table
+      const { data: profile } = await _supabase
+        .from('users')
+        .select('first_name, last_name, role')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      const firstName = profile?.first_name || user.user_metadata?.first_name || user.email.split('@')[0];
+      const lastName  = profile?.last_name  || user.user_metadata?.last_name  || '';
+      const fullName  = [firstName, lastName].filter(Boolean).join(' ');
+      const role      = profile?.role || 'Admin';
+
+      // Update sidebar avatar block
+      const nameEl = document.querySelector('.sb-user-name');
+      const roleEl = document.querySelector('.sb-user-role');
+      if (nameEl) nameEl.textContent = fullName;
+      if (roleEl) roleEl.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+      // Build the greeting string used by every page switch
+      const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+      window._adminGreeting = `${today} &nbsp;·&nbsp; Welcome back, ${firstName} 👋`;
+
+      // Update the topbar that's already visible
+      const sub = document.getElementById('topbarSub');
+      if (sub) sub.innerHTML = window._adminGreeting;
+
+    } catch (err) {
+      console.error('Could not load admin identity:', err);
+      window._adminGreeting = 'Welcome back 👋';
     }
-
-    // 2. Cross-check role in the backend database
-    const { data: profile } = await sb
-      .from('users')
-      .select('first_name, last_name, role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    const role = profile?.role || '';
-    const isAdmin = user.email.toLowerCase() === 'admin@goroute.com' || role === 'admin';
-
-    // 3. Kick out non-admins securely
-    if (!isAdmin) {
-      await sb.auth.signOut();
-      window.location.replace('admin-login.html');
-      return;
-    }
-
-    // Load admin UI details
-    const firstName = profile?.first_name || user.user_metadata?.first_name || user.email.split('@')[0];
-    const fullName = [firstName, profile?.last_name].filter(Boolean).join(' ');
-
-    document.querySelector('.sb-user-name').textContent = fullName;
-    document.querySelector('.sb-user-role').textContent = role ? (role.charAt(0).toUpperCase() + role.slice(1)) : 'Admin';
-
-    window._adminGreeting = `${new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })} &nbsp;·&nbsp; Welcome back, ${firstName} 👋`;
-    document.getElementById('topbarSub').innerHTML = window._adminGreeting;
-
-  } catch (err) {
-    console.error('Could not load admin identity:', err);
   }
-}
 
-  loadAdminIdentity();
-  loadLiveBuses();
+  // ── Auth Guard: block non-admins even if they navigate here directly ──
+  async function enforceAdminAccess() {
+    const { data: { user }, error } = await _supabase.auth.getUser();
+    if (error || !user) {
+      window.location.replace('admin-login.html');
+      return false;
+    }
+    const isKnownAdminEmail = (user.email || '').toLowerCase() === 'admin@goroute.com';
+    const isAdminRole = (role) => String(role || '').trim().toLowerCase() === 'admin';
+    const { data: profile } = await _supabase
+      .from('users')
+      .select('role')
+      .eq('email', user.email)
+      .maybeSingle();
+    if ((!profile || !isAdminRole(profile.role)) && !isKnownAdminEmail) {
+      await _supabase.auth.signOut();
+      window.location.replace('admin-login.html');
+      return false;
+    }
+    return true;
+  }
+
+  enforceAdminAccess().then(allowed => {
+    if (!allowed) return;
+    loadAdminIdentity();
+    loadLiveBuses();
   fetchUsers();
   loadDashboardData();
   loadLiveBookings();
   loadLiveRoutes();
   loadLiveSchedules();
   populateActivityLog();
+  }); // end enforceAdminAccess
 
   // ==========================================
   // ADD USER
@@ -1703,11 +1749,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     btn.innerText = 'Creating...'; btn.disabled = true;
     try {
       // Create auth user
-      const { data: authData, error: authErr } = await sb.auth.admin
-        ? await sb.auth.admin.createUser({ email, password: pw, email_confirm: true })
+      const { data: authData, error: authErr } = await _supabase.auth.admin
+        ? await _supabase.auth.admin.createUser({ email, password: pw, email_confirm: true })
         : { data: null, error: null };
       // Insert into users table regardless (may not have admin rights)
-      const { error } = await sb.from('users').insert([{
+      const { error } = await _supabase.from('users').insert([{
         first_name: first, last_name: last, email, phone, role
       }]);
       if (error) throw error;
@@ -1777,7 +1823,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   };
 
   window.updateBookingStatus = async function(id, status) {
-    const { error } = await sb.from('bookings').update({ status }).eq('id', id);
+    const { error } = await _supabase.from('bookings').update({ status }).eq('id', id);
     if (error) return showToast(error.message, 'error');
     showToast(`Booking ${status.toLowerCase()}`, 'success');
     closeModal(); loadLiveBookings();
@@ -1813,7 +1859,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         status: document.getElementById('editBusStatus').value
       };
       btn.innerText = 'Saving...'; btn.disabled = true;
-      const { error } = await sb.from('buses').update(payload).eq('id', bus.id);
+      const { error } = await _supabase.from('buses').update(payload).eq('id', bus.id);
       if (error) showToast(error.message, 'error');
       else { showToast('Bus updated!', 'success'); closeModal(); loadLiveBuses(); }
       btn.innerText = 'Save'; btn.disabled = false;
@@ -1847,7 +1893,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         duration_hours: document.getElementById('editRouteDuration').value
       };
       btn.innerText = 'Saving...'; btn.disabled = true;
-      const { error } = await sb.from('routes').update(payload).eq('id', route.id);
+      const { error } = await _supabase.from('routes').update(payload).eq('id', route.id);
       if (error) showToast(error.message, 'error');
       else { showToast('Route updated!', 'success'); closeModal(); loadLiveRoutes(); }
       btn.innerText = 'Save'; btn.disabled = false;
@@ -1860,7 +1906,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   window.toggleRouteStatus = async function(id, currentStatus) {
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-    const { error } = await sb.from('routes').update({ status: newStatus }).eq('id', id);
+    const { error } = await _supabase.from('routes').update({ status: newStatus }).eq('id', id);
     if (error) showToast(error.message, 'error');
     else { showToast(`Route ${newStatus.toLowerCase()}d`, 'success'); loadLiveRoutes(); }
   };
@@ -1889,7 +1935,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         price: document.getElementById('editSchedPrice').value
       };
       btn.innerText = 'Saving...'; btn.disabled = true;
-      const { error } = await sb.from('schedules').update(payload).eq('id', s.id);
+      const { error } = await _supabase.from('schedules').update(payload).eq('id', s.id);
       if (error) showToast(error.message, 'error');
       else { showToast('Schedule updated!', 'success'); closeModal(); loadLiveSchedules(); }
       btn.innerText = 'Save'; btn.disabled = false;
@@ -1905,7 +1951,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     const confirm = document.getElementById('confirmAdminPw')?.value;
     if (!pw || pw.length < 8) return showToast('Password must be at least 8 characters', 'error');
     if (pw !== confirm) return showToast('Passwords do not match', 'error');
-    const { error } = await sb.auth.updateUser({ password: pw });
+    const { error } = await _supabase.auth.updateUser({ password: pw });
     if (error) showToast(error.message, 'error');
     else showToast('Password updated successfully!', 'success');
   };
@@ -1930,7 +1976,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   window.exportUsersCSV = async function() {
     showToast('Preparing users export…', 'success');
-    const { data, error } = await sb.from('users').select('id,first_name,last_name,email,phone,role,created_at');
+    const { data, error } = await _supabase.from('users').select('id,first_name,last_name,email,phone,role,created_at');
     if (error) return showToast(error.message, 'error');
     _downloadCSV(_toCSV(data), `goroute-users-${new Date().toISOString().slice(0,10)}.csv`);
     showToast(`Exported ${data.length} users`, 'success');
@@ -1938,7 +1984,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   window.exportBookingsCSV = async function() {
     showToast('Preparing bookings export…', 'success');
-    const { data, error } = await sb.from('bookings').select('id,passenger_name,contact_mobile,seat_number,price,status,created_at');
+    const { data, error } = await _supabase.from('bookings').select('id,passenger_name,contact_mobile,seat_number,price,status,created_at');
     if (error) return showToast(error.message, 'error');
     _downloadCSV(_toCSV(data), `goroute-bookings-${new Date().toISOString().slice(0,10)}.csv`);
     showToast(`Exported ${data.length} bookings`, 'success');
@@ -1946,7 +1992,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   window.exportBusesCSV = async function() {
     showToast('Preparing fleet export…', 'success');
-    const { data, error } = await sb.from('buses').select('*');
+    const { data, error } = await _supabase.from('buses').select('*');
     if (error) return showToast(error.message, 'error');
     _downloadCSV(_toCSV(data), `goroute-fleet-${new Date().toISOString().slice(0,10)}.csv`);
     showToast(`Exported ${data.length} buses`, 'success');
@@ -1954,7 +2000,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
 
   window.exportRevenueCSV = async function() {
     showToast('Preparing revenue export…', 'success');
-    const { data, error } = await sb.from('bookings').select('id,passenger_name,price,status,created_at').eq('status','Confirmed');
+    const { data, error } = await _supabase.from('bookings').select('id,passenger_name,price,status,created_at').eq('status','Confirmed');
     if (error) return showToast(error.message, 'error');
     _downloadCSV(_toCSV(data), `goroute-revenue-${new Date().toISOString().slice(0,10)}.csv`);
     showToast(`Exported ₱${data.reduce((s,b)=>s+Number(b.price||0),0).toLocaleString()} in ${data.length} transactions`, 'success');
@@ -1983,8 +2029,8 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     if (!container) return;
     try {
       const [{ data: bookings }, { data: users }] = await Promise.all([
-        sb.from('bookings').select('id,passenger_name,status,created_at').order('created_at', { ascending: false }).limit(6),
-        sb.from('users').select('id,first_name,last_name,created_at').order('created_at', { ascending: false }).limit(4)
+        _supabase.from('bookings').select('id,passenger_name,status,created_at').order('created_at', { ascending: false }).limit(6),
+        _supabase.from('users').select('id,first_name,last_name,created_at').order('created_at', { ascending: false }).limit(4)
       ]);
 
       const events = [];
