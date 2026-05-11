@@ -1,4 +1,4 @@
-﻿﻿/* ════════════════════════════════════════════════════════
+﻿/* ════════════════════════════════════════════════════════
    GoRoute | app.js
    All auth + app logic powered by Supabase
    ════════════════════════════════════════════════════════ */
@@ -37,6 +37,10 @@ window.addEventListener('resize', () => {
     if (index !== undefined) window.moveIndicator(index, activeNav);
   }
 });
+
+// Load the saved theme as early as possible so the app boots in the last used mode.
+const savedTheme = localStorage.getItem('goroute-theme') || 'light';
+setTheme(savedTheme === 'dark' ? 'dark' : 'light');
 
 // ── Supabase Init ───────────────────────────────────────
 const SUPABASE_URL     = 'https://djyegteotxpiqsycpwuj.supabase.co';
@@ -991,6 +995,7 @@ async function confirmAndPay() {
 
             <div class="st-barcode-area">
               <svg width="180" height="35" viewBox="0 0 180 35" fill="#1A2940" xmlns="http://www.w3.org/2000/svg">
+              <svg width="180" height="35" viewBox="0 0 180 35" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0" y="5" width="2" height="30"/><rect x="5" y="10" width="4" height="25"/><rect x="12" y="0" width="2" height="35"/><rect x="17" y="15" width="1" height="20"/><rect x="21" y="5" width="5" height="30"/><rect x="29" y="10" width="2" height="25"/><rect x="34" y="0" width="4" height="35"/><rect x="41" y="8" width="1" height="27"/><rect x="45" y="0" width="3" height="35"/><rect x="51" y="12" width="2" height="23"/><rect x="56" y="5" width="4" height="30"/><rect x="63" y="18" width="2" height="17"/><rect x="68" y="0" width="4" height="35"/><rect x="75" y="10" width="1" height="25"/><rect x="79" y="5" width="3" height="30"/><rect x="85" y="0" width="2" height="35"/><rect x="90" y="15" width="4" height="20"/><rect x="97" y="5" width="2" height="30"/><rect x="102" y="0" width="4" height="35"/><rect x="109" y="10" width="1" height="25"/><rect x="113" y="5" width="5" height="30"/><rect x="121" y="18" width="2" height="17"/><rect x="126" y="0" width="3" height="35"/><rect x="132" y="8" width="2" height="27"/><rect x="137" y="5" width="4" height="30"/><rect x="144" y="15" width="1" height="20"/><rect x="148" y="0" width="4" height="35"/><rect x="155" y="10" width="2" height="25"/><rect x="160" y="5" width="3" height="30"/><rect x="166" y="12" width="2" height="23"/><rect x="171" y="0" width="4" height="35"/><rect x="178" y="5" width="2" height="30"/>
               </svg>
               <div class="st-ref">GR-${String(currentScheduleId).substring(0,8).toUpperCase()}</div>
@@ -1169,11 +1174,25 @@ async function loadWallet() {
   if (!session) return;
 
   const userId = session.user.id;
-  let { data: wallet } = await sb.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+  
+  // ADD ERROR DESTRUCTURING HERE
+  let { data: wallet, error: fetchError } = await sb.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+
+  if (fetchError) {
+      console.error("Supabase Fetch Error:", fetchError.message);
+  }
 
   if (!wallet) {
-    const { data: nw } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
-    wallet = nw;
+    // ADD ERROR DESTRUCTURING HERE
+    const { data: nw, error: insertError } = await sb.from('wallets').insert([{ user_id: userId, balance: 100000 }]).select().single();
+    
+    if (insertError) {
+        console.error("Supabase Insert Error (Table might not exist):", insertError.message);
+        // FALLBACK: Create a fake wallet object so the UI doesn't crash
+        wallet = { balance: 0 }; 
+    } else {
+        wallet = nw;
+    }
   }
 
   const { data: bookings } = await sb
@@ -1204,6 +1223,7 @@ async function loadWallet() {
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
       <h2 style="color: var(--blue-dark); font-size: 18px;">My Wallet</h2>
       <div style="width: 32px; height: 32px; background: #EBF5FD; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--blue-dark);">
+      <div style="width: 32px; height: 32px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--blue-dark);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       </div>
     </div>
@@ -1366,23 +1386,41 @@ async function deleteAccount() {
 }
 
 // Appearance helpers
-function setTheme(theme) {
-  if (theme === 'dark') { alert('Dark mode coming soon! 🌙'); return; }
-  document.getElementById('themeLight').style.borderColor = 'var(--blue)';
-  document.getElementById('themeDark').style.borderColor  = 'var(--border)';
-  document.getElementById('acctAppearanceSub').textContent = 'Light mode';
+function syncAppearanceControls(theme) {
+  const lightCard = document.getElementById('themeLight');
+  const darkCard = document.getElementById('themeDark');
+  const appearanceLabel = document.getElementById('acctAppearanceSub');
+  const isDark = theme === 'dark';
+
+  if (lightCard) {
+    lightCard.style.borderColor = isDark ? 'var(--border)' : 'var(--blue)';
+    lightCard.style.backgroundColor = 'var(--card)';
+  }
+
+  if (darkCard) {
+    darkCard.style.borderColor = isDark ? 'var(--blue)' : 'var(--border)';
+    darkCard.style.backgroundColor = 'var(--card)';
+  }
+
+  if (appearanceLabel) {
+    appearanceLabel.textContent = isDark ? 'Dark mode' : 'Light mode';
+  }
 }
 
-function setFontSize(size) {
-  ['Small','Normal','Large'].forEach(s => {
-    const el = document.getElementById('fs' + s);
-    if (el) el.textContent = '';
-  });
-  const map = { small: 'fsSmall', normal: 'fsNormal', large: 'fsLarge' };
-  const tick = document.getElementById(map[size]);
-  if (tick) tick.textContent = '✓';
-  const sizeMap = { small: '13px', normal: '15px', large: '17px' };
-  document.documentElement.style.fontSize = sizeMap[size];
+function setTheme(theme) {
+  const html = document.documentElement;
+
+  const normalizedTheme = theme === 'dark' ? 'dark' : 'light';
+
+  if (normalizedTheme === 'dark') {
+    html.setAttribute('data-theme', 'dark');
+    syncAppearanceControls('dark');
+  } else {
+    html.removeAttribute('data-theme');
+    syncAppearanceControls('light');
+  }
+
+  localStorage.setItem('goroute-theme', normalizedTheme);
 }
 
 // ════════════════════════════════════════════════════════
