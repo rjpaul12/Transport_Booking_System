@@ -438,7 +438,7 @@
     width: 95%;
     max-width: 1100px; /* Increased to allow side-by-side view */
     margin: 20px auto;
-    background: var(--bg);
+    background: linear-gradient(180deg, #F8FCFF 0%, var(--bg) 100%);
     min-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -557,7 +557,7 @@
     letter-spacing: 1.2px;
     color: var(--text3);
     text-align: center;
-    padding: 6px 0 2px;
+    padding: 4px 0 3px;
     text-transform: uppercase;
   }
   .screen {
@@ -572,27 +572,28 @@
     HERO / SEARCH SCREEN
   ════════════════════════════════════════ */
   .hero-screen {
-    background: linear-gradient(150deg, #EBF6FE 0%, #D6ECFA 100%);
-    padding: 24px 18px 20px;
+    background: linear-gradient(180deg, #EEF7FF 0%, #DCEEFB 100%);
+    padding: 18px 16px 16px;
     text-align: center;
+    border-radius: 22px;
   }
   .bus-illustration {
-    width: 80px;
-    height: 50px;
-    margin: 0 auto 12px;
+    width: 78px;
+    height: 48px;
+    margin: 0 auto 10px;
     display: block;
   }
   .hero-screen h2 {
     font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--blue-dark);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .hero-screen p {
     font-size: 12px;
     color: var(--text2);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .search-card {
     background: var(--white);
@@ -629,7 +630,7 @@
   .date-pills-container {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .date-row {
@@ -640,14 +641,14 @@
 
   .date-pill {
     flex: 1;
-    padding: 10px 0;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    color: #64748B;
+    padding: 9px 0;
+    background: #fff;
+    border: 1.5px solid var(--blue-mid);
+    border-radius: 10px;
+    color: var(--text2);
     font-family: 'Nunito', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
+    font-weight: 700;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
@@ -655,9 +656,9 @@
 
   /* The Active State (The Blue highlight) */
   .date-pill.active {
-    background: #EFF6FF;
-    border-color: #3B9EE8;
-    color: #1A6FB0;
+    background: var(--blue-light);
+    border-color: var(--blue);
+    color: var(--blue-dark);
     font-weight: 700;
   }
 
@@ -816,14 +817,32 @@
   }
 
   .search-container {
-    background: white;
-    padding: 20px;
+    background: rgba(255,255,255,.98);
+    padding: 14px;
     max-width: 100%;
     overflow: visible;
-    border-radius: 16px;
+    border-radius: 18px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    border: 1px solid rgba(214,236,250,.9);
+    box-shadow: 0 8px 20px rgba(59,158,232,.10);
+  }
+
+  #searchScreen .input-row {
+    gap: 10px;
+  }
+
+  #searchScreen .finput {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  #searchScreen select.finput {
+    background-color: #fff;
+    font-size: 13px;
   }
 
   /* .input-row already defined above */
@@ -832,7 +851,7 @@
   .input-row-flex {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
   }
 
@@ -847,12 +866,12 @@
   .dot-orange { background-color: #F2994A; }
 
   .swap-btn-side {
-    width: 34px;
-    height: 34px;
-    background: #F0F6FF;
-    border: 1px solid #E2E8F0;
+    width: 36px;
+    height: 36px;
+    background: #EAF5FE;
+    border: 1.5px solid var(--blue-mid);
     border-radius: 50%;
-    color: #1A6FB0;
+    color: var(--blue-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -860,23 +879,25 @@
     flex-shrink: 0;
     font-size: 16px;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(59,158,232,.12);
   }
 
   .swap-btn-side:hover {
-    background: #E1F0FF;
-    border-color: #3B9EE8;
+    background: #DCEFFC;
+    border-color: var(--blue);
   }
 
   .find-buses-btn {
-    background: #3B9EE8;
+    background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%);
     color: white;
     border: none;
-    padding: 14px;
-    border-radius: 12px;
+    padding: 13px;
+    border-radius: 14px;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     margin-top: 4px;
+    box-shadow: 0 6px 16px rgba(59,158,232,.22);
   }
   .find-buses-btn:hover { background: #1A6FB0; }
 
@@ -886,20 +907,56 @@
   .bottom-nav {
     display: flex;
     justify-content: space-around;
-    padding: 10px 0 2px;
-    border-top: 1px solid var(--border);
+    padding: 10px 2px 4px;
+    border-top: 1px solid rgba(214,236,250,.8);
+    overflow: visible;
   }
   .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     font-size: 9px;
     color: var(--text3);
     cursor: pointer;
     transition: color .2s;
+    position: relative;
+    min-width: 64px;
+    padding: 16px 0 6px;
+    border-radius: 18px;
   }
-  .nav-item.active { color: var(--blue); }
+  .nav-item.active { color: var(--blue-dark); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #58ACEF 0%, #2F8AE2 100%);
+    box-shadow: 0 10px 22px rgba(59,158,232,.28);
+  }
+  .nav-item.active .nav-icon,
+  .nav-item.active .nav-label {
+    position: relative;
+    z-index: 1;
+  }
+  .nav-item.active .nav-icon {
+    color: #fff;
+    width: 20px;
+    height: 20px;
+  }
+  .nav-label {
+    line-height: 1;
+    font-size: 9px;
+    font-weight: 600;
+  }
+  .nav-item.active .nav-label {
+    color: var(--text);
+    font-weight: 800;
+  }
   .nav-icon { width: 18px; height: 18px; }
 
   /* Mobile bottom bar container */
@@ -907,9 +964,9 @@
     max-width: 400px;
     margin: 14px auto 0;
     background: var(--card);
-    border-radius: 20px;
+    border-radius: 22px;
     border: 1.5px solid var(--border);
-    padding: 0 10px 6px;
+    padding: 0 8px 6px;
     box-shadow: var(--shadow);
   }
 
@@ -917,6 +974,30 @@
     RESULTS SCREEN & BUS CARDS
   ════════════════════════════════════════ */
   .results-screen { padding: 14px; }
+  #ticketsScreen .results-screen {
+    background: linear-gradient(180deg, #DFF0FD 0%, #D7ECFB 100%);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 14px 12px 12px;
+  }
+  #ticketsScreen .screen-label {
+    padding-bottom: 2px;
+  }
+  .tickets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .tickets-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--blue-dark);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
   .route-header {
     display: flex;
     align-items: center;
@@ -1115,26 +1196,28 @@
     overflow-x: hidden;
     max-height: calc(100vh - 220px); /* app header + screen title row + bottom nav */
     padding-right: 2px; /* keeps card shadows from being clipped */
+    min-height: 0;
+    flex: 1;
   }
 
   /* ── BULLETPROOF TICKET DESIGN ── */
   .ticket-card {
-    background: #F8FAFC !important; 
-    border: 1px solid #E2E8F0 !important; 
-    border-left: 4px solid #1A6FB0 !important; 
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin-bottom: 12px !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(59,158,232,.14) !important;
+    border-left: 5px solid #1A6FB0 !important;
+    border-radius: 18px !important;
+    padding: 14px 14px 12px !important;
+    margin-bottom: 10px !important;
     display: flex !important;
     justify-content: space-between !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+    box-shadow: 0 8px 20px rgba(59,158,232,.08) !important;
     font-family: 'Nunito', 'Poppins', sans-serif !important; /* Forces the clean font */
   }
 
   .ticket-left {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     text-align: left;
   }
 
@@ -1144,21 +1227,23 @@
     align-items: flex-end;
     justify-content: space-between;
     text-align: right;
+    min-width: 86px;
+    gap: 14px;
   }
 
   /* Exact Typography & Colors */
-  .ticket-card .ticket-no { font-size: 11px !important; color: #94A3B8 !important; }
-  .ticket-card .ticket-route { font-size: 16px !important; font-weight: 700 !important; color: #1A6FB0 !important; display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+  .ticket-card .ticket-no { font-size: 10px !important; color: #94A3B8 !important; letter-spacing: .3px; text-transform: uppercase; }
+  .ticket-card .ticket-route { font-size: 17px !important; font-weight: 800 !important; color: #1A6FB0 !important; display: flex; align-items: center; gap: 8px; margin: 1px 0; line-height: 1.1; }
   .ticket-card .ticket-route .arrow { color: #94A3B8 !important; font-size: 14px !important; font-weight: 400 !important; }
-  .ticket-card .ticket-time { font-size: 14px !important; font-weight: 600 !important; color: #334155 !important; }
+  .ticket-card .ticket-time { font-size: 13px !important; font-weight: 600 !important; color: #334155 !important; }
   .ticket-card .ticket-time .arrow { color: #94A3B8 !important; font-weight: 400 !important; font-size: 12px !important; margin: 0 4px !important; }
-  .ticket-card .ticket-meta-info { font-size: 12px !important; color: #94A3B8 !important; }
+  .ticket-card .ticket-meta-info { font-size: 11px !important; color: #94A3B8 !important; }
 
   /* The Pill Badges */
   .ticket-card .status-badge { 
-    padding: 4px 12px !important; 
-    border-radius: 20px !important; 
-    font-size: 11px !important; 
+    padding: 5px 11px !important;
+    border-radius: 999px !important;
+    font-size: 10px !important;
     font-weight: 700 !important; 
     display: inline-block;
   }
@@ -1166,7 +1251,7 @@
   .ticket-card .status-upcoming { background: #FFF3E0 !important; color: #F57C00 !important; }
   .ticket-card .status-completed { background: #F1F5F9 !important; color: #94A3B8 !important; }
 
-  .ticket-card .ticket-date { font-size: 12px !important; color: #94A3B8 !important; font-weight: 500 !important; }
+  .ticket-card .ticket-date { font-size: 11px !important; color: #94A3B8 !important; font-weight: 500 !important; }
 
   /* ════════════════════════════════════════
     WALLET SCREEN
@@ -1709,10 +1794,41 @@
       max-width: 100%;
       margin: 0;
       border-radius: 0;
-      padding: 16px 16px 90px 16px; 
-      min-height: 100vh;
+      padding: 10px 10px calc(88px + env(safe-area-inset-bottom, 0px)) 10px;
+      min-height: 100dvh;
+      height: 100dvh !important;
     }
-    .screens { grid-template-columns: 1fr; }
+    .header {
+      margin: -10px -10px 10px;
+      padding: calc(34px + env(safe-area-inset-top, 0px)) 14px 10px;
+    }
+    .screens {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      padding-bottom: 78px;
+      margin-top: -24px;
+    }
+    .screen-label {
+      padding-top: 1px;
+      padding-bottom: 3px;
+    }
+    .hero-screen {
+      padding: 16px 14px 14px;
+    }
+    .results-screen,
+    .wallet-screen,
+    .settings-screen {
+      padding-top: 10px;
+    }
+    #ticketsScreen .results-screen {
+      padding: 12px 10px 10px;
+    }
+    #myTicketsList {
+      max-height: none;
+    }
+    .tickets-header {
+      margin-bottom: 10px;
+    }
     .mobile-bottom-bar {
       position: fixed; /* Attaches to the physical bottom of the phone screen */
       bottom: 0;
@@ -1726,7 +1842,20 @@
       background: var(--card);
       box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
     }
-    .bottom-nav { padding-bottom: 8px; }
+    .bottom-nav {
+      padding: 8px 0 8px;
+      justify-content: space-between;
+    }
+    .nav-item {
+      min-width: 0;
+      flex: 1;
+      padding-top: 14px;
+    }
+    .nav-item.active::before {
+      top: -18px;
+      width: 50px;
+      height: 50px;
+    }
   }
 
   /* 4. Extra Small Phones (e.g., iPhone SE) */
