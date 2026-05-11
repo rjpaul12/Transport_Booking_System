@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>GoRoute Admin Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚌</text></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -1156,6 +1157,10 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       window._busCache = window._busCache || {};
       data.forEach(bus => {
         window._busCache[bus.id] = bus;
+        const driverName = bus.driver_id && window._userCache && window._userCache[bus.driver_id]
+          ? `${window._userCache[bus.driver_id].first_name || ''} ${window._userCache[bus.driver_id].last_name || ''}`.trim()
+          : 'Unassigned';
+
         let statusColor = 'var(--green)';
         let statusPillClass = 'pill-active';
         let iconBg = 'var(--blue-pale)';
@@ -1189,7 +1194,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         <div class="bus-stat"><div class="bus-stat-val">${bus.available_seats ?? bus.total_seats ?? '—'}</div><div class="bus-stat-label">Available</div></div>
       </div>
       <div class="bus-footer">
-        <div class="bus-driver">Driver: <strong>Unassigned</strong></div>
+        <div class="bus-driver">Driver: <strong>${driverName}</strong></div>
         <span class="pill ${statusPillClass}">${bus.status || 'Active'}</span>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;">
@@ -1597,37 +1602,32 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   // CITY DROPDOWN HELPER (mirrors app.js phCities)
   // ==========================================
-  const phCities = [
-    "Alaminos","Angeles City","Antipolo","Bacoor","Bacolod","Bago","Baguio","Bais","Balanga","Batac",
-    "Batangas City","Bayawan","Baybay","Bayugan","Biñan","Bislig","Bogo","Borongan","Butuan","Cabadbaran",
-    "Cabanatuan","Cabuyao","Cadiz","Cagayan de Oro","Calamba","Calapan","Calasiao","Calbayog","Caloocan",
-    "Candon","Canlaon","Carcar","Catbalogan","Cauayan","Cavite City","Cebu City","Cotabato City","Dagupan",
-    "Danao","Dapitan","Dasmariñas","Davao City","Digos","Dipolog","Dumaguete","El Salvador","Escalante",
-    "Gapan","General Santos","General Trias","Gingoog","Guihulngan","Himamaylan","Ilagan","Iligan",
-    "Iloilo City","Imus","Iriga","Isabela City","Kabankalan","Kidapawan","Koronadal","La Carlota",
-    "Lamitan","Laoag","Lapu-Lapu","Las Piñas","Legazpi","Ligao","Lipa","Lucena","Maasin","Mabalacat",
-    "Mandaluyong","Mandaue","Manila","Marawi","Marikina","Masbate City","Mati","Meycauayan","Muñoz",
-    "Muntinlupa","Naga","Navotas","Olongapo","Ormoc","Oroquieta","Ozamiz","Pagadian","Palayan","Panabo",
-    "Pansol","Parañaque","Pasay","Pasig","Passi","Puerto Princesa","Quezon City","Roxas City","Sagay",
-    "Samal","San Carlos (Negros)","San Carlos (Pangasinan)","San Fernando (La Union)",
-    "San Fernando (Pampanga)","San Jose","San Jose del Monte","San Juan","San Pablo","San Pedro",
-    "Santa Rosa","Santiago","Silay","Sorsogon City","Surigao City","Tabaco","Tabuk","Tacloban",
-    "Tacurong","Tagaytay","Tagbilaran","Taguig","Tagum","Talisay (Cebu)","Talisay (Negros)",
-    "Tanauan","Tandag","Tangub","Tanjay","Tarlac City","Tayabas","Toledo","Trece Martires",
-    "Tuguegarao","Urdaneta","Valencia","Valenzuela","Victorias","Vigan","Zamboanga City"
-  ].sort();
-
-  function populateRouteCityDropdowns() {
+  async function populateRouteCityDropdowns() {
     const originSel = document.getElementById('newRouteOrigin');
     const destSel   = document.getElementById('newRouteDest');
     if (!originSel || !destSel) return;
 
-    phCities.forEach(city => {
-      const o = new Option(city, city);
-      const d = new Option(city, city);
-      originSel.appendChild(o);
-      destSel.appendChild(d);
-    });
+    originSel.innerHTML = '<option value="" disabled selected>Loading cities...</option>';
+    destSel.innerHTML = '<option value="" disabled selected>Loading cities...</option>';
+
+    try {
+      const { data, error } = await _supabase.from('locations').select('name').order('name');
+      if (error) throw error;
+      
+      originSel.innerHTML = '<option value="" disabled selected>Select origin…</option>';
+      destSel.innerHTML = '<option value="" disabled selected>Select destination…</option>';
+
+      if (data) {
+        data.forEach(item => {
+          originSel.appendChild(new Option(item.name, item.name));
+          destSel.appendChild(new Option(item.name, item.name));
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load cities:', err.message);
+      originSel.innerHTML = '<option value="" disabled selected>Error loading cities</option>';
+      destSel.innerHTML = '<option value="" disabled selected>Error loading cities</option>';
+    }
 
     // Live validation: prevent same city for both
     function validateCities() {
@@ -1675,7 +1675,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
         .eq('email', user.email)
         .maybeSingle();
 
-      const firstName = profile?.first_name || user.user_metadata?.first_name || user.email.split('@')[0];
+      const firstName = profile?.first_name || user.user_metadata?.first_name || (user.email || '').split('@')[0] || 'Admin';
       const lastName  = profile?.last_name  || user.user_metadata?.last_name  || '';
       const fullName  = [firstName, lastName].filter(Boolean).join(' ');
       const role      = profile?.role || 'Admin';
@@ -1748,15 +1748,14 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
     const btn = document.getElementById('modalSaveBtn');
     btn.innerText = 'Creating...'; btn.disabled = true;
     try {
-      // Create auth user
-      const { data: authData, error: authErr } = await _supabase.auth.admin
-        ? await _supabase.auth.admin.createUser({ email, password: pw, email_confirm: true })
-        : { data: null, error: null };
-      // Insert into users table regardless (may not have admin rights)
-      const { error } = await _supabase.from('users').insert([{
-        first_name: first, last_name: last, email, phone, role
-      }]);
+      // Securely invoke the Edge Function
+      const { data, error } = await _supabase.functions.invoke('create-admin-user', {
+        body: { email, password: pw, first_name: first, last_name: last, phone, role }
+      });
+      
       if (error) throw error;
+      if (data && data.error) throw new Error(data.error);
+      
       showToast('User created successfully!', 'success');
       closeModal(); fetchUsers();
     } catch(err) { showToast(err.message, 'error'); }
@@ -1832,31 +1831,50 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
   // ==========================================
   // EDIT BUS MODAL
   // ==========================================
-  window.openEditBusModal = function(busData) {
+  window.openEditBusModal = async function(busData) {
     let bus = typeof busData === 'string' ? JSON.parse(busData.replace(/&quot;/g,'"')) : busData;
     const modal = document.getElementById('globalModal');
     document.getElementById('modalTitleText').innerText = 'Edit Bus';
-    document.getElementById('modalContent').innerHTML = `
-      <div class="modal-field"><label>Bus Number / Plate</label><input type="text" id="editBusNum" value="${bus.bus_number||''}" required></div>
-      <div class="modal-field"><label>Bus Model</label><input type="text" id="editBusModel" value="${bus.model||''}" required></div>
-      <div class="modal-row">
-        <div class="modal-field"><label>Total Seats</label><input type="number" id="editBusSeats" value="${bus.total_seats||45}" required></div>
-        <div class="modal-field"><label>Status</label>
-          <select id="editBusStatus">
-            <option value="Active" ${bus.status==='Active'?'selected':''}>Active</option>
-            <option value="Maintenance" ${bus.status==='Maintenance'?'selected':''}>Maintenance</option>
-            <option value="Retired" ${bus.status==='Retired'?'selected':''}>Retired</option>
-          </select>
+    document.getElementById('modalContent').innerHTML = '<div style="text-align:center; padding: 20px;">Loading drivers...</div>';
+    modal.classList.add('open');
+
+    try {
+      const { data: users, error: usersError } = await _supabase.from('users').select('id, first_name, last_name, role').order('first_name');
+      if (usersError) throw usersError;
+
+      const driverOptions = '<option value="">-- Unassigned --</option>' + users.map(u => `<option value="${u.id}" ${bus.driver_id === u.id ? 'selected' : ''}>${u.first_name || 'Unknown'} ${u.last_name || ''} (${u.role || 'Passenger'})</option>`).join('');
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="modal-field"><label>Bus Number / Plate</label><input type="text" id="editBusNum" value="${bus.bus_number||''}" required></div>
+        <div class="modal-field"><label>Bus Model</label><input type="text" id="editBusModel" value="${bus.model||''}" required></div>
+        <div class="modal-row">
+          <div class="modal-field"><label>Total Seats</label><input type="number" id="editBusSeats" value="${bus.total_seats||45}" required></div>
+          <div class="modal-field"><label>Status</label>
+            <select id="editBusStatus">
+              <option value="Active" ${bus.status==='Active'?'selected':''}>Active</option>
+              <option value="Maintenance" ${bus.status==='Maintenance'?'selected':''}>Maintenance</option>
+              <option value="Retired" ${bus.status==='Retired'?'selected':''}>Retired</option>
+            </select>
+          </div>
         </div>
-      </div>
-    `;
+        <div class="modal-field">
+          <label>Assign Driver</label>
+          <select id="editBusDriver">${driverOptions}</select>
+        </div>
+      `;
+    } catch (err) {
+      document.getElementById('modalContent').innerHTML = `<div style="color:red;padding:20px;">Error loading drivers: ${err.message}</div>`;
+      return;
+    }
+
     const btn = document.getElementById('modalSaveBtn');
     btn.onclick = async function() {
       const payload = {
         bus_number: document.getElementById('editBusNum').value.trim(),
         model: document.getElementById('editBusModel').value.trim(),
         total_seats: parseInt(document.getElementById('editBusSeats').value),
-        status: document.getElementById('editBusStatus').value
+        status: document.getElementById('editBusStatus').value,
+        driver_id: document.getElementById('editBusDriver').value || null
       };
       btn.innerText = 'Saving...'; btn.disabled = true;
       const { error } = await _supabase.from('buses').update(payload).eq('id', bus.id);
@@ -1864,26 +1882,40 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       else { showToast('Bus updated!', 'success'); closeModal(); loadLiveBuses(); }
       btn.innerText = 'Save'; btn.disabled = false;
     };
-    modal.classList.add('open');
   };
 
   // ==========================================
   // EDIT ROUTE MODAL
   // ==========================================
-  window.openEditRouteModal = function(routeData) {
+  window.openEditRouteModal = async function(routeData) {
     let route = typeof routeData === 'string' ? JSON.parse(routeData.replace(/&quot;/g,'"')) : routeData;
     const modal = document.getElementById('globalModal');
     document.getElementById('modalTitleText').innerText = 'Edit Route';
-    document.getElementById('modalContent').innerHTML = `
-      <div class="modal-row">
-        <div class="modal-field"><label>Origin</label><input type="text" id="editRouteOrigin" value="${route.origin||''}"></div>
-        <div class="modal-field"><label>Destination</label><input type="text" id="editRouteDest" value="${route.destination||''}"></div>
-      </div>
-      <div class="modal-row">
-        <div class="modal-field"><label>Base Fare (₱)</label><input type="number" id="editRouteFare" value="${route.base_fare||''}"></div>
-        <div class="modal-field"><label>Duration (hours)</label><input type="number" id="editRouteDuration" value="${route.duration_hours||''}" step="0.5"></div>
-      </div>
-    `;
+    document.getElementById('modalContent').innerHTML = '<div style="text-align:center; padding: 20px;">Loading cities...</div>';
+    modal.classList.add('open');
+
+    try {
+      const { data: cities, error: cityError } = await _supabase.from('locations').select('name').order('name');
+      if (cityError) throw cityError;
+
+      const originOptions = cities.map(c => `<option value="${c.name}" ${route.origin === c.name ? 'selected' : ''}>${c.name}</option>`).join('');
+      const destOptions = cities.map(c => `<option value="${c.name}" ${route.destination === c.name ? 'selected' : ''}>${c.name}</option>`).join('');
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="modal-row">
+          <div class="modal-field"><label>Origin</label><select id="editRouteOrigin">${originOptions}</select></div>
+          <div class="modal-field"><label>Destination</label><select id="editRouteDest">${destOptions}</select></div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-field"><label>Base Fare (₱)</label><input type="number" id="editRouteFare" value="${route.base_fare||''}"></div>
+          <div class="modal-field"><label>Duration (hours)</label><input type="number" id="editRouteDuration" value="${route.duration_hours||''}" step="0.5"></div>
+        </div>
+      `;
+    } catch (err) {
+      document.getElementById('modalContent').innerHTML = `<div style="color:red;padding:20px;">Error loading cities: ${err.message}</div>`;
+      return;
+    }
+
     const btn = document.getElementById('modalSaveBtn');
     btn.onclick = async function() {
       const payload = {
@@ -1898,7 +1930,6 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color
       else { showToast('Route updated!', 'success'); closeModal(); loadLiveRoutes(); }
       btn.innerText = 'Save'; btn.disabled = false;
     };
-    modal.classList.add('open');
   };
 
   // ==========================================

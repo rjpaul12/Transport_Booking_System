@@ -1,7 +1,42 @@
-﻿/* ════════════════════════════════════════════════════════
+﻿﻿/* ════════════════════════════════════════════════════════
    GoRoute | app.js
    All auth + app logic powered by Supabase
    ════════════════════════════════════════════════════════ */
+
+// Add at the top of app.js
+window.showToast = function(message, type = 'success') {
+    let toast = document.getElementById('global-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'global-toast';
+        // Base styling for the toast notification
+        toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 9999; transition: opacity 0.3s; opacity: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+        document.body.appendChild(toast);
+    }
+    toast.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981'; // Red for error, Green for success
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+};
+
+// ── Liquid Navigation Indicator Logic ───────────────────
+window.moveIndicator = function(index, element) {
+  const indicator = document.querySelector('.indicator');
+  if (!indicator || !element) return;
+  const itemWidth = element.offsetWidth;
+  const offset = (itemWidth - 70) / 2; // Centers the 70px bubble dynamically
+  indicator.style.transform = `translateX(calc(${index * itemWidth}px + ${offset}px))`;
+};
+
+window.addEventListener('resize', () => {
+  const activeNav = document.querySelector('.navigation ul li.active');
+  if (activeNav) {
+    const tabMap = { 'nav-home': 0, 'nav-tickets': 1, 'nav-wallet': 2, 'nav-account': 3 };
+    const index = tabMap[activeNav.id];
+    if (index !== undefined) window.moveIndicator(index, activeNav);
+  }
+});
 
 // ── Supabase Init ───────────────────────────────────────
 const SUPABASE_URL     = 'https://djyegteotxpiqsycpwuj.supabase.co';
@@ -214,6 +249,12 @@ function switchTab(tab) {
       document.getElementById('nav-account').classList.add('active');
     loadAccount();
   }
+  
+  const tabMap = { 'home': 0, 'tickets': 1, 'wallet': 2, 'account': 3 };
+  if (tabMap[tab] !== undefined) {
+      const activeNav = document.getElementById(`nav-${tab}`);
+      if (activeNav) window.moveIndicator(tabMap[tab], activeNav);
+  }
 }
 
 function showAlert(msg, type = 'error') {
@@ -414,30 +455,30 @@ function swapLocations() {
   dest.value = temp;
 }
 
-const phCities = [
-  "Alaminos", "Angeles City", "Antipolo", "Bacoor", "Bacolod", "Bago", "Baguio", "Bais", "Balanga", "Batac", 
-  "Batangas City", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran",
-   "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calamba", "Calapan", "Calasiao", "Calbayog", "Caloocan", 
-   "Candon", "Canlaon", "Carcar", "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan",
-    "Danao", "Dapitan", "Dasmariñas", "Davao City", "Digos", "Dipolog", "Dumaguete", "El Salvador", "Escalante", 
-    "Gapan", "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan", 
-    "Iloilo City", "Imus", "Iriga", "Isabela City", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", 
-    "Lamitan", "Laoag", "Lapu-Lapu", "Las Piñas", "Legazpi", "Ligao", "Lipa", "Lucena", "Maasin", "Mabalacat", 
-    "Mandaluyong", "Mandaue", "Manila", "Marawi", "Marikina", "Masbate City", "Mati", "Meycauayan", "Muñoz", 
-    "Muntinlupa", "Naga", "Navotas", "Olongapo", "Ormoc", "Oroquieta", "Ozamiz", "Pagadian", "Palayan", "Panabo", 
-    "Pansol", "Parañaque", "Pasay", "Pasig", "Passi", "Puerto Princesa", "Quezon City", "Roxas City", "Sagay", 
-    "Samal", "San Carlos (Negros)", "San Carlos (Pangasinan)", "San Fernando (La Union)", "San Fernando (Pampanga)", 
-    "San Jose", "San Jose del Monte", "San Juan", "San Pablo", "San Pedro", "Santa Rosa", "Santiago", "Silay", 
-    "Sorsogon City", "Surigao City", "Tabaco", "Tabuk", "Tacloban", "Tacurong", "Tagaytay", "Tagbilaran", "Taguig",
-     "Tagum", "Talisay (Cebu)", "Talisay (Negros)", "Tanauan", "Tandag", "Tangub", "Tanjay", "Tarlac City", 
-     "Tayabas", "Toledo", "Trece Martires", "Tuguegarao", "Urdaneta", "Valencia", "Valenzuela", "Victorias", 
-     "Vigan", "Zamboanga City"
-];
+let phCities = [];
+
+async function loadCitiesFromDatabase() {
+  try {
+    const { data, error } = await sb.from('locations').select('name').order('name');
+    if (error) throw error;
+    if (data) {
+      phCities = data.map(item => item.name);
+    }
+  } catch (err) {
+    console.error('Failed to load cities:', err.message);
+  } finally {
+    initCityDropdowns();
+  }
+}
 
 function initCityDropdowns() {
   const originSelect = document.getElementById('searchOrigin');
   const destSelect = document.getElementById('searchDestination');
   if (!originSelect || !destSelect) return;
+  
+  // Clear any existing options to prevent duplication if re-run
+  originSelect.innerHTML = '<option value="" disabled selected>Boarding from...</option>';
+  destSelect.innerHTML = '<option value="" disabled selected>Where are you going?</option>';
 
   const sortedCities = [...phCities].sort();
 
@@ -454,7 +495,15 @@ function initCityDropdowns() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initCityDropdowns);
+document.addEventListener('DOMContentLoaded', loadCitiesFromDatabase);
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Init the liquid nav indicator position for home tab on load
+  setTimeout(() => {
+    const activeNav = document.getElementById('nav-home');
+    if (activeNav) window.moveIndicator(0, activeNav);
+  }, 50); // slight delay ensures DOM has laid out widths correctly
+});
 
 let routeCount = 1;
 // FIX (Bug 7): Use a separate ever-increasing ID counter so removing a route
@@ -1475,17 +1524,48 @@ async function populateActivityLog() {
   }
 }
 
-function applyFilter(type, element) {
-    document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
-    element.classList.add('active');
+// Update existing applyFilter function
+function applyFilter(filterType, element) {
+    // Maintain active chip logic safely
+    if (element) {
+        document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+        element.classList.add('active');
+    }
 
-    if (type === 'All') {
-        renderTickets(lastSearchResults);
+    const allTickets = document.querySelectorAll('.ticket-card');
+    if (allTickets.length > 0) {
+        allTickets.forEach(ticket => {
+            const statusBadgeElement = ticket.querySelector('.status-badge');
+            if (!statusBadgeElement) return;
+            const statusBadge = statusBadgeElement.textContent.toLowerCase();
+            
+            if (filterType.toLowerCase() === 'all') {
+                ticket.style.display = 'block';
+            } else if (filterType.toLowerCase() === 'upcoming' && statusBadge.includes('upcoming')) {
+                ticket.style.display = 'block';
+            } else if (filterType.toLowerCase() === 'past' && (statusBadge.includes('completed') || statusBadge.includes('cancelled'))) {
+                ticket.style.display = 'block';
+            } else {
+                ticket.style.display = 'none';
+            }
+        });
         return;
     }
 
-    const filtered = lastSearchResults.filter(item => item.buses.bus_type === type);
-    renderTickets(filtered);
+    // Direct DOM manipulation for bus search results to prevent flickering
+    const allBusCards = document.querySelectorAll('.bus-card');
+    if (allBusCards.length > 0) {
+        allBusCards.forEach(card => {
+            const busTypeElement = card.querySelector('.bus-type');
+            if (!busTypeElement) return;
+            const busType = busTypeElement.textContent;
+            if (filterType === 'All' || busType.includes(filterType)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
 }
 
 // ════════════════════════════════════════════════════════
@@ -1521,11 +1601,38 @@ async function deleteItem(tableName, id) {
   }
 }
 // ── Sub-screen navigation helper ──────────────────────────
-function showSubScreen(hideId, showId) {
-  const hide = document.getElementById(hideId);
-  const show = document.getElementById(showId);
-  if (hide) hide.style.display = 'none';
-  if (show) show.style.display = 'block';
-  const sc = document.querySelector('.screens');
-  if (sc) sc.scrollTop = 0;
+// Update existing showSubScreen function
+function showSubScreen(parentScreenId, subScreenId) {
+    const hide = document.getElementById(parentScreenId);
+    const show = document.getElementById(subScreenId);
+    if (hide) hide.style.display = 'none';
+    if (show) show.style.display = 'block';
+    const sc = document.querySelector('.screens');
+    if (sc) sc.scrollTop = 0;
+    
+    // ADD THIS FIX: Reload data when returning to account screen
+    if (subScreenId === 'accountScreen' && typeof loadAccount === 'function') {
+        loadAccount(); 
+    }
+}
+
+// Replace existing signOutAllDevices function with this asynchronous version
+async function signOutAllDevices() {
+    try {
+        showToast('Signing out of all devices...', 'success');
+        
+        // Wait for Supabase to clear the session
+        const { error } = await sb.auth.signOut();
+        if (error) throw error;
+        
+        // Ensure local storage is wiped
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Safely redirect to auth page
+        window.location.replace('auth.html');
+    } catch (error) {
+        console.error('Logout error:', error);
+        showToast('Failed to sign out: ' + error.message, 'error');
+    }
 }

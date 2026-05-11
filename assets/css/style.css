@@ -904,70 +904,130 @@
   /* ════════════════════════════════════════
     BOTTOM NAVIGATION
   ════════════════════════════════════════ */
-  .bottom-nav {
+  .navigation {
+    background: #fff;
+    border-radius: 24px 24px 0 0;
     display: flex;
-    justify-content: space-around;
-    padding: 10px 2px 4px;
-    border-top: 1px solid rgba(214,236,250,.8);
-    overflow: visible;
-  }
-  .nav-item {
-    display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 4px;
-    font-size: 9px;
-    color: var(--text3);
-    cursor: pointer;
-    transition: color .2s;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
     position: relative;
-    min-width: 64px;
-    padding: 16px 0 6px;
-    border-radius: 18px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .nav-item.active { color: var(--blue-dark); }
-  .nav-item.active::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #58ACEF 0%, #2F8AE2 100%);
-    box-shadow: 0 10px 22px rgba(59,158,232,.28);
-  }
-  .nav-item.active .nav-icon,
-  .nav-item.active .nav-label {
+
+  .navigation ul {
+    display: flex;
+    width: 100%;
+    height: 70px;
+    padding: 0;
+    margin: 0;
     position: relative;
+  }
+
+  .navigation ul li {
+    position: relative;
+    list-style: none;
+    flex: 1;
     z-index: 1;
   }
-  .nav-item.active .nav-icon {
+
+  .navigation ul li a {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70px;
+    text-align: center;
+    font-weight: 500;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .navigation ul li a .icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    transition: 0.5s;
+    color: var(--text3);
+  }
+
+  .navigation ul li a .icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Move active icon up */
+  .navigation ul li.active a .icon {
+    transform: translateY(-32px);
     color: #fff;
+  }
+
+  /* Hide text by default, show when active */
+  .navigation ul li a .text {
+    position: absolute;
+    color: var(--blue-dark);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .navigation ul li.active a .text {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+
+  /* The moving indicator circle */
+  .indicator {
+    position: absolute;
+    top: -35px;
+    left: 0;
+    width: 70px;
+    height: 70px;
+    background: var(--blue);
+    border-radius: 50%;
+    border: 6px solid var(--bg);
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 0;
+  }
+
+  /* The left liquid curve */
+  .indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -22px;
     width: 20px;
     height: 20px;
+    background: transparent;
+    border-top-right-radius: 20px;
+    box-shadow: 1px -10px 0 0 var(--bg);
   }
-  .nav-label {
-    line-height: 1;
-    font-size: 9px;
-    font-weight: 600;
+
+  /* The right liquid curve */
+  .indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -22px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-top-left-radius: 20px;
+    box-shadow: -1px -10px 0 0 var(--bg);
   }
-  .nav-item.active .nav-label {
-    color: var(--text);
-    font-weight: 800;
-  }
-  .nav-icon { width: 18px; height: 18px; }
 
   /* Mobile bottom bar container */
   .mobile-bottom-bar {
     max-width: 400px;
     margin: 14px auto 0;
-    background: var(--card);
-    border-radius: 22px;
-    border: 1.5px solid var(--border);
-    padding: 0 8px 6px;
-    box-shadow: var(--shadow);
+    position: relative;
   }
 
   /* ════════════════════════════════════════
@@ -1780,9 +1840,6 @@
       position: absolute; /* Keeps it attached to the shell, not the whole screen */
       bottom: 0; left: 0; width: 100%;
       margin: 0;
-      border-radius: 0 0 24px 24px;
-      background: var(--card);
-      box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
     }
   }
 
@@ -1836,25 +1893,7 @@
       width: 100%;
       max-width: 100%;
       margin: 0;
-      border-radius: 24px 24px 0 0;
-      padding-bottom: env(safe-area-inset-bottom, 16px); /* Fixes the iPhone home bar overlap */
       z-index: 1000;
-      background: var(--card);
-      box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
-    }
-    .bottom-nav {
-      padding: 8px 0 8px;
-      justify-content: space-between;
-    }
-    .nav-item {
-      min-width: 0;
-      flex: 1;
-      padding-top: 14px;
-    }
-    .nav-item.active::before {
-      top: -18px;
-      width: 50px;
-      height: 50px;
     }
   }
 
